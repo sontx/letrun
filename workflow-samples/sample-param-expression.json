@@ -1,0 +1,21 @@
+{
+  "name": "param expression workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "http",
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1",
+        "method": "GET"
+      }
+    },
+    {
+      "name": "task2",
+      "handler": "./tasks/exec.js",
+      "parameters": {
+        "cmd": "echo",
+        "args": ["${task1.output.title}"]
+      }
+    }
+  ]
+}

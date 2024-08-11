@@ -1,0 +1,19 @@
+{
+  "name": "parallel workflow",
+  "tasks": {
+    "say hello again": {
+      "handler": "http",
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1",
+        "method": "GET"
+      }
+    },
+    "say hello": {
+      "handler": "./tasks/exec.js",
+      "parameters": {
+        "cmd": "echo",
+        "args": ["hello, world"]
+      }
+    }
+  }
+}

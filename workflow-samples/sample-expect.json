@@ -1,0 +1,14 @@
+{
+  "name": "expect workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "./tasks/expect.js",
+      "parameters": {
+        "object": "2",
+        "match": "toBe",
+        "value": "1"
+      }
+    }
+  ]
+}

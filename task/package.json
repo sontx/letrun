@@ -1,0 +1,31 @@
+{
+  "name": "@letrun/task",
+  "version": "0.0.1",
+  "description": "The tasks package for LetRun",
+  "type": "module",
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "keywords": [
+    "workflow",
+    "task",
+    "execution"
+  ],
+  "scripts": {
+    "build": "npm run clean && node esbuild.js",
+    "build:prod": "npm run clean && node esbuild.js --prod",
+    "clean": "rm -rf ./dist/**"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/node": "^20.11.5",
+    "esbuild": "^0.19.11",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@letrun/core": "file:./core",
+    "expect": "^29.7.0",
+    "joi": "^17.13.3"
+  }
+}

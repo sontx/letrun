@@ -1,0 +1,51 @@
+{
+  "name": "switch workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "http",
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1",
+        "method": "GET"
+      }
+    },
+    {
+      "name": "task2",
+      "handler": "switch",
+      "parameters": {
+        "expression": "'case' + (3-2)",
+        "evaluatorType": "javascript"
+      },
+      "decisionCases": {
+        "case1": [
+          {
+            "name": "task3",
+            "handler": "./tasks/exec.js",
+            "parameters": {
+              "cmd": "echo",
+              "args": ["hello, task3"]
+            }
+          },
+          {
+            "name": "task4",
+            "handler": "./tasks/exec.js",
+            "parameters": {
+              "cmd": "echo",
+              "args": ["hello, task4"]
+            }
+          }
+        ]
+      },
+      "defaultCase": [
+        {
+          "name": "task5",
+          "handler": "./tasks/exec.js",
+          "parameters": {
+            "cmd": "echo",
+            "args": ["hello, task5"]
+          }
+        }
+      ]
+    }
+  ]
+}

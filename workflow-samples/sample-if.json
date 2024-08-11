@@ -1,0 +1,46 @@
+{
+  "name": "if workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "http",
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1",
+        "method": "GET"
+      }
+    },
+    {
+      "name": "task2",
+      "handler": "if",
+      "parameters": {
+        "left": "1",
+        "operator": "==",
+        "right": "2"
+      },
+      "then": [
+        {
+          "name": "task3",
+          "handler": "./tasks/exec.js",
+          "parameters": {
+            "cmd": "echo",
+            "args": ["hello, world"]
+          }
+        }
+      ],
+      "else": [
+        {
+          "name": "task4",
+          "handler": "./tasks/expect.js",
+          "ignoreError": true,
+          "parameters": {
+            "match": "toBe",
+            "object": "2",
+            "value": "1",
+            "message": "2 is not 1",
+            "not": false
+          }
+        }
+      ]
+    }
+  ]
+}

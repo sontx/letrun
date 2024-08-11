@@ -1,0 +1,41 @@
+{
+  "name": "log workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "log",
+      "parameters": {
+        "message": "task 1",
+        "level": "warn"
+      },
+      "tasks": [
+        {
+          "name": "task2",
+          "handler": "log",
+          "parameters": {
+            "message": "task 2",
+            "level": "warn"
+          }
+        },
+        {
+          "name": "task3",
+          "handler": "log",
+          "parameters": {
+            "message": "task 3",
+            "level": "warn"
+          },
+          "tasks": [
+            {
+              "name": "task4",
+              "handler": "log",
+              "parameters": {
+                "message": "task 4",
+                "level": "warn"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

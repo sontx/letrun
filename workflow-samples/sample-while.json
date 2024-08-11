@@ -1,0 +1,22 @@
+{
+  "name": "while workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "while",
+      "parameters": {
+        "expression": "task.output.iteration < 3"
+      },
+      "loopOver": [
+        {
+          "name": "task2",
+          "handler": "./tasks/exec.js",
+          "parameters": {
+            "cmd": "echo",
+            "args": ["hello, world"]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "log workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "./not-found-handler.js"
+    }
+  ]
+}

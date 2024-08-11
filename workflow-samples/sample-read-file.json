@@ -1,0 +1,12 @@
+{
+  "name": "read file workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "./tasks/read-file.js",
+      "parameters": {
+        "path": "../package.json"
+      }
+    }
+  ]
+}

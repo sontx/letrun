@@ -1,0 +1,258 @@
+import {
+  countTasks,
+  getTasksByStatus,
+  InvalidParameterError,
+  isWorkflowTaskDefsEmpty,
+  JAVASCRIPT_PLUGIN,
+  JavaScriptEngine,
+  RerunError,
+  Task,
+  TaskDef,
+  TaskHandler,
+  TaskHandlerInput,
+  validateParameters,
+} from '@letrun/core';
+import Joi from 'joi';
+
+/**
+ * Interface representing the parameters for the CatchTaskHandler.
+ */
+interface TaskParameters {
+  /**
+   * The error name to match against the caught error if the catch is executed.
+   * @type {string}
+   */
+  errorName?: string;
+
+  /**
+   * The JavaScript expression to evaluate to determine if the catch should be executed.
+   * @type {string}
+   */
+  expression?: string;
+}
+
+/**
+ * Schema for validating the task parameters.
+ */
+const Schema = Joi.object<TaskParameters>({
+  errorName: Joi.string().description('The error name to match against the caught error if the catch is executed'),
+  expression: Joi.string().description(
+    'The javascript expression to evaluate to determine if the catch should be executed',
+  ),
+}).oxor('errorName', 'expression');
+
+/**
+ * Class representing the handler for the catch task.
+ * Implements the TaskHandler interface.
+ */
+export class CatchTaskHandler implements TaskHandler {
+  /**
+   * The name of the task handler.
+   * @type {string}
+   */
+  name: string = 'catch';
+
+  /**
+   * The description of the task handler.
+   * @type {string}
+   */
+  description: string = 'Handles errors during task execution';
+
+  /**
+   * The parameters schema for the task handler.
+   * @type {Joi.Description}
+   */
+  parameters: Joi.Description = Schema.describe();
+
+  /**
+   * Handles the task execution.
+   * @param {TaskHandlerInput} input - The input for the task handler.
+   * @returns {Promise<any>} The output of the task.
+   */
+  async handle(input: TaskHandlerInput): Promise<any> {
+    const { task } = input;
+
+    const errorTasks = getTasksByStatus(task, 'error', true);
+    const errorTaskArray = Object.keys(errorTasks).map((key) => errorTasks[key]!);
+    const hasErrors = errorTaskArray.length > 0;
+    const alreadyRanCatch = task.output.handledBlocks?.includes('catch');
+    const alreadyRanFinally = task.output.handledBlocks?.includes('finally');
+
+    const throwDelayErrorIfAny = () => {
+      if (task.delayError) {
+        const delayError = task.delayError;
+        delete task.delayError;
+        throw delayError;
+      }
+    };
+
+    // if there are errors that means the errors may be thrown from either the execution block, catch block or finally block
+    const isErrorFromExecutionBlock = hasErrors && !alreadyRanCatch && !alreadyRanFinally;
+    const isErrorFromCatchBlock = hasErrors && alreadyRanCatch && !alreadyRanFinally;
+    const isErrorFromFinallyBlock = hasErrors && alreadyRanFinally;
+
+    // the errors are thrown from the execution block, forward the error to the catch block
+    if (isErrorFromExecutionBlock) {
+      await this.handleCatchBlock(errorTaskArray, input);
+      // there is nothing to do with the catch block, execute the finally block
+      this.handleFinallyBlock(input);
+      // there is nothing to do with the finally block, throw the error if there is any
+      throwDelayErrorIfAny();
+      return task.output;
+    }
+
+    // the errors are thrown from the catch block, forward the error to the finally block
+    if (isErrorFromCatchBlock) {
+      // we expect this error to be thrown after the finally block is executed
+      task.delayError = errorTaskArray[0]?.error;
+      task.output.error = errorTaskArray[0]?.error;
+      this.handleFinallyBlock(input);
+      // there is nothing to do with the finally block, throw the error if there is any
+      delete task.delayError;
+      throw errorTaskArray[0]?.error;
+    }
+
+    // the errors are thrown from the finally block, throw the error to the parent task
+    if (isErrorFromFinallyBlock) {
+      throw errorTaskArray[0]?.error;
+    }
+
+    // if there are no errors that means either the execution block, catch block or finally block was successful
+    const isSuccessfulExecution = !hasErrors && !alreadyRanCatch && !alreadyRanFinally;
+    const isSuccessfulCatch = !hasErrors && alreadyRanCatch && !alreadyRanFinally;
+    const isSuccessfulFinally = !hasErrors && alreadyRanFinally;
+
+    // the execution block was successful, execute the finally block
+    if (isSuccessfulExecution || isSuccessfulCatch) {
+      this.handleFinallyBlock(input);
+      return task.output;
+    }
+
+    // the finally block was successful, throw the error if there is any
+    if (isSuccessfulFinally) {
+      throwDelayErrorIfAny();
+      return task.output;
+    }
+  }
+
+  /**
+   * Handles the catch block execution.
+   * @private
+   * @param {Task[]} errorTaskArray - The array of error tasks.
+   * @param {TaskHandlerInput} input - The input for the task handler.
+   * @returns {Promise<void | never>} A promise that resolves when the catch block is handled.
+   */
+  private async handleCatchBlock(errorTaskArray: Task[], input: TaskHandlerInput): Promise<void | never> {
+    const { task, context, session } = input;
+    const { errorName, expression } = validateParameters(task.parameters, Schema);
+
+    const errors = errorTaskArray.map((errorTask) => errorTask.error);
+    const firstError = errorTaskArray[0]!.error;
+
+    task.output = {
+      handledBlocks: ['catch'],
+      error: firstError,
+    };
+
+    if (errorName && !this.matchesErrorName(errorName, errors)) {
+      context.getLogger().debug(`Error name ${errorName} does not match any of the caught errors`);
+      // save the error to throw after the finally block is executed
+      task.delayError = firstError;
+      return;
+    }
+
+    if (expression && !(await this.matchesExpression(expression, errors, input))) {
+      context.getLogger().debug(`Expression ${expression} does not match any of the caught errors`);
+      // save the error to throw after the finally block is executed
+      task.delayError = firstError;
+      return;
+    }
+
+    let shortMessage: string;
+    if (errorTaskArray.length === 1) {
+      shortMessage = errorTaskArray[0]?.error?.message;
+    } else {
+      shortMessage = errorTaskArray.map((errorTask) => errorTask.error?.name).join(', ');
+    }
+    context.getLogger().debug(`Executing catch block for error: ${shortMessage}`);
+
+    if (countTasks(task.catch) > 0) {
+      task.errorTasks = task.tasks;
+      session.setTasks(task, task.catch!);
+      // notify the engine to rerun the updated task children above
+      throw new RerunError();
+    }
+  }
+
+  /**
+   * Handles the finally block execution.
+   * @private
+   * @param {TaskHandlerInput} input - The input for the task handler.
+   * @returns {void | never} The output of the finally block.
+   */
+  private handleFinallyBlock({ task, context, session }: TaskHandlerInput): void | never {
+    if (countTasks(task.finally) > 0) {
+      if (!task.output) {
+        task.output = {};
+      }
+      if (!task.output?.handledBlocks) {
+        task.output.handledBlocks = [];
+      }
+      task.output.handledBlocks.push('finally');
+
+      context.getLogger().debug(`Executing finally block`);
+      session.setTasks(task, task.finally!);
+      // notify the engine to rerun the updated task children above
+      throw new RerunError();
+    }
+  }
+
+  /**
+   * Checks if the error name matches any of the caught errors.
+   * @private
+   * @param {string} errorName - The error name to match.
+   * @param {Error[]} errors - The array of caught errors.
+   * @returns {boolean} True if the error name matches, false otherwise.
+   */
+  private matchesErrorName(errorName: string, errors: Error[]): boolean {
+    return errors.some((e) => e.name === errorName);
+  }
+
+  /**
+   * Checks if the expression matches any of the caught errors.
+   * @private
+   * @param {string} expression - The expression to evaluate.
+   * @param {Error[]} errors - The array of caught errors.
+   * @param {TaskHandlerInput} input - The input for the task handler.
+   * @returns {Promise<boolean>} A promise that resolves with true if the expression matches, false otherwise.
+   */
+  private async matchesExpression(
+    expression: string,
+    errors: Error[],
+    { context, task, workflow }: TaskHandlerInput,
+  ): Promise<boolean> {
+    const javascriptEngine = await context.getPluginManager().getOne<JavaScriptEngine>(JAVASCRIPT_PLUGIN);
+    for (const error of errors) {
+      const val = await javascriptEngine.run(expression, { task, workflow, error });
+      if (val) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/**
+ * Validates the catch task definition.
+ * @param {TaskDef} taskDef - The task definition to validate.
+ * @throws {InvalidParameterError} If the task definition is invalid.
+ */
+export function validateCatchTask(taskDef: TaskDef) {
+  if (isWorkflowTaskDefsEmpty(taskDef.tasks)) {
+    throw new InvalidParameterError(`'Catch' task ${taskDef.name} must have a 'tasks' property with at least one task`);
+  }
+
+  if (isWorkflowTaskDefsEmpty(taskDef.catch) && isWorkflowTaskDefsEmpty(taskDef.finally)) {
+    throw new InvalidParameterError(`'Catch' task ${taskDef.name} must have either a 'catch' or 'finally' property`);
+  }
+}

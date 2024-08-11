@@ -1,0 +1,12 @@
+{
+  "name": "run workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "workflow",
+      "parameters": {
+        "file": "../workflow-samples/sample-read-file.json"
+      }
+    }
+  ]
+}

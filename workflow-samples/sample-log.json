@@ -1,0 +1,21 @@
+{
+  "name": "log workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "log",
+      "parameters": {
+        "message": "hello, world",
+        "level": "info"
+      }
+    },
+    {
+      "name": "task2",
+      "handler": "log",
+      "parameters": {
+        "message": "This is a warning",
+        "level": "warn"
+      }
+    }
+  ]
+}
