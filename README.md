@@ -79,7 +79,6 @@ A task should have the following structure:
 - `title`: A brief description of the task. This is optional.
 - `handler`: The name of the task handler. This is required. Please refer to the [Task Handler](#task-handler) section for more details.
 - `parameters`: An object that provides input and configuration for the task. This field supports interpolation, see the [Parameter Interpolator](#parameter-interpolator) section for more details.
-- `input`: An object that provides input for the task. This is optional. This field supports interpolation, see the [Parameter Interpolator](#parameter-interpolator) section for more details.
 - `ignoreError`: Whether to ignore errors during task execution and let other tasks continue running. This is optional.
 - `then`: Tasks to execute when the handler is `if` and the condition is true. This is optional.
 - `else`: Tasks to execute when the handler is `if` and the condition is false. This is optional.
@@ -125,7 +124,7 @@ This is an example of a task that refers to a custom task:
 
 ## Installation
 
-Ensure you have [Node.js](https://nodejs.org/en/download/prebuilt-installer) (>=18) and npm (>=8) installed.
+Ensure you have [Node.js](https://nodejs.org/en/download/prebuilt-installer) (>=20) and npm (>=10) installed.
 
 To install the CLI tool, run:
 
@@ -300,13 +299,13 @@ Options:
 ## Plugin
 
 Plugins are used to extend the functionality of the CLI tool.
-A plugin is a JavaScript file that exports default a class instance that implements the `Plugin` interface.
+A plugin is a JavaScript file that exports default a class that implements the `Plugin` interface.
 Plugins are stored in the `plugins` directory (by default), you can change the directory by setting the `plugin.dir` configuration.
 
 ```ts
 import { Plugin } from '@letrun/core';
 
-class MyPlugin implements Plugin {
+export default class MyPlugin implements Plugin {
   readonly name = 'my-plugin';
   readonly type = 'command';
 
@@ -320,9 +319,6 @@ class MyPlugin implements Plugin {
     // clean up the plugin
   }
 }
-
-const plugin = new MyPlugin();
-export default plugin;
 ```
 
 ### Command Plugin
@@ -342,7 +338,7 @@ The default implementation logs messages to the [console](plugin/src/console-log
 
 ### Parameter Interpolator
 
-This plugin is used by the [workflow-runner](#workflow-runner) plugin to interpolate parameters and input values.
+This plugin is used by the [workflow-runner](#workflow-runner) plugin to interpolate parameters values.
 `Interpolation` is a process of replacing placeholders in a string with actual values which are used in expressions like `${task1.output.name}`.
 The default implementation is [expression-parameter-interpolator.ts](plugin/src/expression-parameter-interpolator.ts).
 
@@ -433,7 +429,7 @@ Custom tasks are tasks that are defined by the user and loaded by the CLI dynami
 They are written in JavaScript and implement from the [TaskHandler](core/src/model.ts) interface.
 They should be placed in the `tasks` directory (by default), you can change the directory by setting the `task.dir` configuration.
 
-A task should have the following structure:
+A task handler should have the following structure:
 
 - `name`: The name of the task.
 - `description`: A brief description of the task, this is optional.
@@ -524,8 +520,8 @@ The default configuration is:
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/en/download/prebuilt-installer) (>=18)
-- npm (>=8)
+- [Node.js](https://nodejs.org/en/download/prebuilt-installer) (>=20)
+- npm (>=10)
 
 ### Setup
 
