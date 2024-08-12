@@ -43,24 +43,35 @@ export default class Handler implements TaskHandler {
     });
 
     let timeoutId: NodeJS.Timeout | null = null;
+    let timedOut = false;
     if (value.timeoutMs) {
       timeoutId = setTimeout(() => {
-        context.getLogger().error('Command timed out, killing the process');
+        timedOut = true;
         child.kill();
       }, value.timeoutMs);
     }
 
     const waitForResult = new Promise<any>((resolve, reject) => {
+      child.on('error', (err) => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+        }
+        reject(new Error(`Failed to start process: ${err.message}`));
+      });
       child.on('close', (code) => {
         if (timeoutId !== null) {
           clearTimeout(timeoutId);
         }
         const stdout = Buffer.concat(stdoutBuffer).toString('utf8');
         const stderr = Buffer.concat(stderrBuffer).toString('utf8');
-        if (code !== 0) {
-          reject(new Error(`Process failed with code ${code}: ${stderr}`));
+        if (timedOut) {
+          reject(new Error(`Command timed out: ${value.timeoutMs} ms`));
         } else {
-          resolve(stdout);
+          if (code !== 0) {
+            reject(new Error(`Process failed with code ${code}: ${stderr}`));
+          } else {
+            resolve(stdout);
+          }
         }
       });
     });

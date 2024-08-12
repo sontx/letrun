@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node ./dist/letrun.js",
+    "test": "npm run test -ws",
     "build": "npm run build -ws && npm run clean && npm run copy",
     "clean": "rm -rf ./dist/**",
     "copy": "npm run copy:cli && npm run copy:task",

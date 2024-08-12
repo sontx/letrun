@@ -15,12 +15,18 @@
   "scripts": {
     "build": "npm run clean && node esbuild.js",
     "build:prod": "npm run clean && node esbuild.js --prod",
-    "clean": "rm -rf ./dist/**"
+    "clean": "rm -rf ./dist/**",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest",
+    "jest": "jest"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.11.5",
     "esbuild": "^0.19.11",
+    "jest": "^29.7.0",
+    "ts-node": "^10.9.2",
+    "ts-jest": "^29.2.4",
     "typescript": "^5.3.3"
   },
   "dependencies": {
