@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "coverage": "jest --coverage",
     "test": "jest"
   },
   "main": "dist/index.js",

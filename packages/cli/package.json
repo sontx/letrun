@@ -17,6 +17,7 @@
     "build:prod": "npm run clean && node esbuild.js --prod",
     "start": "node dist/letrun.js",
     "clean": "rm -f ./dist/**",
+    "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest -- --coverage",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest",
     "jest": "jest"
   },
