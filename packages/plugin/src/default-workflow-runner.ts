@@ -191,7 +191,6 @@ export class DefaultWorkflowRunner implements WorkflowRunner {
   }
 
   private async setTaskDataValues(session: ExecutionSession, task: Task) {
-    task.input = await session.resolveParameter(task.taskDef.input);
     task.parameters = await session.resolveParameter(task.taskDef.parameters);
   }
 

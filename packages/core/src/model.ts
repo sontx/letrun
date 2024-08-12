@@ -4,7 +4,10 @@ import { FunctionKeys, ObjectType } from './types';
  * Interface representing a workflow definition.
  * Extends the ContainerDef interface.
  */
-export interface WorkflowDef extends ContainerDef {}
+export interface WorkflowDef extends ContainerDef {
+  /** Optional input data for the workflow definition. */
+  input?: any;
+}
 
 /**
  * Interface representing a workflow, generated based on the {@link WorkflowDef} automatically.
@@ -16,6 +19,8 @@ export interface Workflow extends Container {
   status: WorkflowStatus;
   /** Optional variables associated with the workflow. All tasks inside this workflow can access and change variables whenever they want. */
   variables?: ObjectType;
+  /** Optional input data for the workflow. */
+  input?: ObjectType;
 }
 
 /** Type representing the possible statuses of a workflow. */
@@ -72,8 +77,6 @@ export interface Task extends Container {
 export interface Container {
   /** The unique identifier of the container. */
   id: string;
-  /** Optional input data for the container, calculated after being interpolated by the {@link ContainerDef.input}. */
-  input?: ObjectType;
   /** Optional output data for the container. */
   output?: any;
   /** Optional tasks to be executed. */
@@ -132,8 +135,6 @@ export interface ContainerDef {
    * from either the {@link ContainerDef.input} or {@link TaskDef.parameters}.
    * */
   name: string;
-  /** Optional input data for the container definition, supporting interpolating values when it's {@link TaskDef}. */
-  input?: any;
   /** Optional task definitions associated with the container definition, executed before this task is completed. */
   tasks?: WorkflowTaskDefs;
   /** Additional properties for the container definition. */

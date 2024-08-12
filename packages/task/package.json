@@ -1,11 +1,11 @@
 {
-  "name": "@letrun/plugin",
+  "name": "@letrun/task",
   "version": "0.0.1",
-  "description": "The plugins package for LetRun",
+  "description": "The tasks package for LetRun",
   "type": "module",
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "keywords": [
     "workflow",
@@ -19,20 +19,13 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
-    "@types/glob": "^8.1.0",
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.11.5",
-    "@types/uuid": "^10.0.0",
     "esbuild": "^0.19.11",
-    "@types/winston": "^2.4.4",
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/core": "file:./core",
-    "glob": "^11.0.0",
-    "joi": "^17.13.3",
-    "jsonpath-plus": "^9.0.0",
-    "winston": "^3.13.1",
-    "commander": "^12.1.0"
+    "@letrun/core": "*",
+    "expect": "^29.7.0",
+    "joi": "^17.13.3"
   }
 }

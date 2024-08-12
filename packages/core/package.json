@@ -4,8 +4,8 @@
   "description": "The core package for the cli and its plugins or tasks",
   "type": "module",
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "keywords": [
     "workflow",
