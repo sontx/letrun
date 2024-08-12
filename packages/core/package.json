@@ -16,7 +16,7 @@
     "build": "tsc"
   },
   "main": "dist/index.js",
-  "types": "src/index.d.ts",
+  "types": "src/index.ts",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.5",

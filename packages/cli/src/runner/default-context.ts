@@ -2,6 +2,7 @@ import { AppContext, ConfigProvider, Logger, PluginLoader, PluginManager } from 
 import { FilePluginLoader, SimplePluginManager } from '../plugin';
 import { LoggerModule } from '../logger';
 import { ChainConfigProvider } from '../config';
+import { DefaultPluginLoader } from '@letrun/plugin';
 
 /**
  * Interface representing the options for the DefaultContext.
@@ -37,20 +38,12 @@ export class DefaultContext implements AppContext {
   private pluginLoader?: PluginLoader;
   private loaded = false;
 
-  /**
-   * Creates an instance of DefaultContext.
-   * @param {Options} [options={}] - The options for the context.
-   */
   constructor(options: Options = {}) {
     this.configProvider = options.configProvider ?? new ChainConfigProvider();
     this.pluginManager = options.pluginManager ?? new SimplePluginManager();
     this.pluginLoader = options.pluginLoader;
   }
 
-  /**
-   * Loads the application context.
-   * @returns {Promise<void>} A promise that resolves when the context is loaded.
-   */
   async load(): Promise<void> {
     if (this.loaded) {
       return;
@@ -62,12 +55,21 @@ export class DefaultContext implements AppContext {
     this.getLogger().info('App context loaded');
   }
 
-  /**
-   * Initializes the plugin manager.
-   * @private
-   * @returns {Promise<void>} A promise that resolves when the plugin manager is initialized.
-   */
   private async initPluginManager(): Promise<void> {
+    await this.loadDefaultPlugins();
+    await this.loadCustomPlugins();
+    this.pluginManager.load(this);
+  }
+
+  private async loadDefaultPlugins() {
+    const defaultPluginLoader = new DefaultPluginLoader();
+    const plugins = await defaultPluginLoader.load();
+    for (const plugin of plugins) {
+      this.pluginManager.register(plugin);
+    }
+  }
+
+  private async loadCustomPlugins() {
     if (!this.pluginLoader) {
       const pluginDir = await this.configProvider.get('plugin.dir', 'plugins');
       this.pluginLoader = new FilePluginLoader(pluginDir);
@@ -76,13 +78,8 @@ export class DefaultContext implements AppContext {
     for (const plugin of plugins) {
       this.pluginManager.register(plugin);
     }
-    this.pluginManager.load(this);
   }
 
-  /**
-   * Unloads the application context.
-   * @returns {Promise<void>} A promise that resolves when the context is unloaded.
-   */
   async unload(): Promise<void> {
     if (!this.loaded) {
       return;
@@ -94,26 +91,14 @@ export class DefaultContext implements AppContext {
     this.loaded = false;
   }
 
-  /**
-   * Retrieves the plugin manager.
-   * @returns {PluginManager} The plugin manager instance.
-   */
   getPluginManager(): PluginManager {
     return this.pluginManager!;
   }
 
-  /**
-   * Retrieves the configuration provider.
-   * @returns {ConfigProvider} The configuration provider instance.
-   */
   getConfigProvider(): ConfigProvider {
     return this.configProvider;
   }
 
-  /**
-   * Retrieves the logger instance.
-   * @returns {Logger} The logger instance.
-   */
   getLogger(): Logger {
     return this.loggerModule.getLogger();
   }

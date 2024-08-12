@@ -6,7 +6,7 @@ import { inspect, InspectOptions } from 'util';
 import { format, transports } from 'winston';
 import { AppContext, LOGGER_PLUGIN, LoggerPlugin } from '@letrun/core';
 
-export class ConsoleLogger implements LoggerPlugin {
+export default class ConsoleLogger implements LoggerPlugin {
   private options?: ConsoleFormatOptions;
 
   readonly name = 'console';
@@ -198,6 +198,3 @@ class ConsoleFormat {
     return info;
   }
 }
-
-const consoleLogger = new ConsoleLogger();
-export default consoleLogger;

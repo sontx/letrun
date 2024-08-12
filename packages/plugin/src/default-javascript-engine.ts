@@ -1,7 +1,7 @@
 import { AppContext, JAVASCRIPT_PLUGIN, JavaScriptEngine, loadConfigToPlugin, ObjectType } from '@letrun/core';
 import vm from 'vm';
 
-export class DefaultJavascriptEngine implements JavaScriptEngine {
+export default class DefaultJavascriptEngine implements JavaScriptEngine {
   readonly name = 'default';
   readonly type = JAVASCRIPT_PLUGIN;
 
@@ -23,6 +23,3 @@ export class DefaultJavascriptEngine implements JavaScriptEngine {
     return Promise.resolve(undefined);
   }
 }
-
-const javascriptEngine = new DefaultJavascriptEngine();
-export default javascriptEngine;

@@ -65,7 +65,7 @@ const art = `
                            *======================*#**##*##**#*####*#####                           
                             **+++==================##*############%#`;
 
-class SampleCommandPlugin implements CommandPlugin {
+export default class SampleCommandPlugin implements CommandPlugin {
   readonly name = 'sample';
   readonly type = COMMAND_PLUGIN;
 
@@ -81,6 +81,3 @@ class SampleCommandPlugin implements CommandPlugin {
   async load() {}
   async unload() {}
 }
-
-const plugin = new SampleCommandPlugin();
-export default plugin;

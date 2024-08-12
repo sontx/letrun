@@ -7,7 +7,7 @@ import {
 } from '@letrun/core';
 import { JSONPath } from 'jsonpath-plus';
 
-export class JsonPathParameterInterpolator implements ParameterInterpolator {
+export default class JsonPathParameterInterpolator implements ParameterInterpolator {
   private flatten: boolean = false;
   private recursive: boolean = true;
   private logger?: Logger;
@@ -55,6 +55,3 @@ export class JsonPathParameterInterpolator implements ParameterInterpolator {
     return Promise.resolve(undefined);
   }
 }
-
-const propertyResolver = new JsonPathParameterInterpolator();
-export default propertyResolver;

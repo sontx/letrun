@@ -5,15 +5,16 @@ import {
   PARAMETER_INTERPOLATOR_PLUGIN,
   ParameterInterpolator,
 } from '@letrun/core';
-import { JsonPathParameterInterpolator } from './json-path-parameter-interpolator';
+import JsonPathParameterInterpolator from './json-path-parameter-interpolator';
 
-export class ExpressionParameterInterpolator implements ParameterInterpolator {
+export default class ExpressionParameterInterpolator implements ParameterInterpolator {
   private jsonPath = new JsonPathParameterInterpolator();
   private recursive: boolean = true;
   private logger?: Logger;
 
   readonly name = 'expression';
   readonly type = PARAMETER_INTERPOLATOR_PLUGIN;
+  readonly priority = 1;
 
   async load(context: AppContext) {
     this.logger = context.getLogger();
@@ -62,6 +63,3 @@ export class ExpressionParameterInterpolator implements ParameterInterpolator {
     await this.jsonPath.unload();
   }
 }
-
-const propertyResolver = new ExpressionParameterInterpolator();
-export default propertyResolver;

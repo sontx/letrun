@@ -11,7 +11,7 @@ import path from 'node:path';
 import fs from 'fs';
 import { InvalidParameterError } from '@letrun/core/dist';
 
-class DefaultTaskInvoker implements TaskInvoker {
+export default class DefaultTaskInvoker implements TaskInvoker {
   readonly name = 'default';
   readonly type = TASK_INVOKER_PLUGIN;
 
@@ -84,6 +84,3 @@ class DefaultTaskInvoker implements TaskInvoker {
 
   async unload(): Promise<void> {}
 }
-
-const defaultTaskInvoker = new DefaultTaskInvoker();
-export default defaultTaskInvoker;

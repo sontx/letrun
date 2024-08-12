@@ -1,5 +1,5 @@
-import {getEntryPointDir, importDefault, Plugin, PluginLoader} from '@letrun/core';
-import fs from 'fs/promises';
+import { getEntryPointDir, importDefault, Plugin, PluginLoader } from '@letrun/core';
+import fs from 'fs';
 import path from 'node:path';
 import { DEFAULT_LOGGER } from '../logger';
 
@@ -25,15 +25,22 @@ export class FilePluginLoader implements PluginLoader {
    */
   async load(): Promise<Plugin[]> {
     if (!this.plugins) {
-      const files = await fs.readdir(this.pluginDir);
+      if (!fs.existsSync(this.pluginDir)) {
+        DEFAULT_LOGGER.debug(`Plugin directory not found: ${this.pluginDir}`);
+        this.plugins = [];
+        return this.plugins;
+      }
+
+      const files = await fs.promises.readdir(this.pluginDir);
       const plugins: Plugin[] = [];
       for (const file of files.filter((file) => file.endsWith('.js') || file.endsWith('.cjs'))) {
         const pluginFile = path.resolve(this.pluginDir, file);
         try {
-          const plugin = await importDefault(pluginFile);
-          if (!plugin) {
+          const pluginClass = await importDefault(pluginFile);
+          if (!pluginClass) {
             DEFAULT_LOGGER.warn(`No default export found in ${pluginFile}`);
           } else {
+            const plugin = new pluginClass();
             plugins.push(plugin);
           }
         } catch (e: any) {

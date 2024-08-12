@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "The plugins package for LetRun",
   "type": "module",
+  "main": "src/index.ts",
   "engines": {
     "node": ">=20",
     "npm": ">=10"

@@ -47,7 +47,7 @@ class FilePersistenceUnit implements PersistenceUnit {
   }
 }
 
-export class FilePersistence implements Persistence {
+export default class FilePersistence implements Persistence {
   readonly name = 'file';
   readonly type = PERSISTENCE_PLUGIN;
 
@@ -68,6 +68,3 @@ export class FilePersistence implements Persistence {
 
   async unload() {}
 }
-
-const plugin = new FilePersistence();
-export default plugin;

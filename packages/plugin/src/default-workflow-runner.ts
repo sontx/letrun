@@ -25,7 +25,7 @@ import {
 const POST_TASK_RUN = 'post-task-run';
 const PRE_TASK_RUN = 'pre-task-run';
 
-export class DefaultWorkflowRunner implements WorkflowRunner {
+export default class DefaultWorkflowRunner implements WorkflowRunner {
   private context?: AppContext;
   private logger?: Logger;
   private unloaded = false;
@@ -355,6 +355,3 @@ export class DefaultWorkflowRunner implements WorkflowRunner {
     });
   }
 }
-
-const workflowRunner = new DefaultWorkflowRunner();
-export default workflowRunner;

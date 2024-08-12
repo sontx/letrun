@@ -25,7 +25,7 @@ function buildHandler(entryPoint, outputFile) {
 }
 
 fs.readdirSync('./src').forEach((file) => {
-  if (file.endsWith('.ts')) {
+  if (file.endsWith('.ts') && file !== 'index.ts') {
     buildHandler(`src/${file}`, `dist/${file.replace('.ts', '.js')}`);
   }
 });

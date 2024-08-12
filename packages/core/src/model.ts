@@ -206,6 +206,8 @@ export interface Plugin extends PluginLifecycle {
   readonly name: string;
   /** The type of the plugin. There may be multiple plugins with the same type but different names. */
   readonly type: string;
+  /** If there are multiple names of this plugin type, the highest priority is prioritized for use. Default is 0 */
+  readonly priority?: number;
   /** Additional properties for the plugin. */
   [key: string]: any;
 }

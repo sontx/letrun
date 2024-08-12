@@ -299,13 +299,13 @@ Options:
 ## Plugin
 
 Plugins are used to extend the functionality of the CLI tool.
-A plugin is a JavaScript file that exports default a class instance that implements the `Plugin` interface.
+A plugin is a JavaScript file that exports default a class that implements the `Plugin` interface.
 Plugins are stored in the `plugins` directory (by default), you can change the directory by setting the `plugin.dir` configuration.
 
 ```ts
 import { Plugin } from '@letrun/core';
 
-class MyPlugin implements Plugin {
+export default class MyPlugin implements Plugin {
   readonly name = 'my-plugin';
   readonly type = 'command';
 
@@ -319,9 +319,6 @@ class MyPlugin implements Plugin {
     // clean up the plugin
   }
 }
-
-const plugin = new MyPlugin();
-export default plugin;
 ```
 
 ### Command Plugin

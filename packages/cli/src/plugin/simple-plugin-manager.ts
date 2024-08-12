@@ -12,7 +12,10 @@ export class SimplePluginManager implements PluginManager {
   register(plugin: Plugin): void {
     const plugins = this.pluginMap.get(plugin.type) || [];
     plugins.push(plugin);
-    this.pluginMap.set(plugin.type, plugins);
+    this.pluginMap.set(
+      plugin.type,
+      plugins.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0)),
+    );
   }
 
   getAll(): Promise<Map<string, Plugin[]>> {
@@ -33,7 +36,7 @@ export class SimplePluginManager implements PluginManager {
     if (foundPlugins.length > 1) {
       this.context
         ?.getLogger()
-        ?.warn(`Multiple plugins of type ${type} found, returning the first one: ${firstPlugin.name}`);
+        ?.debug(`Multiple plugins of type ${type} found, returning the highest priority: ${firstPlugin.name}`);
     }
     return this.loadPluginIfNotLoaded(firstPlugin);
   }

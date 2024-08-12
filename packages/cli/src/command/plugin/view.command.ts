@@ -9,7 +9,7 @@ export class ViewCommand extends AbstractCommand {
       .command('view')
       .description('view detail of a plugin')
       .requiredOption('-t, --type <type>', 'type of the plugin')
-      .requiredOption('-n, --name <name>', 'name of the plugin')
+      .option('-n, --name <name>', 'name of the plugin')
       .action((options) => {
         return this.doAction(options);
       });
@@ -18,11 +18,11 @@ export class ViewCommand extends AbstractCommand {
   private async doAction(options: AbstractOptions) {
     const { name, type } = options;
     const plugins = await this.context.getPluginManager().get(type);
-    const plugin = plugins.find((plugin) => plugin.name === name);
+    const plugin = name ? plugins.find((plugin) => plugin.name === name) : plugins[0];
     if (!plugin) {
       this.context.getLogger().error(`Plugin not found: ${name}`);
     } else {
-      console.log(`Type: ${plugin.type}`);
+      console.log(`\nType: ${plugin.type}`);
       console.log(`Name: ${plugin.name}`);
       const tree: TreeObject = {};
       const customMethods = this.getCustomMethods(plugin);
