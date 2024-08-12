@@ -8,8 +8,8 @@ export class RerunError extends Error {
   /**
    * Creates an instance of RerunError.
    */
-  constructor() {
-    super();
+  constructor(message?: string) {
+    super(message);
     this.name = RerunError.name;
   }
 }

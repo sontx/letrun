@@ -1,5 +1,5 @@
 import {
-  AppContext,
+  AppContext, ConfigNotFoundError,
   loadConfigToPlugin,
   Logger,
   PARAMETER_INTERPOLATOR_PLUGIN,
@@ -15,7 +15,7 @@ export default class JsonPathParameterInterpolator implements ParameterInterpola
   readonly name = 'json-path';
   readonly type = PARAMETER_INTERPOLATOR_PLUGIN;
 
-  interpolate<T = any>(value: string, interpolatorContext: any): T {
+  interpolate<T = any>(value: string, interpolatorContext: any, throwIfNotFound = false): T {
     if (!this.isJsonPath(value)) {
       return value as T;
     }
@@ -32,7 +32,10 @@ export default class JsonPathParameterInterpolator implements ParameterInterpola
       this.logger?.verbose(`Resolved JSON path: ${currentValue} --> ${result}`);
       currentValue = result;
     } while (this.recursive && this.isJsonPath(currentValue));
-    return currentValue as T;
+    if (throwIfNotFound && currentValue === undefined) {
+      throw new ConfigNotFoundError(`The json path ${value} was not found`);
+    }
+    return (currentValue !== undefined ? currentValue : value) as T;
   }
 
   private isJsonPath(str: any) {

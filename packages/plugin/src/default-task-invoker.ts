@@ -15,6 +15,8 @@ export default class DefaultTaskInvoker implements TaskInvoker {
   readonly name = 'default';
   readonly type = TASK_INVOKER_PLUGIN;
 
+  constructor(private readonly moduleResolver = importDefault) {}
+
   async invoke(input: TaskHandlerInput): Promise<TaskHandlerOutput> {
     const {
       task,
@@ -43,7 +45,7 @@ export default class DefaultTaskInvoker implements TaskInvoker {
     }
 
     input.context.getLogger().verbose(`Invoking external task: ${location}`);
-    const handlerClass = await importDefault(location);
+    const handlerClass = await this.moduleResolver(location);
     const handler = new handlerClass();
     const rawResult = handler.handle(input) as Promise<TaskHandlerOutput> | TaskHandlerOutput;
     return rawResult instanceof Promise ? await rawResult : rawResult;

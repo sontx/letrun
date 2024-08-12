@@ -2,7 +2,7 @@ import { AppContext, getEntryPointDir, Persistence, PERSISTENCE_PLUGIN, Persiste
 import fs from 'fs';
 import path from 'node:path';
 
-class FilePersistenceUnit implements PersistenceUnit {
+export class FilePersistenceUnit implements PersistenceUnit {
   private readonly dataDir: string;
 
   constructor(name: string, dataDir: string) {

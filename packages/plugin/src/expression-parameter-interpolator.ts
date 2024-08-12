@@ -1,5 +1,6 @@
 import {
   AppContext,
+  ConfigNotFoundError,
   loadConfigToPlugin,
   Logger,
   PARAMETER_INTERPOLATOR_PLUGIN,
@@ -38,9 +39,16 @@ export default class ExpressionParameterInterpolator implements ParameterInterpo
       }
 
       const jsonPathKey = expressionKey ? `$.${expressionKey}` : '$';
-      const result = this.jsonPath.interpolate(jsonPathKey, interpolatorContext);
-      this.logger?.verbose(`Resolved expression: ${currentValue} --> ${result}`);
-      currentValue = result;
+      try {
+        const result = this.jsonPath.interpolate(jsonPathKey, interpolatorContext, true);
+        this.logger?.verbose(`Resolved expression: ${currentValue} --> ${result}`);
+        currentValue = result;
+      } catch (e: any) {
+        if (e instanceof ConfigNotFoundError) {
+          return value as T;
+        }
+        throw e;
+      }
     } while (this.recursive && this.isExpression(currentValue));
     return currentValue as T;
   }
