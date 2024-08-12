@@ -1,4 +1,4 @@
-import { asTree, TreeObject } from 'treeify';
+import treeify, { TreeObject } from 'treeify';
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import fs from 'fs';
@@ -35,8 +35,14 @@ export class ViewCommand extends AbstractCommand {
   }
 
   private async doAction(pathOrId: string, options: AbstractOptions) {
-    const workflow = await this.loadWorkflow(pathOrId);
-    if (!workflow) {
+    let workflow: Workflow;
+    try {
+      workflow = await this.loadWorkflow(pathOrId);
+      if (!workflow) {
+        return;
+      }
+    } catch (error: any) {
+      this.context.getLogger().error(`Failed to load workflow: ${error.message}`);
       return;
     }
 
@@ -71,7 +77,7 @@ export class ViewCommand extends AbstractCommand {
     const rootTree: TreeObject = {};
     buildRecursiveTasks(rootTree, workflow);
 
-    const tree = asTree(rootTree, true, true);
+    const tree = treeify.asTree(rootTree, true, true);
 
     console.log(`\n${'status' in workflow ? 'Workflow' : 'Workflow Definition'}: ${workflow.name}`);
     const node = buildNode(workflow);

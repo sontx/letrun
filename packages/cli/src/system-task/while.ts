@@ -70,7 +70,7 @@ export class WhileTaskHandler implements TaskHandler {
   async handle({ task, workflow, context, session }: TaskHandlerInput): Promise<any> {
     const { expression, mode } = validateParameters(task.parameters, Schema);
 
-    if (!task.output) {
+    if (typeof task.output?.iteration !== 'number') {
       context.getLogger().debug(`Initializing while loop with expression ${expression}`);
       task.output = {
         iteration: 0,

@@ -1,6 +1,6 @@
 import { AbstractCommand } from '../abstract.command';
 import { Command } from 'commander';
-import { asTree, TreeObject } from 'treeify';
+import treeify, { TreeObject } from 'treeify';
 import { EMOJIS } from '../../ui';
 
 export class ListCommand extends AbstractCommand {
@@ -30,7 +30,7 @@ export class ListCommand extends AbstractCommand {
     console.log(`\nTotal plugins: ${total}\n`);
     let message = '';
     for (const type in pluginTrees) {
-      message += `${EMOJIS.FOLDER} ${type}\n${asTree(pluginTrees[type]!, true, true)}`;
+      message += `${EMOJIS.FOLDER} ${type}\n${treeify.asTree(pluginTrees[type]!, true, true)}`;
     }
     if (message) {
       console.log(message.trim());

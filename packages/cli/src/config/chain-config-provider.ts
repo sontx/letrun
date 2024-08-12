@@ -48,9 +48,6 @@ export class ChainConfigProvider implements ConfigProvider {
     this.configProviderChain.push(new EnvironmentConfigProvider());
   }
 
-  /**
-   * Sets a configuration value to the in-memory store.
-   */
   async set(key: string, value: any): Promise<void> {
     const config = await this.getAll();
     config[key] = value;
@@ -60,73 +57,34 @@ export class ChainConfigProvider implements ConfigProvider {
     }
   }
 
-  /**
-   * Retrieves all configuration data.
-   * @returns {Promise<ObjectType>} A promise that resolves with the configuration data.
-   */
   async getAll(): Promise<ObjectType> {
     if (!this.config) {
       const result: ObjectType = {};
       for (const configProvider of this.configProviderChain.reverse()) {
         const val = await configProvider.getAll();
-        Object.assign(val);
+        Object.assign(result, val);
       }
       this.config = result;
     }
     return this.config;
   }
 
-  /**
-   * Retrieves a string value for a given key.
-   * @param {string} key - The configuration key.
-   * @param {string} [defaultValue] - The default value if the key is not found.
-   * @returns {Promise<string>} A promise that resolves with the string value.
-   * @throws {ConfigNotFoundError} If the key is not found and no default value is provided.
-   */
   get(key: string, defaultValue?: string): Promise<string> {
     return this.doGet(key, 'get', defaultValue);
   }
 
-  /**
-   * Retrieves a boolean value for a given key.
-   * @param {string} key - The configuration key.
-   * @param {boolean} [defaultValue] - The default value if the key is not found.
-   * @returns {Promise<boolean>} A promise that resolves with the boolean value.
-   */
   getBoolean(key: string, defaultValue?: boolean): Promise<boolean> {
     return this.doGet(key, 'getBoolean', defaultValue);
   }
 
-  /**
-   * Retrieves a float value for a given key.
-   * @param {string} key - The configuration key.
-   * @param {number} [defaultValue] - The default value if the key is not found.
-   * @returns {Promise<number>} A promise that resolves with the float value.
-   */
   getFloat(key: string, defaultValue?: number): Promise<number> {
     return this.doGet(key, 'getFloat', defaultValue);
   }
 
-  /**
-   * Retrieves an integer value for a given key.
-   * @param {string} key - The configuration key.
-   * @param {number} [defaultValue] - The default value if the key is not found.
-   * @returns {Promise<number>} A promise that resolves with the integer value.
-   */
   getInt(key: string, defaultValue?: number): Promise<number> {
     return this.doGet(key, 'getInt', defaultValue);
   }
 
-  /**
-   * Helper method to retrieve a value for a given key using a specified method.
-   * @private
-   * @template T
-   * @param {string} key - The configuration key.
-   * @param {FunctionKeys<ConfigProvider>} method - The method to use for retrieval.
-   * @param {T} [defaultValue] - The default value if the key is not found.
-   * @returns {Promise<T>} A promise that resolves with the value.
-   * @throws {ConfigNotFoundError} If the key is not found and no default value is provided.
-   */
   private async doGet<T>(key: string, method: FunctionKeys<ConfigProvider>, defaultValue?: T): Promise<T> {
     for (const configProvider of this.configProviderChain) {
       try {
@@ -145,13 +103,5 @@ export class ChainConfigProvider implements ConfigProvider {
       return defaultValue;
     }
     throw new ConfigNotFoundError(`Config not found for key: ${key}`);
-  }
-
-  /**
-   * Unloads the configuration data.
-   * @returns {Promise<void>} A promise that resolves when the configuration data is unloaded.
-   */
-  unload(): Promise<void> {
-    return Promise.resolve(undefined);
   }
 }

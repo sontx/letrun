@@ -1,15 +1,21 @@
 import { RerunError, TaskDef, TaskHandler, TaskHandlerInput, validateParameters } from '@letrun/core';
 import Joi from 'joi';
-import {initNewIteration, validateLoopTask} from './loop-task';
+import { initNewIteration, validateLoopTask } from './loop-task';
 
 interface TaskParameters {
   items: any[] | Map<string, any> | Set<any>;
 }
 
 const Schema = Joi.object<TaskParameters>({
-  items: Joi.alternatives(Joi.array().items(Joi.any()), Joi.object().pattern(Joi.string(), Joi.any()))
+  items: Joi.any()
     .description('An array of items to iterate over')
-    .required(),
+    .required()
+    .custom((value, helper) => {
+      if (Array.isArray(value) || value instanceof Map || value instanceof Set) {
+        return Array.isArray(value) ? value : value instanceof Set ? [...value] : [...value.entries()];
+      }
+      return helper.error('must be an array, Map, or Set');
+    }),
 });
 
 export class IterateTaskHandler implements TaskHandler {
@@ -20,15 +26,14 @@ export class IterateTaskHandler implements TaskHandler {
   async handle({ task, context, session }: TaskHandlerInput): Promise<any> {
     const { items } = validateParameters(task.parameters, Schema);
 
-    if (!task.output?.iteration) {
+    if (typeof task.output?.iteration !== 'number') {
       context.getLogger().verbose(`Initializing new iteration for task ${task.id}`);
       task.output.iteration = 0;
     } else {
       task.output.iteration++;
     }
 
-    const itemArray = Array.isArray(items) ? items : items instanceof Set ? [...items] : [...items.entries()];
-    const iterationItem = itemArray[task.output.iteration];
+    const iterationItem = (items as any[])[task.output.iteration];
 
     if (iterationItem) {
       context.getLogger().verbose(`Running iteration ${task.output.iteration} for task ${task.id}`);

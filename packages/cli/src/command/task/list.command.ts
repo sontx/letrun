@@ -1,9 +1,9 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
-import { asTree, TreeObject } from 'treeify';
-import { getSystemTasks } from '../../system-task';
+import treeify, { TreeObject } from 'treeify';
+import { SystemTaskManager } from '../../system-task';
 import { EMOJIS } from '../../ui';
-import { extractParentDirs, loadCustomTasksFromConfig } from './helper';
+import { TaskHelper } from '../libs/task-helper';
 
 export class ListCommand extends AbstractCommand {
   load(program: Command): void {
@@ -30,7 +30,7 @@ export class ListCommand extends AbstractCommand {
   }
 
   private listSystemTasks(options: AbstractOptions) {
-    const systemTasks = getSystemTasks();
+    const systemTasks = SystemTaskManager.getSystemTasks();
     const tree: TreeObject = {};
     const withFields = this.parseArrayOption(options.with);
     for (const name in systemTasks) {
@@ -42,18 +42,18 @@ export class ListCommand extends AbstractCommand {
     }
 
     console.log(`\nTotal system tasks: ${Object.keys(tree).length}`);
-    console.log(asTree(tree, true, true).trim());
+    console.log(treeify.asTree(tree, true, true).trim());
   }
 
   private async listCustomTasks(options: AbstractOptions) {
-    const customTasks = await loadCustomTasksFromConfig(this.context);
+    const customTasks = await TaskHelper.loadCustomTasksFromConfig(this.context);
 
     const rootTree: TreeObject = {};
     const withFields = this.parseArrayOption(options.with);
 
     for (const task of customTasks) {
       const filePath = task.path!;
-      const parents = extractParentDirs(filePath).map((dir) => `${EMOJIS.FOLDER} ${dir}`);
+      const parents = TaskHelper.extractParentDirs(filePath).map((dir) => `${EMOJIS.FOLDER} ${dir}`);
       let currentNode = rootTree;
       for (const parent of parents) {
         if (!currentNode[parent]) {
@@ -64,7 +64,7 @@ export class ListCommand extends AbstractCommand {
       currentNode[`${EMOJIS.ROBOT} ${task.name}`] = this.extractFields(task, withFields, true);
     }
 
-    console.log(`\nTotal custom tasks: ${Object.keys(rootTree).length}`);
-    console.log(asTree(rootTree, true, true).trim());
+    console.log(`\nTotal custom tasks: ${customTasks.length}`);
+    console.log(treeify.asTree(rootTree, true, true).trim());
   }
 }

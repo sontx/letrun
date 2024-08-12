@@ -16,6 +16,10 @@ export class DeleteCommand extends AbstractCommand {
   private async doAction(id: string) {
     const persistence = await this.context.getPluginManager().getOne<Persistence>(PERSISTENCE_PLUGIN);
     const workflowUnit = persistence.getUnit('workflow');
-    await workflowUnit.remove(id);
+    try {
+      await workflowUnit.remove(id);
+    } catch (e: any) {
+      this.context.getLogger().error(`Failed to delete workflow: ${e.message}`);
+    }
   }
 }

@@ -30,6 +30,7 @@
     "npm": ">=10"
   },
   "devDependencies": {
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "prettier": "^3.3.3"
   }
 }

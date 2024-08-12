@@ -21,6 +21,7 @@
     "jest": "jest"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@tsconfig/node20": "^20.1.2",
     "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.12",

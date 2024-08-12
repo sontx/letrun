@@ -11,11 +11,10 @@ export class FilePluginLoader implements PluginLoader {
   private readonly pluginDir: string;
   private plugins?: Plugin[];
 
-  /**
-   * Creates an instance of FilePluginLoader.
-   * @param {string} [pluginDir='plugins'] - The directory containing the plugin files.
-   */
-  constructor(pluginDir: string = 'plugins') {
+  constructor(
+    pluginDir: string = 'plugins',
+    private readonly moduleResolver = importDefault,
+  ) {
     this.pluginDir = path.resolve(getEntryPointDir(), pluginDir);
   }
 
@@ -36,7 +35,7 @@ export class FilePluginLoader implements PluginLoader {
       for (const file of files.filter((file) => file.endsWith('.js') || file.endsWith('.cjs'))) {
         const pluginFile = path.resolve(this.pluginDir, file);
         try {
-          const pluginClass = await importDefault(pluginFile);
+          const pluginClass = await this.moduleResolver(pluginFile);
           if (!pluginClass) {
             DEFAULT_LOGGER.warn(`No default export found in ${pluginFile}`);
           } else {

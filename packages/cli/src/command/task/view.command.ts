@@ -2,9 +2,9 @@ import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import { asTree, TreeObject } from 'treeify';
 import { EMOJIS } from '../../ui';
-import { getSystemTasks } from '../../system-task';
+import { SystemTaskManager } from '../../system-task';
 import { TaskHandler } from '@letrun/core';
-import { loadCustomTasksFromConfig, searchTasks } from './helper';
+import { TaskHelper } from '../libs/task-helper';
 
 export class ViewCommand extends AbstractCommand {
   load(program: Command): void {
@@ -12,14 +12,17 @@ export class ViewCommand extends AbstractCommand {
       .command('view')
       .description('view detail of a task')
       .argument('<name>', 'name of the task')
-      .option('-g, --group <group>', 'group of the task, use "." if you want to search tasks that doesn\'t have a group')
+      .option(
+        '-g, --group <group>',
+        'group of the task, use "." if you want to search tasks that doesn\'t have a group',
+      )
       .action((name, options) => {
         return this.doAction(name, options);
       });
   }
 
   private async doAction(name: string, options: AbstractOptions) {
-    const systemTasks = getSystemTasks();
+    const systemTasks = SystemTaskManager.getSystemTasks();
     if (systemTasks[name]) {
       this.viewTask(systemTasks[name], true);
     } else {
@@ -28,8 +31,8 @@ export class ViewCommand extends AbstractCommand {
   }
 
   private async viewCustomTask(name: string, group?: string) {
-    const customTasks = await loadCustomTasksFromConfig(this.context);
-    const tasks = searchTasks(customTasks, name, group);
+    const customTasks = await TaskHelper.loadCustomTasksFromConfig(this.context);
+    const tasks = TaskHelper.searchTasks(customTasks, name, group);
 
     if (tasks.length === 0) {
       this.context.getLogger().error(`Task "${name}" not found`);

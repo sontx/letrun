@@ -25,6 +25,8 @@ interface Options {
    * @type {PluginLoader}
    */
   pluginLoader?: PluginLoader;
+
+  defaultPluginLoader?: PluginLoader;
 }
 
 /**
@@ -36,12 +38,14 @@ export class DefaultContext implements AppContext {
   private readonly configProvider: ConfigProvider;
   private readonly pluginManager: PluginManager;
   private pluginLoader?: PluginLoader;
+  private defaultPluginLoader?: PluginLoader;
   private loaded = false;
 
   constructor(options: Options = {}) {
     this.configProvider = options.configProvider ?? new ChainConfigProvider();
     this.pluginManager = options.pluginManager ?? new SimplePluginManager();
     this.pluginLoader = options.pluginLoader;
+    this.defaultPluginLoader = options.defaultPluginLoader;
   }
 
   async load(): Promise<void> {
@@ -62,7 +66,7 @@ export class DefaultContext implements AppContext {
   }
 
   private async loadDefaultPlugins() {
-    const defaultPluginLoader = new DefaultPluginLoader();
+    const defaultPluginLoader = this.defaultPluginLoader ?? new DefaultPluginLoader();
     const plugins = await defaultPluginLoader.load();
     for (const plugin of plugins) {
       this.pluginManager.register(plugin);

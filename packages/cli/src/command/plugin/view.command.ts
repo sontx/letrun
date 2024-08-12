@@ -1,6 +1,6 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
-import { asTree, TreeObject } from 'treeify';
+import treeify, { TreeObject } from 'treeify';
 import { EMOJIS } from '../../ui';
 
 export class ViewCommand extends AbstractCommand {
@@ -29,7 +29,7 @@ export class ViewCommand extends AbstractCommand {
       for (const method of customMethods) {
         tree[`${EMOJIS.GEAR} ${method}`] = {};
       }
-      console.log(asTree(tree, true, true).trim());
+      console.log(treeify.asTree(tree, true, true).trim());
     }
   }
 

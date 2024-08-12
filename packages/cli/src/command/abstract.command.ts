@@ -2,7 +2,6 @@ import { Command } from 'commander';
 import { AppContext } from '@letrun/core';
 
 export interface AbstractOptions {
-  log: string;
   [key: string]: any;
 }
 

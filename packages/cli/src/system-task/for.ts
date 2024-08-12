@@ -69,7 +69,7 @@ export class ForTaskHandler implements TaskHandler {
   async handle({ task, context, session }: TaskHandlerInput): Promise<any> {
     const { from, to, step } = validateParameters(task.parameters, Schema);
 
-    if (!task.output) {
+    if (typeof task.output?.from !== 'number') {
       context.getLogger().debug(`Initializing for loop from ${from} to ${to} with step ${step}`);
       task.output = {
         index: from,

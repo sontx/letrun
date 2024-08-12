@@ -14,7 +14,7 @@ import {
 import { nanoid } from 'nanoid';
 import { DefaultContext } from './default-context';
 import { ContainerDefSchema } from './workflow-schema';
-import { getSystemTasks, taskDefValidator } from '../system-task';
+import { SystemTaskManager } from '../system-task';
 import { DefaultTasksFactory } from './default-tasks-factory';
 import { DefaultExecutionSession } from './default-execution-session';
 
@@ -62,7 +62,7 @@ export class DefaultRunner implements Runner {
     }
 
     const workflowRunner = await pluginManager.getOne<WorkflowRunner>(WORKFLOW_RUNNER_PLUGIN);
-    const tasksFactory = new DefaultTasksFactory(taskDefValidator);
+    const tasksFactory = new DefaultTasksFactory(SystemTaskManager.getTaskDefValidator);
     const startTime = Date.now();
     let workflow: Workflow | undefined;
 
@@ -80,7 +80,13 @@ export class DefaultRunner implements Runner {
 
       const result = await workflowRunner?.execute({
         workflow,
-        session: new DefaultExecutionSession(workflow, tasksFactory, this, getSystemTasks(), this.context!),
+        session: new DefaultExecutionSession(
+          workflow,
+          tasksFactory,
+          this,
+          SystemTaskManager.getSystemTasks(),
+          this.context!,
+        ),
       });
       workflow.output = result;
 

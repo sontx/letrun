@@ -1,10 +1,10 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
-import { loadCustomTasksFromConfig, searchTasks } from './helper';
 import { TaskHandler, WorkflowDef } from '@letrun/core';
 import { DefaultRunner } from '../../runner';
 import fs from 'fs';
-import { getSystemTasks } from '../../system-task';
+import { SystemTaskManager } from '../../system-task';
+import { TaskHelper } from '../libs/task-helper';
 
 const SUPPORT_RUN_SYSTEM_TASKS = ['log', 'http'];
 
@@ -15,7 +15,10 @@ export class RunCommand extends AbstractCommand {
       .description('run a task')
       .argument('<name>', 'name of the task')
       .option('-i, --input <input>', 'input for the task, can be a file path or a JSON string')
-      .option('-g, --group <group>', 'group of the task, use "." if you want to search tasks  that doesn\'t have a group')
+      .option(
+        '-g, --group <group>',
+        'group of the task, use "." if you want to search tasks  that doesn\'t have a group',
+      )
       .option('-o, --output <output>', 'output file which contains the result of the task')
       .action((name, options) => {
         return this.doAction(name, options);
@@ -31,7 +34,7 @@ export class RunCommand extends AbstractCommand {
   }
 
   private async runSystemTask(name: string, options: AbstractOptions) {
-    const systemTasks = getSystemTasks();
+    const systemTasks = SystemTaskManager.getSystemTasks();
     if (systemTasks[name]) {
       const task = systemTasks[name]!;
       await this.runTask(
@@ -47,9 +50,9 @@ export class RunCommand extends AbstractCommand {
   }
 
   private async runCustomTask(name: string, options: AbstractOptions) {
-    const customTasks = await loadCustomTasksFromConfig(this.context);
+    const customTasks = await TaskHelper.loadCustomTasksFromConfig(this.context);
     const group = options.group;
-    const tasks = searchTasks(customTasks, name, group);
+    const tasks = TaskHelper.searchTasks(customTasks, name, group);
 
     if (tasks.length === 0) {
       this.context.getLogger().error(`Task "${name}" not found`);

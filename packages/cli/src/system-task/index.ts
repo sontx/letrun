@@ -10,12 +10,8 @@ import { LogTaskHandler } from './log';
 import { HttpTaskHandler } from './http';
 import { IterateTaskHandler, validateIterateTask } from './iterate';
 
-/**
- * Returns a record of system task handlers.
- * @returns {Record<string, TaskHandler>} A record of task handlers.
- */
-export function getSystemTasks(): Record<string, TaskHandler> {
-  return {
+export class SystemTaskManager {
+  private static systemTasks: Record<string, TaskHandler> = {
     if: new IfTaskHandler(),
     switch: new SwitchTaskHandler(),
     for: new ForTaskHandler(),
@@ -26,25 +22,22 @@ export function getSystemTasks(): Record<string, TaskHandler> {
     log: new LogTaskHandler(),
     http: new HttpTaskHandler(),
   };
+  private static taskDefValidatorMap: Record<string, TaskDefValidator> = {
+    if: validateIfTask,
+    switch: validateSwitchTask,
+    for: validateForTask,
+    while: validateWhileTask,
+    iterate: validateIterateTask,
+    catch: validateCatchTask,
+  };
+
+  static getSystemTasks(): Record<string, TaskHandler> {
+    return { ...this.systemTasks };
+  }
+
+  static getTaskDefValidator(): TaskDefValidator {
+    return (taskDef: TaskDef) => {
+      this.taskDefValidatorMap[taskDef.handler]?.(taskDef);
+    };
+  }
 }
-
-/**
- * A map of task definition validators.
- * @type {Record<string, (taskDef: TaskDef) => void>}
- */
-const TaskDefValidatorMap: Record<string, (taskDef: TaskDef) => void> = {
-  if: validateIfTask,
-  switch: validateSwitchTask,
-  for: validateForTask,
-  while: validateWhileTask,
-  iterate: validateIterateTask,
-  catch: validateCatchTask,
-};
-
-/**
- * Validates a task definition.
- * @param {TaskDef} taskDef - The task definition to validate.
- */
-export const taskDefValidator: TaskDefValidator = (taskDef: TaskDef) => {
-  TaskDefValidatorMap[taskDef.handler]?.(taskDef);
-};

@@ -1,6 +1,6 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
-import { asTree } from 'treeify';
+import treeify from 'treeify';
 import { Persistence, PERSISTENCE_PLUGIN } from '@letrun/core';
 import { FIELD_TRANSFORMERS } from './helper';
 import { EMOJIS } from '../../ui';
@@ -30,16 +30,20 @@ export class ListCommand extends AbstractCommand {
 
     let message = '';
     for (const workflowId of showingIds) {
-      const workflow = await workflowUnit.load(workflowId);
-      if (workflow) {
-        message += `${EMOJIS.ROCKET} ${workflowId}\n${asTree(
-          {
-            name: workflow.name,
-            ...this.extractFields(workflow, withFields, true, FIELD_TRANSFORMERS),
-          },
-          true,
-          true,
-        )}`;
+      try {
+        const workflow = await workflowUnit.load(workflowId);
+        if (workflow) {
+          message += `${EMOJIS.ROCKET} ${workflowId}\n${treeify.asTree(
+            {
+              name: workflow.name,
+              ...this.extractFields(workflow, withFields, true, FIELD_TRANSFORMERS),
+            },
+            true,
+            true,
+          )}`;
+        }
+      } catch (e: any) {
+        message += `${EMOJIS.BOOM} ${workflowId}\n${treeify.asTree({ error: e.message }, true, true)}`;
       }
     }
 
