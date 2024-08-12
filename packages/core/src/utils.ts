@@ -20,7 +20,7 @@ export async function importDefault(filePath: string): Promise<any> {
  * @param {string} path - The path to check.
  * @returns {boolean} True if the path is relative, false otherwise.
  */
-function isRelativePath(path: string): boolean {
+export function isRelativePath(path: string): boolean {
   return path.startsWith('./') || path.startsWith('../');
 }
 
