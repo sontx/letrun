@@ -1,9 +1,10 @@
 import { Command } from 'commander';
-import { CommandLoader, getOptionValue } from './command';
+import { CommandLoader } from './command';
 import { BANNER, EMOJIS } from './ui';
 import { DefaultContext } from './runner';
 import { AppContext, COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
 import { DEFAULT_LOGGER } from './logger';
+import { getOptionValue } from '@src/command/libs';
 
 async function setupLogLevel(context: AppContext) {
   const logLevel = getOptionValue('-l', '--log') ?? 'warn';

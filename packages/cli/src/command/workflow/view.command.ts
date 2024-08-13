@@ -3,8 +3,8 @@ import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import fs from 'fs';
 import { Container, Persistence, PERSISTENCE_PLUGIN, Workflow } from '@letrun/core';
-import { FIELD_TRANSFORMERS } from './helper';
-import { EMOJIS } from '../../ui';
+import { FIELD_TRANSFORMERS } from '../libs';
+import { EMOJIS } from '@src/ui';
 
 export class ViewCommand extends AbstractCommand {
   load(program: Command): void {

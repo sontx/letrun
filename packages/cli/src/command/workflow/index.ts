@@ -7,9 +7,7 @@ import { ClearCommand } from './clear.command';
 
 export class WorkflowCommand extends AbstractCommand {
   load(program: Command): void {
-    const command = program
-      .command('workflow [command]')
-      .description('manage workflows');
+    const command = program.command('workflow [command]').description('manage workflows');
 
     new ViewCommand(this.context).load(command);
     new ListCommand(this.context).load(command);

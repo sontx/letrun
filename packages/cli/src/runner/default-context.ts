@@ -37,8 +37,8 @@ export class DefaultContext implements AppContext {
   private readonly loggerModule: LoggerModule = new LoggerModule();
   private readonly configProvider: ConfigProvider;
   private readonly pluginManager: PluginManager;
-  private pluginLoader?: PluginLoader;
   private defaultPluginLoader?: PluginLoader;
+  private pluginLoader?: PluginLoader;
   private loaded = false;
 
   constructor(options: Options = {}) {

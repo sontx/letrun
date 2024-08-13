@@ -2,8 +2,8 @@ import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import treeify from 'treeify';
 import { Persistence, PERSISTENCE_PLUGIN } from '@letrun/core';
-import { FIELD_TRANSFORMERS } from './helper';
-import { EMOJIS } from '../../ui';
+import { FIELD_TRANSFORMERS } from '../libs';
+import { EMOJIS } from '@src/ui';
 
 export class ListCommand extends AbstractCommand {
   load(program: Command): void {

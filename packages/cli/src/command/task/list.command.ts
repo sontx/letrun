@@ -1,9 +1,9 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import treeify, { TreeObject } from 'treeify';
-import { SystemTaskManager } from '../../system-task';
-import { EMOJIS } from '../../ui';
-import { TaskHelper } from '../libs/task-helper';
+import { SystemTaskManager } from '@src/system-task';
+import { EMOJIS } from '@src/ui';
+import { TaskHelper } from '@src/command/libs';
 
 export class ListCommand extends AbstractCommand {
   load(program: Command): void {

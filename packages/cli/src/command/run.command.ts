@@ -3,7 +3,7 @@ import { Command } from 'commander';
 import { parse } from 'yaml';
 import fs from 'fs';
 import { DefaultRunner } from '../runner';
-import { Persistence, PERSISTENCE_PLUGIN, Workflow } from '@letrun/core/dist';
+import { Persistence, PERSISTENCE_PLUGIN, Workflow } from '@letrun/core';
 
 export class RunCommand extends AbstractCommand {
   load(program: Command): void {
