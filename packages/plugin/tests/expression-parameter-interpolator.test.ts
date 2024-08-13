@@ -1,4 +1,4 @@
-import ExpressionParameterInterpolator from './expression-parameter-interpolator';
+import ExpressionParameterInterpolator from '@src/expression-parameter-interpolator';
 import { AppContext } from '@letrun/core';
 
 const jest = import.meta.jest;

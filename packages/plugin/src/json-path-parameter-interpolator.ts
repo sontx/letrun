@@ -1,5 +1,6 @@
 import {
-  AppContext, ConfigNotFoundError,
+  AppContext,
+  ConfigNotFoundError,
   loadConfigToPlugin,
   Logger,
   PARAMETER_INTERPOLATOR_PLUGIN,

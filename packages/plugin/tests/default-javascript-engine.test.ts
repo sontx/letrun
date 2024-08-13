@@ -1,4 +1,4 @@
-import DefaultJavascriptEngine from './default-javascript-engine';
+import DefaultJavascriptEngine from '@src/default-javascript-engine';
 import { AppContext } from '@letrun/core';
 
 const jest = import.meta.jest;

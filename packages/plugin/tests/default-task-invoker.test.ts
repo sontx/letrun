@@ -1,5 +1,5 @@
-import DefaultTaskInvoker from './default-task-invoker';
-import {TaskHandlerInput} from '@letrun/core';
+import DefaultTaskInvoker from '@src/default-task-invoker';
+import { TaskHandlerInput } from '@letrun/core';
 import { InvalidParameterError } from '@letrun/core/dist';
 import path from 'node:path';
 import fs from 'fs';
@@ -26,7 +26,7 @@ describe('DefaultTaskInvoker', () => {
     const mockModuleResolver = jest.fn().mockResolvedValue(
       jest.fn().mockImplementation(() => ({
         handle: externalTaskHandler,
-      }))
+      })),
     );
 
     const handlerPath = path.resolve('tasks', 'externalTaskHandler.js');

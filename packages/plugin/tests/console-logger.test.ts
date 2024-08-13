@@ -1,4 +1,4 @@
-import ConsoleLogger from './console-logger';
+import ConsoleLogger from '@src/console-logger';
 import { AppContext } from '@letrun/core';
 import { transports } from 'winston';
 

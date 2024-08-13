@@ -1,4 +1,4 @@
-import JsonPathParameterInterpolator from './json-path-parameter-interpolator';
+import JsonPathParameterInterpolator from '@src/json-path-parameter-interpolator';
 import { AppContext } from '@letrun/core';
 
 const jest = import.meta.jest;

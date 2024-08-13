@@ -1,4 +1,4 @@
-import DefaultWorkflowRunner from './default-workflow-runner';
+import DefaultWorkflowRunner from '@src/default-workflow-runner';
 import {
   AppContext,
   ExecutionSession,
