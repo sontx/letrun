@@ -30,8 +30,10 @@ export default class ExpressionParameterInterpolator implements ParameterInterpo
     }
 
     let currentValue = value;
-    do {
-      let expressionKey = this.extractKeyFromExpression(currentValue);
+    let match;
+
+    while ((match = /\${(.*?)}/g.exec(currentValue)) !== null) {
+      let expressionKey = match[1]!;
       if (expressionKey.startsWith('input.')) {
         expressionKey = `workflow.${expressionKey}`;
       } else if (expressionKey.startsWith('variables.')) {
@@ -41,15 +43,18 @@ export default class ExpressionParameterInterpolator implements ParameterInterpo
       const jsonPathKey = expressionKey ? `$.${expressionKey}` : '$';
       try {
         const result = this.jsonPath.interpolate(jsonPathKey, interpolatorContext, true);
-        this.logger?.verbose(`Resolved expression: ${currentValue} --> ${result}`);
-        currentValue = result;
+        this.logger?.verbose(`Resolved expression: ${match[0]} --> ${result}`);
+        currentValue = currentValue.replaceAll(match[0], result);
+        if (!this.recursive) {
+          break;
+        }
       } catch (e: any) {
         if (e instanceof ConfigNotFoundError) {
           return value as T;
         }
         throw e;
       }
-    } while (this.recursive && this.isExpression(currentValue));
+    }
     return currentValue as T;
   }
 
@@ -58,13 +63,9 @@ export default class ExpressionParameterInterpolator implements ParameterInterpo
       return false;
     }
 
-    // Define a regular expression for a simple expression validation
-    const expressionRegex = /^(\${.*?})+$/;
+    // Define a regular expression for detecting expressions within a string
+    const expressionRegex = /\${.*?}/;
     return expressionRegex.test(str);
-  }
-
-  private extractKeyFromExpression(expression: string) {
-    return expression.substring(2, expression.length - 1);
   }
 
   async unload() {

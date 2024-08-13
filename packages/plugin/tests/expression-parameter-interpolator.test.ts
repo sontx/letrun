@@ -37,6 +37,20 @@ describe('ExpressionParameterInterpolator', () => {
     expect(result).toBe('${input.missingKey}');
   });
 
+  it('interpolates expressions inside a string (placeholder)', () => {
+    const interpolator = new ExpressionParameterInterpolator();
+    const context = { workflow: { input: { name: 'World' } } };
+    const result = interpolator.interpolate('Hello ${input.name}', context);
+    expect(result).toBe('Hello World');
+  });
+
+  it('interpolates multiple placeholders in a string', () => {
+    const interpolator = new ExpressionParameterInterpolator();
+    const context = { workflow: { input: { firstName: 'John', lastName: 'Doe' } } };
+    const result = interpolator.interpolate('Hello ${input.firstName} ${input.lastName}', context);
+    expect(result).toBe('Hello John Doe');
+  });
+
   it('loads configuration correctly', async () => {
     const context = {
       getConfigProvider: jest.fn().mockReturnValue({
