@@ -15,10 +15,20 @@
   "scripts": {
     "build": "tsc",
     "coverage": "jest --coverage",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm run build && npm run test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sontx/letrun.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sontx/letrun/issues"
+  },
+  "homepage": "https://github.com/sontx/letrun#readme",
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "dist/index.d.ts",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/jest": "^29.5.12",
