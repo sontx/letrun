@@ -1,10 +1,10 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import { TaskHandler, WorkflowDef } from '@letrun/core';
-import { DefaultRunner } from '../../runner';
+import { DefaultRunner } from '@src/runner';
 import fs from 'fs';
-import { SystemTaskManager } from '../../system-task';
-import { TaskHelper } from '../libs/task-helper';
+import { SystemTaskManager } from '@src/system-task';
+import { TaskHelper } from '@src/command/libs';
 
 const SUPPORT_RUN_SYSTEM_TASKS = ['log', 'http'];
 

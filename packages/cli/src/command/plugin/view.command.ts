@@ -1,7 +1,7 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import treeify, { TreeObject } from 'treeify';
-import { EMOJIS } from '../../ui';
+import { EMOJIS } from '@src/ui';
 
 export class ViewCommand extends AbstractCommand {
   load(program: Command): void {

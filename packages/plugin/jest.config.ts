@@ -1,4 +1,4 @@
-import { Config } from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   preset: 'ts-jest',
@@ -14,7 +14,9 @@ const config: Config = {
   },
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@src/(.*)$': '<rootDir>/src/$1',
   },
+  testMatch: ['**/tests/**/*.test.ts'],
 };
+
 export default config;
