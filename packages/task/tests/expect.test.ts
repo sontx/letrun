@@ -1,4 +1,4 @@
-import Handler from './expect';
+import Handler from '@src/expect';
 import { TaskHandlerInput } from '@letrun/core';
 import { expect } from 'expect';
 

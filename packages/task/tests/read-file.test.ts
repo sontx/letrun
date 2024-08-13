@@ -1,4 +1,4 @@
-import Handler from './read-file';
+import Handler from '@src/read-file';
 import { TaskHandlerInput } from '@letrun/core';
 import * as fs from 'node:fs';
 

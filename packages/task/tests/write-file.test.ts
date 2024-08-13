@@ -1,4 +1,4 @@
-import Handler from './write-file';
+import Handler from '@src/write-file';
 import { TaskHandlerInput } from '@letrun/core';
 import * as fs from 'node:fs';
 
