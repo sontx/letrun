@@ -69,7 +69,7 @@ describe('RunCommand', () => {
     await runCommand['doAction'](path, options);
 
     expect(runnerMock.load).toHaveBeenCalled();
-    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining({ name: 'Workflow 1' }));
+    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining({ name: 'Workflow 1' }), {});
     expect(runnerMock.unload).toHaveBeenCalled();
     expect(fs.promises.writeFile).toHaveBeenCalledWith('output.json', JSON.stringify('result', null, 2), 'utf8');
   });
@@ -84,9 +84,59 @@ describe('RunCommand', () => {
     await runCommand['doAction'](path, options);
 
     expect(runnerMock.load).toHaveBeenCalled();
-    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining({ name: 'Workflow 1' }));
+    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining({ name: 'Workflow 1' }), {});
     expect(runnerMock.unload).toHaveBeenCalled();
     expect(workflowUnitMock.save).toHaveBeenCalledWith('workflow1', expect.objectContaining({ id: 'workflow1' }));
+  });
+
+  it('passes input correctly to the workflow runner', async () => {
+    const path = 'workflow.json';
+    const options = { input: 'input.json', output: '', save: false };
+    const inputContent = { key: 'value' };
+    const workflowContent = { name: 'Workflow 1' };
+
+    jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+      return filePath === path || filePath === options.input;
+    });
+
+    jest.spyOn(fs.promises, 'readFile').mockImplementation((filePath) => {
+      if (filePath === path) {
+        return Promise.resolve(JSON.stringify(workflowContent));
+      } else if (filePath === options.input) {
+        return Promise.resolve(JSON.stringify(inputContent));
+      }
+      return Promise.reject(new Error('File not found'));
+    });
+
+    await runCommand['doAction'](path, options);
+
+    expect(runnerMock.load).toHaveBeenCalled();
+    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining(workflowContent), inputContent);
+    expect(runnerMock.unload).toHaveBeenCalled();
+  });
+
+  it('parses input JSON string and passes it to the workflow runner', async () => {
+    const path = 'workflow.json';
+    const options = { input: '{"key": "value"}', output: '', save: false };
+    const inputContent = { key: 'value' };
+    const workflowContent = { name: 'Workflow 1' };
+
+    jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+      return filePath === path;
+    });
+
+    jest.spyOn(fs.promises, 'readFile').mockImplementation((filePath) => {
+      if (filePath === path) {
+        return Promise.resolve(JSON.stringify(workflowContent));
+      }
+      return Promise.reject(new Error('File not found'));
+    });
+
+    await runCommand['doAction'](path, options);
+
+    expect(runnerMock.load).toHaveBeenCalled();
+    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining(workflowContent), inputContent);
+    expect(runnerMock.unload).toHaveBeenCalled();
   });
 
   it('logs an error when the file does not exist', async () => {

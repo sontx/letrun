@@ -1,0 +1,13 @@
+{
+  "name": "param input workflow",
+  "tasks": [
+    {
+      "name": "task1",
+      "handler": "http",
+      "parameters": {
+        "url": "${input.name}",
+        "method": "GET"
+      }
+    }
+  ]
+}

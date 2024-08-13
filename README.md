@@ -161,7 +161,7 @@ Arguments:
 - `<path>`: Path to the workflow file either in JSON or YAML format.
 
 Options:
-
+- `-i, --input <input>`: Input for the workflow, can be a file path or a JSON string.
 - `-s, --save`: Whether to save the workflow after running it.
 - `-o, --output <output>`: Output file which contains the result of the workflow.
 

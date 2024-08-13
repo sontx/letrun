@@ -11,6 +11,7 @@ export class RunCommand extends AbstractCommand {
       .command('run', { isDefault: true })
       .description('run a workflow')
       .argument('<path>', 'path to the workflow file either in JSON or YAML format')
+      .option('-i, --input <input>', 'input for the workflow, can be a file path or a JSON string')
       .option('-s, --save', 'whether to save the workflow after running it', false)
       .option('-o, --output <output>', 'Output file which contains the result of the workflow')
       .action(async (path, options) => {
@@ -30,6 +31,16 @@ export class RunCommand extends AbstractCommand {
       return;
     }
 
+    let input = {};
+    if (options.input) {
+      if (fs.existsSync(options.input)) {
+        const inputString = await fs.promises.readFile(options.input, 'utf8');
+        input = JSON.parse(inputString);
+      } else {
+        input = JSON.parse(options.input);
+      }
+    }
+
     const content = await fs.promises.readFile(path, 'utf8');
     const workflow = ext === 'json' ? JSON.parse(content) : parse(content);
     const runner = new DefaultRunner();
@@ -37,7 +48,7 @@ export class RunCommand extends AbstractCommand {
     let ranWorkflow: Workflow | undefined;
     try {
       await runner.load(this.context);
-      ranWorkflow = await runner.run(workflow);
+      ranWorkflow = await runner.run(workflow, input);
       if (options.output) {
         await fs.promises.writeFile(options.output, JSON.stringify(ranWorkflow?.output ?? '', null, 2), 'utf8');
       }
