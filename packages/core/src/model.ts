@@ -5,8 +5,6 @@ import { FunctionKeys, ObjectType } from './types';
  * Extends the ContainerDef interface.
  */
 export interface WorkflowDef extends ContainerDef {
-  /** Optional input data for the workflow definition. */
-  input?: any;
 }
 
 /**
