@@ -1,4 +1,4 @@
-import { IdGenerator } from './id-generator';
+import { IdGenerator } from '@src/id-generator';
 
 describe('IdGenerator', () => {
   it('generates unique IDs without parent ID', () => {

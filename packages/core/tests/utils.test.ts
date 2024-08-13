@@ -12,9 +12,9 @@ import {
   loadConfigToPlugin,
   scanAllTasks,
   validateParameters,
-} from './utils';
-import { Container, Plugin, TaskDef, WorkflowTasks } from './model';
-import { InvalidParameterError } from './error';
+} from '@src/utils';
+import { Container, Plugin, TaskDef, WorkflowTasks } from '@src/model';
+import { InvalidParameterError } from '@src/error';
 import Joi from 'joi';
 
 describe('Utils', () => {
