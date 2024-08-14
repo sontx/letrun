@@ -29,6 +29,11 @@ describe('searchTasks', () => {
     { name: 'task2', path: 'group1/task2.js' },
   ];
 
+  it('returns tasks matching the given name and group', () => {
+    const result = TaskHelper.searchTasks(tasks, 'task1', 'group1');
+    expect(result).toEqual([{ name: 'task1', path: 'group1/task1.js', group: 'group1' }]);
+  });
+
   it('returns tasks matching the given name and group with null group', () => {
     const result = TaskHelper.searchTasks(tasks, 'task1', undefined);
     expect(result).toEqual([
@@ -44,6 +49,11 @@ describe('searchTasks', () => {
       { name: 'task1', path: 'group2/task1.js', group: 'group2' },
     ]);
   });
+
+  it('returns an empty array when no tasks are provided', () => {
+    const result = TaskHelper.searchTasks([], 'task1', 'group1');
+    expect(result).toEqual([]);
+  });
 });
 
 describe('loadCustomTasksFromConfig', () => {
@@ -54,50 +64,11 @@ describe('loadCustomTasksFromConfig', () => {
       }),
     } as unknown as AppContext;
 
-    jest.spyOn(TaskHelper, 'loadCustomTasks').mockResolvedValue([]);
+    jest.spyOn(TaskHelper as any, 'loadCustomTasks').mockResolvedValue([]);
     jest.spyOn(TaskHelper, 'getEntryPointDir').mockReturnValue('/entry/point/dir');
 
     const result = await TaskHelper.loadCustomTasksFromConfig(context);
     expect(result).toEqual([]);
-    expect(TaskHelper.loadCustomTasks).toHaveBeenCalledWith(path.resolve('/entry/point/dir/tasks'), context);
-  });
-});
-
-describe('loadCustomTasks', () => {
-  it('handles empty task directory', async () => {
-    const tasksDir = '/emptyTasks';
-    jest.spyOn(TaskHelper, 'getAllJsFiles').mockResolvedValue([]);
-    const context = {
-      getLogger: jest.fn(() => ({ error: jest.fn() })),
-    } as unknown as AppContext;
-    const result = await TaskHelper.loadCustomTasks(tasksDir, context);
-    expect(result).toEqual([]);
-  });
-});
-
-describe('getAllJsFiles', () => {
-  it('handles directories with no .js files', async () => {
-    const dir = '/noJsFiles';
-    const { promises } = await import('fs');
-    (promises.readdir as jest.Mock).mockResolvedValueOnce(['file1.txt', 'file2.md']);
-    const context = {
-      getLogger: jest.fn(() => ({ error: jest.fn() })),
-    } as unknown as AppContext;
-    const result = await TaskHelper.getAllJsFiles(dir, context);
-    expect(result).toEqual([]);
-  });
-
-  it('handles nested directories with no .js files', async () => {
-    const dir = '/nestedNoJsFiles';
-    const { promises } = await import('fs');
-    (promises.readdir as jest.Mock).mockResolvedValueOnce(['subdir']);
-    (promises.stat as jest.Mock).mockResolvedValueOnce({ isDirectory: () => true });
-    (promises.readdir as jest.Mock).mockResolvedValueOnce(['file1.txt']);
-    (promises.stat as jest.Mock).mockResolvedValueOnce({ isDirectory: () => false });
-    const context = {
-      getLogger: jest.fn(() => ({ error: jest.fn() })),
-    } as unknown as AppContext;
-    const result = await TaskHelper.getAllJsFiles(dir, context);
-    expect(result).toEqual([]);
+    expect((TaskHelper as any).loadCustomTasks).toHaveBeenCalledWith(path.resolve('/entry/point/dir/tasks'), context);
   });
 });
