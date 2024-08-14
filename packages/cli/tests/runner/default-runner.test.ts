@@ -1,6 +1,6 @@
 import { DefaultRunner } from '@src/runner/default-runner';
 import {
-  AppContext,
+  AppContext, IdGenerator,
   IllegalStateError,
   InvalidParameterError,
   Workflow,
@@ -17,6 +17,7 @@ describe('DefaultRunner', () => {
   let runner: DefaultRunner;
   let mockContext: jest.Mocked<AppContext>;
   let mockWorkflowRunner: jest.Mocked<WorkflowRunner>;
+  let mockIdGenerator: jest.Mocked<IdGenerator>;
 
   beforeEach(() => {
     mockWorkflowRunner = {
@@ -35,6 +36,10 @@ describe('DefaultRunner', () => {
       }),
       unload: jest.fn(),
     } as unknown as jest.Mocked<AppContext>;
+    mockIdGenerator = {
+      getParentId: jest.fn(),
+      generateId: jest.fn(),
+    } as unknown as jest.Mocked<IdGenerator>;
 
     runner = new DefaultRunner();
   });
@@ -96,7 +101,7 @@ describe('DefaultRunner', () => {
     const input = { key: 'value' };
     const preparedWorkflow = runner['prepareWorkflow'](
       workflowDef,
-      new DefaultTasksFactory(SystemTaskManager.getTaskDefValidator),
+      new DefaultTasksFactory(mockIdGenerator, SystemTaskManager.getTaskDefValidator),
       input,
     );
     expect(preparedWorkflow.input).toBe(input);

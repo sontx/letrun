@@ -1,6 +1,8 @@
 import {
   AppContext,
   ExecutablePlugin,
+  ID_GENERATOR_PLUGIN,
+  IdGenerator,
   IllegalStateError,
   InvalidParameterError,
   Logger,
@@ -62,7 +64,8 @@ export class DefaultRunner implements Runner {
     }
 
     const workflowRunner = await pluginManager.getOne<WorkflowRunner>(WORKFLOW_RUNNER_PLUGIN);
-    const tasksFactory = new DefaultTasksFactory(SystemTaskManager.getTaskDefValidator);
+    const idGenerator = await pluginManager.getOne<IdGenerator>(ID_GENERATOR_PLUGIN);
+    const tasksFactory = new DefaultTasksFactory(idGenerator, SystemTaskManager.getTaskDefValidator);
     const startTime = Date.now();
     let workflow: Workflow | undefined;
 
@@ -86,6 +89,7 @@ export class DefaultRunner implements Runner {
           this,
           SystemTaskManager.getSystemTasks(),
           this.context!,
+          idGenerator,
         ),
       });
       workflow.output = result;

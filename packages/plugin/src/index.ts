@@ -6,6 +6,7 @@ import DefaultWorkflowRunner from './default-workflow-runner';
 import ExpressionParameterInterpolator from './expression-parameter-interpolator';
 import FilePersistence from './file-persistence';
 import DefaultInputParameter from './default-input-parameter';
+import DefaultIdGenerator from './default-id-generator';
 
 const DEFAULT_PLUGINS: Plugin[] = [
   new ConsoleLogger(),
@@ -15,6 +16,7 @@ const DEFAULT_PLUGINS: Plugin[] = [
   new ExpressionParameterInterpolator(),
   new FilePersistence(),
   new DefaultInputParameter(),
+  new DefaultIdGenerator(),
 ];
 
 export class DefaultPluginLoader implements PluginLoader {

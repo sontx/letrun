@@ -1,5 +1,14 @@
 import { DefaultExecutionSession } from '@src/runner/default-execution-session';
-import { AppContext, IllegalStateError, Runner, Task, TaskHandler, TasksFactory, Workflow } from '@letrun/core';
+import {
+  AppContext,
+  IdGenerator,
+  IllegalStateError,
+  Runner,
+  Task,
+  TaskHandler,
+  TasksFactory,
+  Workflow,
+} from '@letrun/core';
 
 const jest = import.meta.jest;
 
@@ -10,6 +19,7 @@ describe('DefaultExecutionSession', () => {
   let mockRunner: jest.Mocked<Runner>;
   let mockSystemTasks: Record<string, jest.Mocked<TaskHandler>>;
   let mockWorkflow: jest.Mocked<Workflow>;
+  let mockIdGenerator: jest.Mocked<IdGenerator>;
 
   beforeEach(() => {
     mockContext = {
@@ -32,8 +42,18 @@ describe('DefaultExecutionSession', () => {
     mockWorkflow = {
       tasks: {},
     } as unknown as jest.Mocked<Workflow>;
+    mockIdGenerator = {
+      getParentId: jest.fn(),
+    } as unknown as jest.Mocked<IdGenerator>;
 
-    session = new DefaultExecutionSession(mockWorkflow, mockTasksFactory, mockRunner, mockSystemTasks, mockContext);
+    session = new DefaultExecutionSession(
+      mockWorkflow,
+      mockTasksFactory,
+      mockRunner,
+      mockSystemTasks,
+      mockContext,
+      mockIdGenerator,
+    );
   });
 
   it('resolves string parameter successfully', async () => {
@@ -117,7 +137,7 @@ describe('DefaultExecutionSession', () => {
     const childTask = { id: 'parent/child' } as Task;
     session['registeredTasks'].set(parentTask.id, parentTask);
     session['registeredTasks'].set(childTask.id, childTask);
-
+    mockIdGenerator.getParentId.mockReturnValueOnce('parent');
     const result = session.getParentTask(childTask);
     expect(result).toBe(parentTask);
   });

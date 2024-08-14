@@ -1,5 +1,5 @@
 import { DefaultTasksFactory } from '@src/runner/default-tasks-factory';
-import { InvalidParameterError, Task, TaskDef } from '@letrun/core';
+import {IdGenerator, InvalidParameterError, Task, TaskDef} from '@letrun/core';
 
 const jest = import.meta.jest;
 
@@ -7,11 +7,16 @@ describe('DefaultTasksFactory', () => {
   let factory: DefaultTasksFactory;
   let mockTaskDefValidator: jest.MockedFunction<(taskDef: TaskDef) => void>;
   let mockTaskCustomizer: jest.MockedFunction<(task: Task) => Task>;
+  let mockIdGenerator: jest.Mocked<IdGenerator>;
 
   beforeEach(() => {
     mockTaskDefValidator = jest.fn();
     mockTaskCustomizer = jest.fn((task) => task);
-    factory = new DefaultTasksFactory(mockTaskDefValidator, mockTaskCustomizer);
+    mockIdGenerator = {
+      getParentId: jest.fn(),
+      generateId: jest.fn(),
+    } as unknown as jest.Mocked<IdGenerator>;
+    factory = new DefaultTasksFactory(mockIdGenerator, mockTaskDefValidator, mockTaskCustomizer);
   });
 
   it('creates tasks successfully from array', () => {
