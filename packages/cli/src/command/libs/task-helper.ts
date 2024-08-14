@@ -34,7 +34,7 @@ export class TaskHelper {
     return await this.loadCustomTasks(pathTasksDir, context);
   }
 
-  static async loadCustomTasks(tasksDir: string, context: AppContext) {
+  private static async loadCustomTasks(tasksDir: string, context: AppContext) {
     const jsFiles = await this.getAllJsFiles(tasksDir, context);
     const tasks: CustomTask[] = [];
 
@@ -70,7 +70,7 @@ export class TaskHelper {
     return tasks;
   }
 
-  static async getAllJsFiles(dir: string, context: AppContext) {
+  private static async getAllJsFiles(dir: string, context: AppContext) {
     const results: string[] = [];
 
     const readDir = async (currentDir: string) => {
