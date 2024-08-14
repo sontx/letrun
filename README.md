@@ -30,6 +30,7 @@ A simple and efficient tool for running declarative workflows with ease.
   - [Parameter Interpolator](#parameter-interpolator)
   - [Persistence](#persistence)
   - [Input Parameter](#input-parameter)
+  - [Id Generator](#id-generator)
   - [Task Invoker](#task-invoker)
   - [Workflow Runner](#workflow-runner)
   - [Pre/Post Run Workflow Plugin](#pre-post-run-workflow-plugin)
@@ -352,6 +353,11 @@ This plugin is used to persist data to a storage. The default implementation use
 This plugin is used to parse or load the raw input parameter to the desired format.
 The [default implementation](plugin/src/default-input-parameter.ts) supports JSON string and file input (JSON and YAML format)
 and converts the input to an object.
+
+### Id Generator
+
+This plugin is used to generate unique IDs for tasks and can look up the parent id from any child id.
+The [default implementation](plugin/src/default-id-generator.ts) is using `/` as a separator for the parent id.
 
 ### Task Invoker
 
