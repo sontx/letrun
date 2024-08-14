@@ -21,11 +21,11 @@ const bootstrap = async () => {
     .hook('preAction', (command) => {
       if (!command.optsWithGlobals().hideBanner) {
         console.log(BANNER);
-        console.log(`v${process.env.APP_VERSION} - from ${process.env.APP_AUTHOR} with ${EMOJIS.HEART}`);
+        console.log(`v${process.env.APP_VERSION} - from ${process.env.APP_AUTHOR} with ${EMOJIS.HEART}\n`);
       }
     })
     .option('-l, --log <logLevel>', 'log level', 'warn')
-    .option('--hide-banner <hideBanner>', 'hide banner', false);
+    .option('--hide-banner', 'hide banner', false);
 
   const context = new DefaultContext();
   try {
