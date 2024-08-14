@@ -15,9 +15,9 @@ export type TaskDefValidator = (taskDef: TaskDef) => void;
 
 export class DefaultTasksFactory implements TasksFactory {
   private readonly createdTaskNames = new Set<string>();
-  private readonly idGenerator = new IdGenerator();
 
   constructor(
+    private idGenerator: IdGenerator,
     private taskDefValidator?: TaskDefValidator,
     private taskCustomizer?: TaskCustomizer,
   ) {}

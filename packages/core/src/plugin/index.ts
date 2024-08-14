@@ -6,3 +6,4 @@ export * from './javascript-engine';
 export * from './task-invoker';
 export * from './command-plugin';
 export * from './input-parameter';
+export * from './id-generator';

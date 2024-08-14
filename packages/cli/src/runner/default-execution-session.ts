@@ -31,6 +31,7 @@ export class DefaultExecutionSession implements ExecutionSession {
     public readonly runner: Runner,
     public readonly systemTasks: Record<string, TaskHandler>,
     private readonly context: AppContext,
+    private readonly idGenerator: IdGenerator,
   ) {
     this.registerTasks(workflow);
     this.interpolatorContext['workflow'] = workflow;
@@ -50,7 +51,7 @@ export class DefaultExecutionSession implements ExecutionSession {
   getParentTask(task: Task, checkParentFn?: (parentTask: Task) => boolean): Task | undefined {
     let currentId = task.id;
     do {
-      const parentId = IdGenerator.getParentId(currentId);
+      const parentId = this.idGenerator.getParentId(currentId);
       if (!parentId) {
         return undefined;
       }
