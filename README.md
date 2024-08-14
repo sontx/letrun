@@ -29,6 +29,7 @@ A simple and efficient tool for running declarative workflows with ease.
   - [Logger Plugin](#logger-plugin)
   - [Parameter Interpolator](#parameter-interpolator)
   - [Persistence](#persistence)
+  - [Input Parameter](#input-parameter)
   - [Task Invoker](#task-invoker)
   - [Workflow Runner](#workflow-runner)
   - [Pre/Post Run Workflow Plugin](#pre-post-run-workflow-plugin)
@@ -346,6 +347,12 @@ The default implementation is [expression-parameter-interpolator.ts](plugin/src/
 
 This plugin is used to persist data to a storage. The default implementation uses a [file-based storage](plugin/src/file-persistence.ts).
 
+### Input Parameter
+
+This plugin is used to parse or load the raw input parameter to the desired format.
+The [default implementation](plugin/src/default-input-parameter.ts) supports JSON string and file input (JSON and YAML format)
+and converts the input to an object.
+
 ### Task Invoker
 
 This plugin is used to invoke task handlers which is used by the [workflow-runner](#workflow-runner) plugin.
@@ -514,7 +521,6 @@ The default configuration is:
   }
 }
 ```
-
 
 ## Development
 
