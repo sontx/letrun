@@ -7,6 +7,7 @@ import ExpressionParameterInterpolator from './expression-parameter-interpolator
 import FilePersistence from './file-persistence';
 import DefaultInputParameter from './default-input-parameter';
 import DefaultIdGenerator from './default-id-generator';
+import WinstonLoggerPlugin from './winston-logger-plugin';
 
 const DEFAULT_PLUGINS: Plugin[] = [
   new ConsoleLogger(),
@@ -17,6 +18,7 @@ const DEFAULT_PLUGINS: Plugin[] = [
   new FilePersistence(),
   new DefaultInputParameter(),
   new DefaultIdGenerator(),
+  new WinstonLoggerPlugin(),
 ];
 
 export class DefaultPluginLoader implements PluginLoader {

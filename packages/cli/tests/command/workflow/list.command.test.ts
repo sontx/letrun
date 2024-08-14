@@ -48,14 +48,14 @@ describe('ListCommand', () => {
     workflowUnitMock.list.mockResolvedValue(['workflow1', 'workflow2']);
     workflowUnitMock.load.mockResolvedValue({ name: 'Workflow 1' });
     await listCommand['doAction']({ max: '10', offset: '0', with: '' } as any);
-    expect(consoleSpy).toHaveBeenCalledWith('\nShowing 2 workflow(s)');
+    expect(consoleSpy).toHaveBeenCalledWith('Showing 2 workflow(s)');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.ROCKET} workflow1`));
   });
 
   it('handles empty workflow list gracefully', async () => {
     workflowUnitMock.list.mockResolvedValue([]);
     await listCommand['doAction']({ max: '10', offset: '0', with: '' } as any);
-    expect(consoleSpy).toHaveBeenCalledWith('\nShowing 0 workflow(s)');
+    expect(consoleSpy).toHaveBeenCalledWith('Showing 0 workflow(s)');
   });
 
   it('handles workflows with additional fields', async () => {
@@ -69,7 +69,7 @@ describe('ListCommand', () => {
     workflowUnitMock.list.mockResolvedValue(['workflow1', 'workflow2', 'workflow3']);
     workflowUnitMock.load.mockResolvedValue({ name: 'Workflow 2' });
     await listCommand['doAction']({ max: '1', offset: '1', with: '' } as any);
-    expect(consoleSpy).toHaveBeenCalledWith('\nShowing 1 workflow(s) out of 3');
+    expect(consoleSpy).toHaveBeenCalledWith('Showing 1 workflow(s) out of 3');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.ROCKET} workflow2`));
   });
 

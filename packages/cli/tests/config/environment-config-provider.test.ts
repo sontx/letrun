@@ -1,5 +1,5 @@
 import { EnvironmentConfigProvider } from '@src/config/environment-config-provider';
-import { DEFAULT_LOGGER } from '@src/logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 const jest = import.meta.jest;
 

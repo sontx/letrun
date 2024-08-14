@@ -1,4 +1,4 @@
-import { Plugin, TaskHandlerInput, TaskHandlerOutput } from '../model';
+import { Plugin, TaskHandlerInput, TaskHandlerOutput } from '@src/model';
 
 export const TASK_INVOKER_PLUGIN = 'task-invoker';
 

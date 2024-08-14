@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { AbstractConfigProvider } from './abstract-config-provider';
-import { DEFAULT_LOGGER } from '../logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 /**
  * Class representing a configuration provider that loads configuration from a JSON file.

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { YamlConfigProvider } from '@src/config/yaml-config-provider';
-import { DEFAULT_LOGGER } from '@src/logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 import { YAMLParseError } from 'yaml';
 
 const jest = import.meta.jest;

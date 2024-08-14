@@ -1,4 +1,5 @@
 export * from './logger-plugin';
+export * from './log-transport-plugin';
 export * from './persistence';
 export * from './parameter-interpolator';
 export * from './workflow-runner';

@@ -3,12 +3,12 @@ import { CommandLoader } from './command';
 import { BANNER, EMOJIS } from './ui';
 import { DefaultContext } from './runner';
 import { AppContext, COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
-import { DEFAULT_LOGGER } from './logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 import { getOptionValue } from '@src/command/libs';
 
 async function setupLogLevel(context: AppContext) {
   const logLevel = getOptionValue('-l', '--log') ?? 'warn';
-  DEFAULT_LOGGER.level = logLevel;
+  DEFAULT_LOGGER.setLevel(logLevel);
   await context.getConfigProvider().set('logger.level', logLevel);
 }
 

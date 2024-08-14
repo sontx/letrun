@@ -1,4 +1,4 @@
-import { Plugin } from '../model';
+import { Plugin } from '@src/model';
 
 export const PERSISTENCE_PLUGIN = 'persistence';
 

@@ -1,4 +1,5 @@
-import { ExecutablePlugin, ExecutionSession, Workflow } from '../model';
+import { ExecutablePlugin, Workflow } from '@src/model';
+import { ExecutionSession } from '@src/model/execution-session';
 
 export const WORKFLOW_RUNNER_PLUGIN = 'workflow-runner';
 

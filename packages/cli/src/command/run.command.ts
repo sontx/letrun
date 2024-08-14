@@ -20,6 +20,7 @@ export class RunCommand extends AbstractCommand {
       .option('-i, --input <input>', 'input for the workflow, can be a file path or a JSON string')
       .option('-s, --save', 'whether to save the workflow after running it', false)
       .option('-o, --output <output>', 'Output file which contains the result of the workflow')
+      .option('-p, --pipe', 'Pipe the output to the next command', false)
       .action(async (path, options) => {
         await this.doAction(path, options);
       });

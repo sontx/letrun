@@ -1,6 +1,5 @@
 import { DefaultContext } from '@src/runner/default-context';
-import { ConfigProvider, Logger, PluginLoader, PluginManager } from '@letrun/core';
-import { LoggerModule } from '@src/logger';
+import { ConfigProvider, Logger, LOGGER_PLUGIN, PluginLoader, PluginManager } from '@letrun/core';
 
 const jest = import.meta.jest;
 
@@ -10,46 +9,49 @@ describe('DefaultContext', () => {
   let mockPluginManager: jest.Mocked<PluginManager>;
   let mockPluginLoader: jest.Mocked<PluginLoader>;
   let mockLogger: jest.Mocked<Logger>;
-  let mockLoggerModule: jest.Mocked<LoggerModule>;
 
   beforeEach(() => {
     mockConfigProvider = {
-      get: jest.fn(),
+      get: jest.fn().mockReturnValue(''),
+      getInt: jest.fn(),
+      getBoolean: jest.fn(),
     } as unknown as jest.Mocked<ConfigProvider>;
+
+    mockLogger = {
+      info: jest.fn(),
+      debug: jest.fn(),
+      error: jest.fn(),
+      verbose: jest.fn(),
+    } as unknown as jest.Mocked<Logger>;
 
     mockPluginManager = {
       load: jest.fn(),
       unload: jest.fn(),
       register: jest.fn(),
       get: jest.fn().mockReturnValue([]),
+      getOne: jest.fn((pluginType) => {
+        if (pluginType === LOGGER_PLUGIN) {
+          return { getLogger: () => mockLogger };
+        }
+        throw new Error(`No plugin of type ${pluginType} found`);
+      }),
     } as unknown as jest.Mocked<PluginManager>;
 
     mockPluginLoader = {
       load: jest.fn().mockReturnValue([]),
     } as unknown as jest.Mocked<PluginLoader>;
 
-    mockLogger = {
-      info: jest.fn(),
-    } as unknown as jest.Mocked<Logger>;
-
-    mockLoggerModule = {
-      load: jest.fn(),
-      unload: jest.fn(),
-      getLogger: jest.fn().mockReturnValue(mockLogger),
-    } as unknown as jest.Mocked<LoggerModule>;
-
     context = new DefaultContext({
       configProvider: mockConfigProvider,
       pluginManager: mockPluginManager,
       pluginLoader: mockPluginLoader,
     });
-    (context as any)['loggerModule'] = mockLoggerModule;
   });
 
   it('loads the context successfully', async () => {
     await context.load();
     expect(mockPluginManager.load).toHaveBeenCalledWith(context);
-    expect(mockLogger.info).toHaveBeenCalledWith('App context loaded');
+    expect(context['loaded']).toBeTruthy();
   });
 
   it('does not reload the context if already loaded', async () => {
@@ -62,7 +64,7 @@ describe('DefaultContext', () => {
     await context.load();
     await context.unload();
     expect(mockPluginManager.unload).toHaveBeenCalled();
-    expect(mockLogger.info).toHaveBeenCalledWith('App context unloaded');
+    expect(context['loaded']).toBeFalsy();
   });
 
   it('does not unload the context if not loaded', async () => {
@@ -76,6 +78,8 @@ describe('DefaultContext', () => {
       load: jest.fn().mockReturnValue(plugins),
     };
 
+    jest.spyOn(context as any, 'loadCustomPlugins').mockResolvedValue(undefined);
+
     context['defaultPluginLoader'] = defaultPluginLoader as any;
     context['pluginLoader'] = undefined;
     await context.load();
@@ -85,6 +89,8 @@ describe('DefaultContext', () => {
   it('loads custom plugins', async () => {
     const plugins = [{ name: 'customPlugin' }];
     (mockPluginLoader.load as jest.Mock).mockResolvedValue(plugins);
+
+    jest.spyOn(context as any, 'loadDefaultPlugins').mockResolvedValue(undefined);
 
     await context.load();
     expect(mockPluginManager.register).toHaveBeenCalledWith(plugins[0]);

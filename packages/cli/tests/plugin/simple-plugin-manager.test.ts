@@ -26,7 +26,7 @@ describe('SimplePluginManager', () => {
 
     pluginManager.register(pluginA);
     pluginManager.register(pluginB);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     const plugins = await pluginManager.get<Plugin>('typeA');
     expect(plugins.length).toBe(2);
@@ -40,7 +40,7 @@ describe('SimplePluginManager', () => {
     const plugin: Plugin = { type: 'typeA', name: 'PluginA', load: jest.fn() } as any;
 
     pluginManager.register(plugin);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     const loadedPlugin = await pluginManager.getOne<Plugin>('typeA');
     expect(plugin.load).toHaveBeenCalledWith(mockContext);
@@ -51,7 +51,7 @@ describe('SimplePluginManager', () => {
     const plugin: Plugin = { type: 'typeA', name: 'PluginA', load: jest.fn() } as any;
 
     pluginManager.register(plugin);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     await pluginManager.getOne<Plugin>('typeA');
     await pluginManager.getOne<Plugin>('typeA');
@@ -63,7 +63,7 @@ describe('SimplePluginManager', () => {
     const plugin: Plugin = { type: 'typeA', name: 'PluginA', someMethod: jest.fn().mockReturnValue('result') } as any;
 
     pluginManager.register(plugin);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     const result = await pluginManager.callPluginMethod('typeA', 'someMethod');
     expect(result).toBe('result');
@@ -73,7 +73,7 @@ describe('SimplePluginManager', () => {
     const plugin: Plugin = { type: 'typeA', name: 'PluginA' } as any;
 
     pluginManager.register(plugin);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     await expect(pluginManager.callPluginMethod('typeA', 'nonExistentMethod')).rejects.toThrow(
       'No method nonExistentMethod found on plugin of type typeA',
@@ -90,7 +90,7 @@ describe('SimplePluginManager', () => {
     } as any;
 
     pluginManager.register(plugin);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     const result = await pluginManager.callPluginMethod('typeA', 'someMethod');
     expect(result).toBe('interruptedResult');
@@ -103,7 +103,7 @@ describe('SimplePluginManager', () => {
     const plugin: Plugin = { type: 'typeA', name: 'PluginA', load: jest.fn(), unload: jest.fn() };
 
     pluginManager.register(plugin);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     await pluginManager.getOne<Plugin>('typeA');
     await pluginManager.unload();
@@ -122,7 +122,7 @@ describe('SimplePluginManager', () => {
     };
 
     pluginManager.register(plugin);
-    pluginManager.load(mockContext);
+    await pluginManager.load(mockContext);
 
     await pluginManager.getOne<Plugin>('typeA');
     await pluginManager.unload();

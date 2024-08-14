@@ -1,8 +1,8 @@
-import { Container, Plugin, Task, TaskDef, TaskStatus, WorkflowTaskDefs, WorkflowTasks } from './model';
 import path from 'node:path';
 import { ObjectType } from './types';
 import { InvalidParameterError } from './error';
 import type Joi from 'joi';
+import { Container, Plugin, Task, TaskDef, TaskStatus, WorkflowTaskDefs, WorkflowTasks } from '@src/model';
 
 /**
  * Imports the default export from a module.

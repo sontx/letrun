@@ -1,5 +1,5 @@
 import { ObjectType } from '../types';
-import { Plugin } from '../model';
+import { Plugin } from '@src/model';
 
 export const JAVASCRIPT_PLUGIN = 'javascript';
 

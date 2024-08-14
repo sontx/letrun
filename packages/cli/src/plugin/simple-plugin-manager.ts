@@ -102,8 +102,15 @@ export class SimplePluginManager implements PluginManager {
     return previousInvokeResult;
   }
 
-  load(context: AppContext) {
+  async load(context: AppContext) {
     this.context = context;
+    for (const plugin of [...this.pluginMap.values()].flatMap((plugins) => plugins)) {
+      if (plugin.ready) {
+        // make sure the plugin is loaded before calling ready
+        await this.loadPluginIfNotLoaded(plugin);
+        await plugin.ready(context);
+      }
+    }
   }
 
   async unload(): Promise<void> {

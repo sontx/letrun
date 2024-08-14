@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { parse } from 'yaml';
 import { AbstractConfigProvider } from './abstract-config-provider';
-import { DEFAULT_LOGGER } from '../logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 /**
  * Class representing a configuration provider that loads configuration from a YAML file.
