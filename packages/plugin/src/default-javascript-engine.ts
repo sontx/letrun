@@ -1,7 +1,7 @@
-import { AppContext, JAVASCRIPT_PLUGIN, JavaScriptEngine, loadConfigToPlugin, ObjectType } from '@letrun/core';
+import { AbstractPlugin, AppContext, JAVASCRIPT_PLUGIN, JavaScriptEngine, ObjectType } from '@letrun/core';
 import vm from 'vm';
 
-export default class DefaultJavascriptEngine implements JavaScriptEngine {
+export default class DefaultJavascriptEngine extends AbstractPlugin implements JavaScriptEngine {
   readonly name = 'default';
   readonly type = JAVASCRIPT_PLUGIN;
 
@@ -14,12 +14,8 @@ export default class DefaultJavascriptEngine implements JavaScriptEngine {
     return val instanceof Promise ? await val : val;
   }
 
-  async load(context: AppContext) {
-    const config = context.getConfigProvider().getAll();
-    loadConfigToPlugin(config, this);
-  }
-
-  unload(): Promise<void> {
-    return Promise.resolve(undefined);
+  protected async doLoad(context: AppContext): Promise<void> {
+    await super.doLoad(context);
+    await this.injectConfig();
   }
 }

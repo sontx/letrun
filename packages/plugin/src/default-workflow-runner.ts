@@ -1,5 +1,5 @@
 import {
-  AppContext,
+  AbstractPlugin,
   childHasStatus,
   countTasks,
   ExecutablePlugin,
@@ -8,7 +8,6 @@ import {
   IllegalStateError,
   InterruptInvokeError,
   isTerminatedStatus,
-  Logger,
   RerunError,
   scanAllTasks,
   Task,
@@ -25,24 +24,9 @@ import {
 const POST_TASK_RUN = 'post-task-run';
 const PRE_TASK_RUN = 'pre-task-run';
 
-export default class DefaultWorkflowRunner implements WorkflowRunner {
-  private context?: AppContext;
-  private logger?: Logger;
-  private unloaded = false;
-
+export default class DefaultWorkflowRunner extends AbstractPlugin implements WorkflowRunner {
   readonly name = 'default';
   readonly type = WORKFLOW_RUNNER_PLUGIN;
-
-  async load(context: AppContext) {
-    this.unloaded = false;
-    this.context = context;
-    this.logger = context.getLogger();
-  }
-
-  unload(): Promise<void> {
-    this.unloaded = true;
-    return Promise.resolve(undefined);
-  }
 
   async execute(input: WorkflowRunnerInput) {
     const { workflow } = input;
@@ -66,7 +50,7 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
   }
 
   private async runWorkflow(input: WorkflowRunnerInput, lastResult?: any): Promise<any> {
-    if (this.unloaded) {
+    if (!this.isLoaded) {
       throw new InterruptInvokeError('WorkflowRunner is unloaded');
     }
 
@@ -83,9 +67,9 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
     const openTasks = getTasksByStatus(workflow, 'open', true);
     const openTaskNames = Object.keys(openTasks);
     if (openTaskNames.length) {
-      this.logger?.verbose(`Found open task(s): ${openTaskNames.join(', ')}`);
+      this.context?.getLogger()?.verbose(`Found open task(s): ${openTaskNames.join(', ')}`);
     } else {
-      this.logger?.verbose('No open tasks found');
+      this.context?.getLogger()?.verbose('No open tasks found');
     }
 
     this.logAllTaskStatuses(workflow);
@@ -122,23 +106,27 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
         await this.setTaskDataValues(input.session, task);
         task.status = 'executing';
         taskExecutionQueue.push(taskFunction);
-        this.logger?.verbose(
-          `Task ${taskName} is queued for execution because its status is 'open' and has no children.`,
-        );
+        this.context
+          ?.getLogger()
+          ?.verbose(`Task ${taskName} is queued for execution because its status is 'open' and has no children.`);
       } else {
         //if the task has children, but they're ALL terminated, queue it to execute, that means the parent will be the last one to execute
         if (childHasStatus(task, (status) => isTerminatedStatus(status), true)) {
           await this.setTaskDataValues(input.session, task);
           task.status = 'executing';
           taskExecutionQueue.push(taskFunction);
-          this.logger?.verbose(
-            `Task ${taskName} is queued for execution because its status is 'open' and all children are terminated.`,
-          );
+          this.context
+            ?.getLogger()
+            ?.verbose(
+              `Task ${taskName} is queued for execution because its status is 'open' and all children are terminated.`,
+            );
         } else {
           //if the task has children, but they're NOT all completed, then we need to wait
-          this.logger?.verbose(
-            `Task ${taskName} is not queued for execution because its status is 'open' and not all children are terminated.`,
-          );
+          this.context
+            ?.getLogger()
+            ?.verbose(
+              `Task ${taskName} is not queued for execution because its status is 'open' and not all children are terminated.`,
+            );
         }
       }
     }
@@ -146,7 +134,7 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
     //Assuming we actually have any valid tasks to execute, let async call them in parallel
     if (taskExecutionQueue.length > 0) {
       if (taskExecutionQueue.length > 1) {
-        this.logger?.debug(`Executing ${taskExecutionQueue.length} tasks in parallel`);
+        this.context?.getLogger()?.debug(`Executing ${taskExecutionQueue.length} tasks in parallel`);
       }
       try {
         const result = await Promise.all(taskExecutionQueue.map((fn) => fn()));
@@ -157,7 +145,7 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
         throw e;
       }
     } else {
-      this.logger?.debug('No tasks to execute');
+      this.context?.getLogger()?.debug('No tasks to execute');
     }
 
     return lastResult;
@@ -169,7 +157,7 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
       allTaskStatuses.push(`${name}: ${task.status}`);
       return true;
     });
-    this.logger?.verbose(`All task: ${allTaskStatuses.join(', ')}`);
+    this.context?.getLogger()?.verbose(`All task: ${allTaskStatuses.join(', ')}`);
   }
 
   private closeParentTasks(workflow: Workflow) {
@@ -179,12 +167,12 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
       if (areAllChildrenCompleted) {
         task.status = 'completed';
         this.completeTask(task);
-        this.logger?.debug(`Task ${name} is completed because all children are completed.`);
+        this.context?.getLogger()?.debug(`Task ${name} is completed because all children are completed.`);
       }
       const hasErrorChild = childHasStatus(task, 'error', false);
       if (hasErrorChild) {
         task.status = 'error';
-        this.logger?.debug(`Task ${name} is error because it has error children.`);
+        this.context?.getLogger()?.debug(`Task ${name} is error because it has error children.`);
       }
       return true;
     });
@@ -248,7 +236,7 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
     await this.preTaskRun(input.workflow, task);
 
     //No error or skip condition so execute handler
-    this.logger?.info(`Starting task ${taskName}`);
+    this.context?.getLogger()?.info(`Starting task ${taskName}`);
     let output: any;
     let error: any;
 
@@ -256,10 +244,10 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
       output = await this.getContext()
         .getPluginManager()
         .callPluginMethod<TaskInvoker>(TASK_INVOKER_PLUGIN, 'invoke', input);
-      this.logger?.info(`Task ${taskName} is completed successfully.`);
+      this.context?.getLogger()?.info(`Task ${taskName} is completed successfully.`);
     } catch (e: any) {
       if (e.name === RerunError.name) {
-        this.logger?.verbose(`Task ${taskName} is rerunning.`);
+        this.context?.getLogger()?.verbose(`Task ${taskName} is rerunning.`);
         // will run all the children if exists and then rerun this task
         task.status = 'open';
       } else {
@@ -268,7 +256,7 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
         // because we can't return output value from the return statement by throwing an intended error
         output = task.output;
         if (task.taskDef.ignoreError) {
-          this.logger?.warn(`Ignoring error for task ${taskName}: ${e.message}`);
+          this.context?.getLogger()?.warn(`Ignoring error for task ${taskName}: ${e.message}`);
           task.status = 'executing';
           error = null;
         } else {
@@ -281,13 +269,15 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
             (parentTask) => parentTask.taskDef.handler === 'catch',
           );
           if (parentCatchTask) {
-            this.logger?.debug(
-              `Task ${taskName} was thrown an error but it is handled by a catch task ${parentCatchTask.runtimeName}.`,
-            );
+            this.context
+              ?.getLogger()
+              ?.debug(
+                `Task ${taskName} was thrown an error but it is handled by a catch task ${parentCatchTask.runtimeName}.`,
+              );
             this.cancelTasksInsideCatchTask(parentCatchTask);
             error = null;
           } else {
-            this.logger?.error(`Error while executing task ${taskName}:`, e);
+            this.context?.getLogger()?.error(`Error while executing task ${taskName}:`, e);
           }
         }
       }
@@ -297,9 +287,11 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
       const hasChildren = countTasks(task.tasks) > 0;
       const areAllChildrenCompleted = childHasStatus(task, 'completed', true);
       if (hasChildren && !areAllChildrenCompleted) {
-        this.logger?.debug(
-          `Task ${taskName} is finished but it has pending children which are added by this task, we'll keep its 'waiting' status, the children are going to execute.`,
-        );
+        this.context
+          ?.getLogger()
+          ?.debug(
+            `Task ${taskName} is finished but it has pending children which are added by this task, we'll keep its 'waiting' status, the children are going to execute.`,
+          );
       } else {
         task.status = 'completed';
       }
@@ -332,7 +324,7 @@ export default class DefaultWorkflowRunner implements WorkflowRunner {
       }
       return true;
     });
-    this.logger?.debug(`Cancelled ${count} tasks inside catch task ${catchTask.runtimeName}.`);
+    this.context?.getLogger()?.debug(`Cancelled ${count} tasks inside catch task ${catchTask.runtimeName}.`);
   }
 
   private async preTaskRun(workflow: Workflow, task: Task) {

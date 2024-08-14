@@ -1,4 +1,5 @@
 import { ObjectType } from '@src/types';
+import {Observable} from "rxjs";
 
 /**
  * Interface representing a configuration provider.
@@ -46,4 +47,9 @@ export interface ConfigProvider {
    * Sets a configuration value to the in-memory store.
    */
   set(key: string, value: any): Promise<void>;
+
+  /**
+   * Fires when a configuration value changes at runtime.
+   */
+  get changes$(): Observable<Record<string, any>>;
 }

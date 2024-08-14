@@ -4,9 +4,9 @@ import type { TransformableInfo } from 'logform';
 import { LEVEL, MESSAGE, SPLAT } from 'triple-beam';
 import { inspect, InspectOptions } from 'util';
 import { format, transports } from 'winston';
-import { AppContext, LOG_TRANSPORT_PLUGIN, LogTransportPlugin } from '@letrun/core';
+import { AbstractPlugin, AppContext, LOG_TRANSPORT_PLUGIN, LogTransportPlugin } from '@letrun/core';
 
-export default class ConsoleLogger implements LogTransportPlugin {
+export default class ConsoleLogger extends AbstractPlugin implements LogTransportPlugin {
   private options?: ConsoleFormatOptions;
 
   readonly name = 'console';
@@ -31,7 +31,7 @@ export default class ConsoleLogger implements LogTransportPlugin {
     });
   }
 
-  async load(context: AppContext) {
+  protected async doLoad(context: AppContext) {
     const configProvider = context.getConfigProvider();
     const showMeta = await configProvider.getBoolean('logger.console.showMeta', true);
     const metaStrip = (await configProvider.get('logger.console.metaStrip', 'timestamp,service')).split(',');
@@ -58,10 +58,6 @@ export default class ConsoleLogger implements LogTransportPlugin {
         compact: inspectOptionsCompact < 0 ? Infinity : inspectOptionsCompact,
       },
     };
-  }
-
-  unload(): Promise<void> {
-    return Promise.resolve(undefined);
   }
 }
 

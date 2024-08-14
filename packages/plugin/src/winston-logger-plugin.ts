@@ -1,4 +1,4 @@
-import { AppContext, LOG_TRANSPORT_PLUGIN, Logger, LOGGER_PLUGIN, LoggerPlugin } from '@letrun/core';
+import { AbstractPlugin, AppContext, LOG_TRANSPORT_PLUGIN, Logger, LOGGER_PLUGIN, LoggerPlugin } from '@letrun/core';
 import winston, { createLogger, format } from 'winston';
 
 class DefaultLogger implements Logger {
@@ -25,7 +25,7 @@ class DefaultLogger implements Logger {
   }
 }
 
-export default class WinstonLoggerPlugin implements LoggerPlugin {
+export default class WinstonLoggerPlugin extends AbstractPlugin implements LoggerPlugin {
   name = 'winston-logger';
   type = LOGGER_PLUGIN;
 
@@ -33,23 +33,26 @@ export default class WinstonLoggerPlugin implements LoggerPlugin {
     level: 'debug',
     format: format.json(),
   });
-  private loaded = false;
   private readonly logger: Logger;
 
   /**
    * Creates an instance of LoggerModule.
    */
   constructor() {
+    super();
     this.logger = new DefaultLogger(this.winstonLogger);
   }
 
-  async load(context: AppContext): Promise<void> {
-    if (this.loaded) {
-      return;
-    }
-
+  protected async doLoad(context: AppContext): Promise<void> {
+    await super.doLoad(context);
     this.winstonLogger.level = await context.getConfigProvider().get('logger.level', 'debug');
-    this.loaded = true;
+  }
+
+  protected async onConfigChange(newConfig: Record<string, any>): Promise<void> {
+    await super.onConfigChange(newConfig);
+    if ('logger.level' in newConfig) {
+      this.winstonLogger.level = newConfig['logger.level'];
+    }
   }
 
   async ready(context: AppContext) {
@@ -61,11 +64,12 @@ export default class WinstonLoggerPlugin implements LoggerPlugin {
     }
   }
 
-  async unload(): Promise<void> {
-    this.winstonLogger.close();
-  }
-
   getLogger(): Logger {
     return this.logger;
+  }
+
+  protected async doUnload(): Promise<void> {
+    await super.doUnload();
+    this.winstonLogger.close();
   }
 }

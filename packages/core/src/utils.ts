@@ -52,6 +52,7 @@ export function loadConfigToPlugin(config: ObjectType, plugin: Plugin) {
   for (const key in pluginConfig) {
     plugin[key] = pluginConfig[key];
   }
+  return Object.keys(pluginConfig).length;
 }
 
 /**

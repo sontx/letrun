@@ -1,4 +1,5 @@
 import {
+  AbstractPlugin,
   getEntryPointDir,
   importDefault,
   Task,
@@ -11,11 +12,13 @@ import path from 'node:path';
 import fs from 'fs';
 import { InvalidParameterError } from '@letrun/core/dist';
 
-export default class DefaultTaskInvoker implements TaskInvoker {
+export default class DefaultTaskInvoker extends AbstractPlugin implements TaskInvoker {
   readonly name = 'default';
   readonly type = TASK_INVOKER_PLUGIN;
 
-  constructor(private readonly moduleResolver = importDefault) {}
+  constructor(private readonly moduleResolver = importDefault) {
+    super();
+  }
 
   async invoke(input: TaskHandlerInput): Promise<TaskHandlerOutput> {
     const {
@@ -81,8 +84,4 @@ export default class DefaultTaskInvoker implements TaskInvoker {
 
     return null;
   }
-
-  async load(): Promise<void> {}
-
-  async unload(): Promise<void> {}
 }

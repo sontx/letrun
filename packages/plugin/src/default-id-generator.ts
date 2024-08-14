@@ -1,9 +1,9 @@
-import { AppContext, ID_GENERATOR_PLUGIN, IdGenerator, loadConfigToPlugin } from '@letrun/core';
+import { AbstractPlugin, AppContext, ID_GENERATOR_PLUGIN, IdGenerator } from '@letrun/core';
 
 /**
  * Class responsible for generating unique IDs.
  */
-export default class DefaultIdGenerator implements IdGenerator {
+export default class DefaultIdGenerator extends AbstractPlugin implements IdGenerator {
   name = 'default';
   type = ID_GENERATOR_PLUGIN;
 
@@ -18,10 +18,8 @@ export default class DefaultIdGenerator implements IdGenerator {
     return id?.substring(0, id.lastIndexOf(this.idSeparator));
   }
 
-  async load(context: AppContext): Promise<void> {
-    const config = await context.getConfigProvider().getAll();
-    loadConfigToPlugin(config, this);
+  protected async doLoad(context: AppContext): Promise<void> {
+    await super.doLoad(context);
+    await this.injectConfig();
   }
-
-  async unload(): Promise<void> {}
 }

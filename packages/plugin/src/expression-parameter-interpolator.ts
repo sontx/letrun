@@ -1,26 +1,23 @@
 import {
+  AbstractPlugin,
   AppContext,
   ConfigNotFoundError,
-  loadConfigToPlugin,
-  Logger,
   PARAMETER_INTERPOLATOR_PLUGIN,
   ParameterInterpolator,
 } from '@letrun/core';
 import JsonPathParameterInterpolator from './json-path-parameter-interpolator';
 
-export default class ExpressionParameterInterpolator implements ParameterInterpolator {
+export default class ExpressionParameterInterpolator extends AbstractPlugin implements ParameterInterpolator {
   private jsonPath = new JsonPathParameterInterpolator();
   private recursive: boolean = true;
-  private logger?: Logger;
 
   readonly name = 'expression';
   readonly type = PARAMETER_INTERPOLATOR_PLUGIN;
   readonly priority = 1;
 
-  async load(context: AppContext) {
-    this.logger = context.getLogger();
-    const config = context.getConfigProvider().getAll();
-    loadConfigToPlugin(config, this);
+  protected async doLoad(context: AppContext): Promise<void> {
+    await super.doLoad(context);
+    await this.injectConfig();
     await this.jsonPath.load(context);
   }
 
@@ -43,7 +40,7 @@ export default class ExpressionParameterInterpolator implements ParameterInterpo
       const jsonPathKey = expressionKey ? `$.${expressionKey}` : '$';
       try {
         const result = this.jsonPath.interpolate(jsonPathKey, interpolatorContext, true);
-        this.logger?.verbose(`Resolved expression: ${match[0]} --> ${result}`);
+        this.context?.getLogger()?.verbose(`Resolved expression: ${match[0]} --> ${result}`);
         currentValue = currentValue.replaceAll(match[0], result);
         if (!this.recursive) {
           break;
@@ -68,7 +65,8 @@ export default class ExpressionParameterInterpolator implements ParameterInterpo
     return expressionRegex.test(str);
   }
 
-  async unload() {
+  protected async doUnload(): Promise<void> {
+    await super.doUnload();
     await this.jsonPath.unload();
   }
 }

@@ -34,6 +34,7 @@ export interface Plugin extends PluginLifecycle {
   readonly type: string;
   /** If there are multiple names of this plugin type, the highest priority is prioritized for use. Default is 0 */
   readonly priority?: number;
+  readonly description?: string;
   /** Additional properties for the plugin. */
   [key: string]: any;
 }
