@@ -27,6 +27,7 @@ A simple and efficient tool for running declarative workflows with ease.
   - [Command Plugin](#command-plugin)
   - [JavaScript Engine](#javascript-engine)
   - [Logger Plugin](#logger-plugin)
+  - [Log Transport Plugin](#log-transport-plugin)
   - [Parameter Interpolator](#parameter-interpolator)
   - [Persistence](#persistence)
   - [Input Parameter](#input-parameter)
@@ -105,6 +106,7 @@ This is an example of a task:
 ```
 
 The `handler` can refer to a custom task by:
+
 - Define an absolute path to the task file.
 - Define a relative path to the task file.
 - Define a task name, the CLI tool will look up in the custom tasks directory (default is `tasks` directory).
@@ -163,6 +165,7 @@ Arguments:
 - `<path>`: Path to the workflow file either in JSON or YAML format.
 
 Options:
+
 - `-i, --input <input>`: Input for the workflow, can be a file path or a JSON string.
 - `-s, --save`: Whether to save the workflow after running it.
 - `-o, --output <output>`: Output file which contains the result of the workflow.
@@ -326,43 +329,50 @@ export default class MyPlugin implements Plugin {
 ### Command Plugin
 
 This plugin allows you to extend the CLI tool with custom commands. We're using `commander` package to define commands.
-Please refer to this sample for more details: [sample-command-plugin.ts](plugin/src/sample-command-plugin.ts).
+Please refer to this sample for more details: [sample-command-plugin.ts](packages/plugin/src/sample-command-plugin.ts).
 
 ### JavaScript Engine
 
 This plugin allows some tasks to run JavaScript code in a sandboxed environment. The code is executed in a separate process to prevent side effects.
-Please refer to this default implementation for more details: [default-javascript-engine.ts](plugin/src/default-javascript-engine.ts).
+Please refer to this default implementation for more details: [default-javascript-engine.ts](packages/plugin/src/default-javascript-engine.ts).
 
 ### Logger Plugin
 
-This plugin allows you to add more log transports which using `winston` package.
-The default implementation logs messages to the [console](plugin/src/console-logger.ts).
+This plugin allows you to config how the CLI tool logs messages.
+The [default implementation](packages/plugin/src/winston-logger-plugin.ts) uses the `winston` package under the hook.
+Be aware that changing the implementation may affect the [Log Transport Plugin](#log-transport-plugin) as well.
+
+### Log Transport Plugin
+
+This plugin allows you to add more log transports which using `winston` package by default.
+This is useful if you want to send logs to a remote server, a file, etc.
+The default implementation logs messages to the [console](packages/plugin/src/console-logger.ts).
 
 ### Parameter Interpolator
 
 This plugin is used by the [workflow-runner](#workflow-runner) plugin to interpolate parameters values.
 `Interpolation` is a process of replacing placeholders in a string with actual values which are used in expressions like `${task1.output.name}`.
-The default implementation is [expression-parameter-interpolator.ts](plugin/src/expression-parameter-interpolator.ts).
+The default implementation is [expression-parameter-interpolator.ts](packages/plugin/src/expression-parameter-interpolator.ts).
 
 ### Persistence
 
-This plugin is used to persist data to a storage. The default implementation uses a [file-based storage](plugin/src/file-persistence.ts).
+This plugin is used to persist data to a storage. The default implementation uses a [file-based storage](packages/plugin/src/file-persistence.ts).
 
 ### Input Parameter
 
 This plugin is used to parse or load the raw input parameter to the desired format.
-The [default implementation](plugin/src/default-input-parameter.ts) supports JSON string and file input (JSON and YAML format)
+The [default implementation](packages/plugin/src/default-input-parameter.ts) supports JSON string and file input (JSON and YAML format)
 and converts the input to an object.
 
 ### Id Generator
 
 This plugin is used to generate unique IDs for tasks and can look up the parent id from any child id.
-The [default implementation](plugin/src/default-id-generator.ts) is using `/` as a separator for the parent id.
+The [default implementation](packages/plugin/src/default-id-generator.ts) is using `/` as a separator for the parent id.
 
 ### Task Invoker
 
 This plugin is used to invoke task handlers which is used by the [workflow-runner](#workflow-runner) plugin.
-Invoking is a process of resolve the task handler to a [task](#task) and call it with input values.
+Invoking is a process of resolve the task handler to a [task](#concept-task) and call it with input values.
 
 With the custom tasks, the default implementation will look up in this order:
 
@@ -375,14 +385,14 @@ With the custom tasks, the default implementation will look up in this order:
 
 This plugin is used to run workflows, control the execution flow, and handle errors.
 This is the most complex plugin, and it's responsible for the core functionality of the CLI tool.
-The default implementation is [default-workflow-runner.ts](plugin/src/default-workflow-runner.ts).
+The default implementation is [default-workflow-runner.ts](packages/plugin/src/default-workflow-runner.ts).
 
 ### Pre/Post Run Workflow Plugin
 
 This plugin is used to run some jobs before or after running a workflow.
 There may be multiple plugins, and they will be called in chain.
 
-They must be implemented by [ExecutablePlugin](core/src/model.ts) interface.
+They must be implemented by [ExecutablePlugin](packages/core/src/model/plugin.ts) interface.
 
 #### Pre-run Workflow Plugin
 
@@ -403,7 +413,7 @@ If the output is a workflow, it will be used to return instead of the original o
 This plugin is used to run some jobs before or after running a task.
 There may be multiple plugins, and they will be called in chain.
 
-They must be implemented by [ExecutablePlugin](core/src/model.ts) interface.
+They must be implemented by [ExecutablePlugin](packages/core/src/model/plugin.ts) interface.
 
 #### Pre-run Task Plugin
 
@@ -423,8 +433,7 @@ A task handler is a function that executes a task. There are two types of tasks:
 
 ### System Tasks
 
-[package.json](..%2F..%2Fxproject%2Fterraform%2Flambda%2Flibs%2Fcommon%2Fpackage.json)
-System tasks are built-in tasks that come with the CLI tool. They are defined in the [system-task](src/system-task) directory.
+System tasks are built-in tasks that come with the CLI tool. They are defined in the [system-task](packages/cli/src/system-task) directory.
 
 1. `if`: Executes tasks based on conditions.
 2. `switch`: Chooses tasks based on input values.
@@ -436,10 +445,10 @@ System tasks are built-in tasks that come with the CLI tool. They are defined in
 8. `http`: Sends HTTP requests and processes responses.
 9. `run-workflow`: Runs another workflow within the current workflow.
 
-### Custom Tas[package.json](..%2F..%2Fxproject%2Fterraform%2Flambda%2Flibs%2Fcommon%2Fpackage.json)ks
+### Custom Tasks
 
 Custom tasks are tasks that are defined by the user and loaded by the CLI dynamically, you can see more details in the [Task Invoker](#task-invoker) plugin.
-They are written in JavaScript and implement from the [TaskHandler](core/src/model.ts) interface.
+They are written in JavaScript and implement from the [TaskHandler](packages/core/src/model/task-handler.ts) interface.
 They should be placed in the `tasks` directory (by default), you can change the directory by setting the `task.dir` configuration.
 
 A task handler should have the following structure:
