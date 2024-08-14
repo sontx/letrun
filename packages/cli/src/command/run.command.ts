@@ -1,9 +1,15 @@
 import { AbstractCommand, AbstractOptions } from './abstract.command';
 import { Command } from 'commander';
-import { parse } from 'yaml';
 import fs from 'fs';
 import { DefaultRunner } from '../runner';
-import { Persistence, PERSISTENCE_PLUGIN, Workflow } from '@letrun/core';
+import {
+  INPUT_PARAMETER_PLUGIN,
+  InputParameter,
+  Persistence,
+  PERSISTENCE_PLUGIN,
+  Workflow,
+  WorkflowDef,
+} from '@letrun/core';
 
 export class RunCommand extends AbstractCommand {
   load(program: Command): void {
@@ -25,30 +31,16 @@ export class RunCommand extends AbstractCommand {
       return;
     }
 
-    const ext = path.split('.').pop()?.toLowerCase();
-    if (!['json', 'yaml', 'yml'].includes(ext ?? '')) {
-      this.context.getLogger().error('Invalid file extension. Only JSON and YAML files are supported.');
-      return;
-    }
+    const inputParameter = await this.context.getPluginManager().getOne<InputParameter>(INPUT_PARAMETER_PLUGIN);
 
-    let input = {};
-    if (options.input) {
-      if (fs.existsSync(options.input)) {
-        const inputString = await fs.promises.readFile(options.input, 'utf8');
-        input = JSON.parse(inputString);
-      } else {
-        input = JSON.parse(options.input);
-      }
-    }
-
-    const content = await fs.promises.readFile(path, 'utf8');
-    const workflow = ext === 'json' ? JSON.parse(content) : parse(content);
+    const input = await inputParameter.read(options.input ?? '{}');
+    const workflow = await inputParameter.read<WorkflowDef>(path);
     const runner = new DefaultRunner();
 
     let ranWorkflow: Workflow | undefined;
     try {
       await runner.load(this.context);
-      ranWorkflow = await runner.run(workflow, input);
+      ranWorkflow = await runner.run(workflow!, input);
       if (options.output) {
         await fs.promises.writeFile(options.output, JSON.stringify(ranWorkflow?.output ?? '', null, 2), 'utf8');
       }

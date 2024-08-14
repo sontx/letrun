@@ -1,6 +1,6 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
-import { TaskHandler, WorkflowDef } from '@letrun/core';
+import { INPUT_PARAMETER_PLUGIN, InputParameter, TaskHandler, WorkflowDef } from '@letrun/core';
 import { DefaultRunner } from '@src/runner';
 import fs from 'fs';
 import { SystemTaskManager } from '@src/system-task';
@@ -73,13 +73,8 @@ export class RunCommand extends AbstractCommand {
   }
 
   private async runTask(task: TaskHandler & { fullPath: string }, options: AbstractOptions) {
-    let input = {};
-    if (fs.existsSync(options.input)) {
-      const content = await fs.promises.readFile(options.input, { encoding: 'utf-8' });
-      input = JSON.parse(content);
-    } else if (options.input) {
-      input = JSON.parse(options.input);
-    }
+    const inputParameter = await this.context.getPluginManager().getOne<InputParameter>(INPUT_PARAMETER_PLUGIN);
+    const input = await inputParameter.read(options.input ?? '{}');
 
     const workflow: WorkflowDef = {
       name: 'letrun',

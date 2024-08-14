@@ -3,6 +3,7 @@ import { DefaultRunner } from '@src/runner';
 import fs from 'fs';
 import { SystemTaskManager } from '@src/system-task';
 import { TaskHelper } from '@src/command/libs/task-helper';
+import { InputParameter } from '@letrun/core';
 
 const jest = import.meta.jest;
 
@@ -11,13 +12,20 @@ describe('RunCommand', () => {
   let context: any;
   let consoleSpy: jest.SpyInstance;
   let runnerMock: jest.Mocked<DefaultRunner>;
+  let inputParameterMock: jest.Mocked<InputParameter>;
   const outputFilePath = 'task-run-output.json';
   const outputValue = { output: 'result' };
 
   beforeEach(() => {
+    inputParameterMock = {
+      read: jest.fn().mockResolvedValue({ key: 'value' }),
+    } as any;
     context = {
       getLogger: jest.fn().mockReturnValue({
         error: jest.fn(),
+      }),
+      getPluginManager: jest.fn().mockReturnValue({
+        getOne: jest.fn().mockResolvedValue(inputParameterMock),
       }),
     };
     runCommand = new RunCommand(context);
@@ -122,6 +130,23 @@ describe('RunCommand', () => {
       .spyOn(TaskHelper, 'loadCustomTasksFromConfig')
       .mockResolvedValue([{ name: 'customTask1', path: 'path/to/customTask1' }]);
     await (runCommand as any)['doAction']('customTask1', { input: 'input.json' });
+    expect(inputParameterMock.read).toHaveBeenCalledWith('input.json');
+    expect(runnerMock.run).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tasks: [expect.objectContaining({ parameters: { key: 'value' } })],
+      }),
+    );
+  });
+
+  it('runs a task with input from JSON string', async () => {
+    jest
+      .spyOn(TaskHelper, 'loadCustomTasksFromConfig')
+      .mockResolvedValue([{ name: 'customTask1', path: 'path/to/customTask1' }]);
+
+    const jsonString = '{"key": "value"}';
+    await (runCommand as any)['doAction']('customTask1', { input: jsonString });
+
+    expect(inputParameterMock.read).toHaveBeenCalledWith(jsonString);
     expect(runnerMock.run).toHaveBeenCalledWith(
       expect.objectContaining({
         tasks: [expect.objectContaining({ parameters: { key: 'value' } })],

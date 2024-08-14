@@ -1,6 +1,6 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
-import { asTree, TreeObject } from 'treeify';
+import treeify, { TreeObject } from 'treeify';
 import { EMOJIS } from '@src/ui';
 import { SystemTaskManager } from '@src/system-task';
 import { TaskHandler } from '@letrun/core';
@@ -58,6 +58,6 @@ export class ViewCommand extends AbstractCommand {
   private viewTask(task: Partial<TaskHandler> & { group?: string }, isSystem: boolean) {
     let tree: TreeObject = this.extractFields(task, ['group', 'path', 'description', 'parameters'], true);
     console.log(`\n${isSystem ? EMOJIS.NUT_AND_BOLT : EMOJIS.ROBOT} ${task.name}`);
-    console.log(asTree(tree, true, true).trim());
+    console.log(treeify.asTree(tree, true, true).trim());
   }
 }

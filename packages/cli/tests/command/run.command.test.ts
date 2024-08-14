@@ -1,6 +1,6 @@
 import { RunCommand } from '@src/command/run.command';
 import { DefaultRunner } from '@src/runner';
-import { Persistence } from '@letrun/core';
+import { INPUT_PARAMETER_PLUGIN, Persistence, PERSISTENCE_PLUGIN } from '@letrun/core';
 import { Command } from 'commander';
 import fs from 'fs';
 
@@ -13,6 +13,7 @@ describe('RunCommand', () => {
   let loggerSpy: jest.SpyInstance;
   let runnerMock: jest.Mocked<DefaultRunner>;
   let persistenceMock: jest.Mocked<Persistence>;
+  let inputParameterMock: jest.Mocked<any>;
   let workflowUnitMock: jest.Mocked<any>;
 
   beforeEach(() => {
@@ -24,12 +25,23 @@ describe('RunCommand', () => {
     };
     persistenceMock.getUnit.mockReturnValue(workflowUnitMock);
 
+    inputParameterMock = {
+      read: jest.fn().mockResolvedValue({}),
+    };
+
     context = {
       getLogger: jest.fn().mockReturnValue({
         error: jest.fn(),
       }),
       getPluginManager: jest.fn().mockReturnValue({
-        getOne: jest.fn().mockResolvedValue(persistenceMock),
+        getOne: jest.fn().mockImplementation((plugin) => {
+          if (plugin === PERSISTENCE_PLUGIN) {
+            return persistenceMock;
+          } else if (plugin === INPUT_PARAMETER_PLUGIN) {
+            return inputParameterMock;
+          }
+          return {};
+        }),
       }),
     };
 
@@ -59,12 +71,20 @@ describe('RunCommand', () => {
     expect(spy).toHaveBeenCalledWith('run', { isDefault: true });
   });
 
-  it('runs a workflow from a JSON file and writes the output to a file', async () => {
+  it('runs a workflow and writes the output to a file', async () => {
     const path = 'workflow.json';
     const options = { output: 'output.json', save: false };
     jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-    jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ name: 'Workflow 1' }));
     jest.spyOn(fs.promises, 'writeFile').mockResolvedValue();
+
+    inputParameterMock.read.mockImplementation((filePath: string) => {
+      if (filePath === path) {
+        return Promise.resolve({ name: 'Workflow 1' });
+      } else if (filePath === '{}') {
+        return Promise.resolve({});
+      }
+      return Promise.reject(new Error('File not found'));
+    })
 
     await runCommand['doAction'](path, options);
 
@@ -72,21 +92,6 @@ describe('RunCommand', () => {
     expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining({ name: 'Workflow 1' }), {});
     expect(runnerMock.unload).toHaveBeenCalled();
     expect(fs.promises.writeFile).toHaveBeenCalledWith('output.json', JSON.stringify('result', null, 2), 'utf8');
-  });
-
-  it('runs a workflow from a YAML file and saves the workflow after running', async () => {
-    const path = 'workflow.yaml';
-    const options = { output: '', save: true };
-    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-    jest.spyOn(fs.promises, 'readFile').mockResolvedValue('name: Workflow 1');
-    jest.spyOn(fs.promises, 'writeFile').mockResolvedValue();
-
-    await runCommand['doAction'](path, options);
-
-    expect(runnerMock.load).toHaveBeenCalled();
-    expect(runnerMock.run).toHaveBeenCalledWith(expect.objectContaining({ name: 'Workflow 1' }), {});
-    expect(runnerMock.unload).toHaveBeenCalled();
-    expect(workflowUnitMock.save).toHaveBeenCalledWith('workflow1', expect.objectContaining({ id: 'workflow1' }));
   });
 
   it('passes input correctly to the workflow runner', async () => {
@@ -99,14 +104,14 @@ describe('RunCommand', () => {
       return filePath === path || filePath === options.input;
     });
 
-    jest.spyOn(fs.promises, 'readFile').mockImplementation((filePath) => {
+    inputParameterMock.read.mockImplementation((filePath: string) => {
       if (filePath === path) {
-        return Promise.resolve(JSON.stringify(workflowContent));
+        return Promise.resolve(workflowContent);
       } else if (filePath === options.input) {
-        return Promise.resolve(JSON.stringify(inputContent));
+        return Promise.resolve(inputContent);
       }
       return Promise.reject(new Error('File not found'));
-    });
+    })
 
     await runCommand['doAction'](path, options);
 
@@ -125,12 +130,12 @@ describe('RunCommand', () => {
       return filePath === path;
     });
 
-    jest.spyOn(fs.promises, 'readFile').mockImplementation((filePath) => {
+    inputParameterMock.read.mockImplementation((filePath: string) => {
       if (filePath === path) {
-        return Promise.resolve(JSON.stringify(workflowContent));
+        return Promise.resolve(workflowContent);
       }
-      return Promise.reject(new Error('File not found'));
-    });
+      return Promise.resolve(JSON.parse(filePath));
+    })
 
     await runCommand['doAction'](path, options);
 
@@ -147,15 +152,5 @@ describe('RunCommand', () => {
     await runCommand['doAction'](path, options);
 
     expect(loggerSpy).toHaveBeenCalledWith('File not found: nonexistent.json');
-  });
-
-  it('logs an error for unsupported file extensions', async () => {
-    const path = 'workflow.txt';
-    const options = { output: '', save: false };
-    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-
-    await runCommand['doAction'](path, options);
-
-    expect(loggerSpy).toHaveBeenCalledWith('Invalid file extension. Only JSON and YAML files are supported.');
   });
 });
