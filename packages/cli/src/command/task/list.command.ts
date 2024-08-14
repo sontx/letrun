@@ -41,7 +41,7 @@ export class ListCommand extends AbstractCommand {
       );
     }
 
-    console.log(`\nTotal system tasks: ${Object.keys(tree).length}`);
+    console.log(`Total system tasks: ${Object.keys(tree).length}`);
     console.log(treeify.asTree(tree, true, true).trim());
   }
 

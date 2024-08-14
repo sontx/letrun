@@ -79,7 +79,7 @@ export class ViewCommand extends AbstractCommand {
 
     const tree = treeify.asTree(rootTree, true, true);
 
-    console.log(`\n${'status' in workflow ? 'Workflow' : 'Workflow Definition'}: ${workflow.name}`);
+    console.log(`${'status' in workflow ? 'Workflow' : 'Workflow Definition'}: ${workflow.name}`);
     const node = buildNode(workflow);
     const keys = Object.keys(node);
     for (let i = 0; i < keys.length; i++) {
