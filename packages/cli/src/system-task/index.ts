@@ -9,6 +9,7 @@ import { TaskDefValidator } from '../runner/default-tasks-factory';
 import { LogTaskHandler } from './log';
 import { HttpTaskHandler } from './http';
 import { IterateTaskHandler, validateIterateTask } from './iterate';
+import { LambdaTaskHandler } from '@src/system-task/lambda';
 
 export class SystemTaskManager {
   private static systemTasks: Record<string, TaskHandler> = {
@@ -21,6 +22,7 @@ export class SystemTaskManager {
     workflow: new RunWorkflowTaskHandler(),
     log: new LogTaskHandler(),
     http: new HttpTaskHandler(),
+    lambda: new LambdaTaskHandler(),
   };
   private static taskDefValidatorMap: Record<string, TaskDefValidator> = {
     if: validateIfTask,
