@@ -48,7 +48,7 @@ export class ListCommand extends AbstractCommand {
     }
 
     console.log(
-      `\nShowing ${showingCount} workflow(s)${showingCount < workflowIds.length ? ` out of ${workflowIds.length}` : ''}`,
+      `Showing ${showingCount} workflow(s)${showingCount < workflowIds.length ? ` out of ${workflowIds.length}` : ''}`,
     );
 
     if (message) {

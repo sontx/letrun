@@ -22,7 +22,7 @@ export class ViewCommand extends AbstractCommand {
     if (!plugin) {
       this.context.getLogger().error(`Plugin not found: ${name}`);
     } else {
-      console.log(`\nType: ${plugin.type}`);
+      console.log(`Type: ${plugin.type}`);
       console.log(`Name: ${plugin.name}`);
       const tree: TreeObject = {};
       const customMethods = this.getCustomMethods(plugin);

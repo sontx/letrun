@@ -27,7 +27,7 @@ export class ListCommand extends AbstractCommand {
       }
     }
 
-    console.log(`\nTotal plugins: ${total}\n`);
+    console.log(`Total plugins: ${total}\n`);
     let message = '';
     for (const type in pluginTrees) {
       message += `${EMOJIS.FOLDER} ${type}\n${treeify.asTree(pluginTrees[type]!, true, true)}`;
