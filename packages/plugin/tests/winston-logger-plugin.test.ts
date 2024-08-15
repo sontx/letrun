@@ -1,7 +1,7 @@
 import winston, { transports } from 'winston';
 import WinstonLoggerPlugin from '@src/winston-logger-plugin';
 import { AppContext } from '@letrun/core';
-import { Subject } from "rxjs";
+import { Subject } from 'rxjs';
 
 const jest = import.meta.jest;
 
@@ -59,5 +59,17 @@ describe('WinstonLoggerPlugin', () => {
     context.getConfigProvider().get = jest.fn().mockResolvedValue('info');
     await plugin.load(context);
     expect(plugin['winstonLogger'].level).toBe('info');
+  });
+
+  it('does not log messages after the plugin is unloaded', async () => {
+    await plugin.load(context);
+    await plugin.unload();
+
+    const winstonLogger = plugin['winstonLogger'];
+    const logSpy = jest.spyOn(winstonLogger, 'debug');
+
+    plugin.getLogger().debug('This message should not be logged');
+
+    expect(logSpy).not.toHaveBeenCalled();
   });
 });

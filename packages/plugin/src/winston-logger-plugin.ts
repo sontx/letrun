@@ -10,26 +10,38 @@ import {
 import winston, { createLogger, format } from 'winston';
 
 class DefaultLogger implements Logger {
+  disabled = false;
+
   constructor(private logger: winston.Logger) {}
 
   verbose(message: string, ...args: any[]): void {
-    this.logger.verbose(message, ...args);
+    if (!this.disabled) {
+      this.logger.verbose(message, ...args);
+    }
   }
 
   debug(message: string, ...args: any[]): void {
-    this.logger.debug(message, ...args);
+    if (!this.disabled) {
+      this.logger.debug(message, ...args);
+    }
   }
 
   error(message: string, ...args: any[]): void {
-    this.logger.error(message, ...args);
+    if (!this.disabled) {
+      this.logger.error(message, ...args);
+    }
   }
 
   info(message: string, ...args: any[]): void {
-    this.logger.info(message, ...args);
+    if (!this.disabled) {
+      this.logger.info(message, ...args);
+    }
   }
 
   warn(message: string, ...args: any[]): void {
-    this.logger.warn(message, ...args);
+    if (!this.disabled) {
+      this.logger.warn(message, ...args);
+    }
   }
 }
 
@@ -79,6 +91,10 @@ export default class WinstonLoggerPlugin extends AbstractPlugin implements Logge
 
   protected async doUnload(): Promise<void> {
     await super.doUnload();
+    // prevent logging after unloading
+    if (this.logger instanceof DefaultLogger) {
+      this.logger.disabled = true;
+    }
     this.winstonLogger.close();
   }
 }
