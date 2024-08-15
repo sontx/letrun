@@ -2,6 +2,10 @@ import { AppContext, Plugin } from '../model';
 import { loadConfigToPlugin } from '../utils';
 import { Subject, takeUntil } from 'rxjs';
 
+/**
+ * Abstract class representing a plugin, cover some common cases and reduce the repeated code.
+ * Implements the Plugin interface.
+ */
 export abstract class AbstractPlugin implements Plugin {
   abstract readonly name: string;
   abstract readonly type: string;
@@ -22,6 +26,11 @@ export abstract class AbstractPlugin implements Plugin {
     this.isLoaded = true;
   }
 
+  /**
+   * Performs the actual loading of the plugin.
+   * Can be overridden by subclasses.
+   * @param context - The application context.
+   */
   // @ts-ignore
   protected async doLoad(context: AppContext) {
     // Do nothing by default
@@ -36,11 +45,20 @@ export abstract class AbstractPlugin implements Plugin {
       });
   }
 
+  /**
+   * Handles configuration changes.
+   * Can be overridden by subclasses.
+   * @param newConfig - The new configuration.
+   */
   // @ts-ignore
   protected async onConfigChange(newConfig: Record<string, any>) {
     // Do nothing by default
   }
 
+  /**
+   * Injects the configuration into the plugin.
+   * By default, the configuration will follow this pattern: pluginType.pluginName.[configKey]
+   */
   protected async injectConfig() {
     const configProvider = this.context?.getConfigProvider();
     if (!configProvider) {
@@ -64,6 +82,10 @@ export abstract class AbstractPlugin implements Plugin {
     this.isLoaded = false;
   }
 
+  /**
+   * Performs the actual unloading of the plugin.
+   * Can be overridden by subclasses.
+   */
   protected async doUnload() {
     // Do nothing by default
   }
