@@ -10,6 +10,7 @@ import {
   Workflow,
   WorkflowDef,
 } from '@letrun/core';
+import { LogHelper } from '@src/command/libs/log-helper';
 
 export class RunCommand extends AbstractCommand {
   load(program: Command): void {
@@ -27,6 +28,16 @@ export class RunCommand extends AbstractCommand {
   }
 
   private async doAction(path: string, options: AbstractOptions) {
+    if (options.pipe) {
+      await LogHelper.usePipeMode(this.context, async () => {
+        return await this.runWorkflow(path, options);
+      });
+    } else {
+      await this.runWorkflow(path, options);
+    }
+  }
+
+  private async runWorkflow(path: string, options: AbstractOptions) {
     if (!fs.existsSync(path)) {
       this.context.getLogger().error(`File not found: ${path}`);
       return;
@@ -45,6 +56,7 @@ export class RunCommand extends AbstractCommand {
       if (options.output) {
         await fs.promises.writeFile(options.output, JSON.stringify(ranWorkflow?.output ?? '', null, 2), 'utf8');
       }
+      return ranWorkflow?.output;
     } finally {
       if (ranWorkflow && options.save) {
         const persistence = await this.context.getPluginManager().getOne<Persistence>(PERSISTENCE_PLUGIN);

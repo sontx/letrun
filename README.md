@@ -169,6 +169,7 @@ Options:
 - `-i, --input <input>`: Input for the workflow, can be a file path or a JSON string.
 - `-s, --save`: Whether to save the workflow after running it.
 - `-o, --output <output>`: Output file which contains the result of the workflow.
+- `-p, --pipe`: Pipe the output to the next command.
 
 ### workflow <a id="workflow-command"></a>
 
@@ -300,6 +301,7 @@ Options:
 - `-i, --input <input>`: Input for the task, can be a file path or a JSON string.
 - `-g, --group <group>`: Group of the task, use `.` if you want to search tasks that doesn't have a group.
 - `-o, --output <output>`: Output file which contains the result of the task.
+- `-p, --pipe`: Pipe the output to the next command.
 
 ## Plugin
 

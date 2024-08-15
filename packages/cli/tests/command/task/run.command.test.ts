@@ -4,6 +4,7 @@ import fs from 'fs';
 import { SystemTaskManager } from '@src/system-task';
 import { TaskHelper } from '@src/command/libs/task-helper';
 import { InputParameter } from '@letrun/core';
+import { LogHelper } from '@src/command/libs/log-helper';
 
 const jest = import.meta.jest;
 
@@ -162,5 +163,24 @@ describe('RunCommand', () => {
     jest.spyOn(fs.promises, 'writeFile').mockResolvedValue();
     await (runCommand as any)['doAction']('customTask1', { input: '{}', output: outputFilePath });
     expect(fs.promises.writeFile).toHaveBeenCalledWith(outputFilePath, JSON.stringify('result', null, 2), 'utf8');
+  });
+
+  it('runs in pipe mode when the pipe option is set', async () => {
+    const path = 'workflow.json';
+    const options = { pipe: true };
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+    const usePipeModeMock = jest.spyOn(LogHelper, 'usePipeMode').mockImplementation(async (_, fn) => {
+      return await fn();
+    });
+    jest
+      .spyOn(TaskHelper, 'loadCustomTasksFromConfig')
+      .mockResolvedValue([{ name: 'customTask1', path: 'path/to/customTask1' }]);
+    jest.spyOn(fs.promises, 'writeFile').mockResolvedValue();
+    jest.spyOn(fs.promises, 'unlink').mockResolvedValue();
+
+    await runCommand['doAction'](path, options);
+
+    expect(usePipeModeMock).toHaveBeenCalledWith(context, expect.any(Function));
+    usePipeModeMock.mockRestore();
   });
 });

@@ -3,6 +3,7 @@ import { DefaultRunner } from '@src/runner';
 import { INPUT_PARAMETER_PLUGIN, Persistence, PERSISTENCE_PLUGIN } from '@letrun/core';
 import { Command } from 'commander';
 import fs from 'fs';
+import { LogHelper } from '@src/command/libs/log-helper';
 
 const jest = import.meta.jest;
 
@@ -84,7 +85,7 @@ describe('RunCommand', () => {
         return Promise.resolve({});
       }
       return Promise.reject(new Error('File not found'));
-    })
+    });
 
     await runCommand['doAction'](path, options);
 
@@ -111,7 +112,7 @@ describe('RunCommand', () => {
         return Promise.resolve(inputContent);
       }
       return Promise.reject(new Error('File not found'));
-    })
+    });
 
     await runCommand['doAction'](path, options);
 
@@ -135,7 +136,7 @@ describe('RunCommand', () => {
         return Promise.resolve(workflowContent);
       }
       return Promise.resolve(JSON.parse(filePath));
-    })
+    });
 
     await runCommand['doAction'](path, options);
 
@@ -152,5 +153,19 @@ describe('RunCommand', () => {
     await runCommand['doAction'](path, options);
 
     expect(loggerSpy).toHaveBeenCalledWith('File not found: nonexistent.json');
+  });
+
+  it('runs in pipe mode when the pipe option is set', async () => {
+    const path = 'workflow.json';
+    const options = { pipe: true };
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+    const usePipeModeMock = jest.spyOn(LogHelper, 'usePipeMode').mockImplementation(async (_, fn) => {
+      return await fn();
+    });
+
+    await runCommand['doAction'](path, options);
+
+    expect(usePipeModeMock).toHaveBeenCalledWith(context, expect.any(Function));
+    usePipeModeMock.mockRestore();
   });
 });
