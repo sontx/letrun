@@ -1,6 +1,7 @@
 import {
   AbstractPlugin,
   AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
   ConfigNotFoundError,
   PARAMETER_INTERPOLATOR_PLUGIN,
   ParameterInterpolator,
@@ -13,7 +14,7 @@ export default class ExpressionParameterInterpolator extends AbstractPlugin impl
 
   readonly name = 'expression';
   readonly type = PARAMETER_INTERPOLATOR_PLUGIN;
-  readonly priority = 1;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   protected async doLoad(context: AppContext): Promise<void> {
     await super.doLoad(context);

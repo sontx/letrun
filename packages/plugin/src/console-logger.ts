@@ -4,13 +4,20 @@ import type { TransformableInfo } from 'logform';
 import { LEVEL, MESSAGE, SPLAT } from 'triple-beam';
 import { inspect, InspectOptions } from 'util';
 import { format, transports } from 'winston';
-import { AbstractPlugin, AppContext, LOG_TRANSPORT_PLUGIN, LogTransportPlugin } from '@letrun/core';
+import {
+  AbstractPlugin,
+  AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
+  LOG_TRANSPORT_PLUGIN,
+  LogTransportPlugin,
+} from '@letrun/core';
 
 export default class ConsoleLogger extends AbstractPlugin implements LogTransportPlugin {
   private options?: ConsoleFormatOptions;
 
   readonly name = 'console';
   readonly type = LOG_TRANSPORT_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   getTransport(): Transport {
     const consoleFormat = new ConsoleFormat(this.options ?? {}) as any;

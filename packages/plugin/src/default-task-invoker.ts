@@ -1,5 +1,6 @@
 import {
   AbstractPlugin,
+  BUILTIN_PLUGIN_PRIORITY,
   getEntryPointDir,
   importDefault,
   Task,
@@ -15,6 +16,7 @@ import { InvalidParameterError } from '@letrun/core/dist';
 export default class DefaultTaskInvoker extends AbstractPlugin implements TaskInvoker {
   readonly name = 'default';
   readonly type = TASK_INVOKER_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   constructor(private readonly moduleResolver = importDefault) {
     super();

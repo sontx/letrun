@@ -1,4 +1,12 @@
-import { AbstractPlugin, AppContext, LOG_TRANSPORT_PLUGIN, Logger, LOGGER_PLUGIN, LoggerPlugin } from '@letrun/core';
+import {
+  AbstractPlugin,
+  AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
+  LOG_TRANSPORT_PLUGIN,
+  Logger,
+  LOGGER_PLUGIN,
+  LoggerPlugin,
+} from '@letrun/core';
 import winston, { createLogger, format } from 'winston';
 
 class DefaultLogger implements Logger {
@@ -28,6 +36,7 @@ class DefaultLogger implements Logger {
 export default class WinstonLoggerPlugin extends AbstractPlugin implements LoggerPlugin {
   name = 'winston-logger';
   type = LOGGER_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   private winstonLogger = createLogger({
     level: 'debug',

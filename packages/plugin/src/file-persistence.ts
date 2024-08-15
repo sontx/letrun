@@ -1,6 +1,7 @@
 import {
   AbstractPlugin,
   AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
   getEntryPointDir,
   Persistence,
   PERSISTENCE_PLUGIN,
@@ -57,6 +58,7 @@ export class FilePersistenceUnit implements PersistenceUnit {
 export default class FilePersistence extends AbstractPlugin implements Persistence {
   readonly name = 'file';
   readonly type = PERSISTENCE_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   private units = new Map<string, FilePersistenceUnit>();
   private dataDir = 'data';

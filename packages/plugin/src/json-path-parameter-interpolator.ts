@@ -1,6 +1,7 @@
 import {
   AbstractPlugin,
   AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
   ConfigNotFoundError,
   PARAMETER_INTERPOLATOR_PLUGIN,
   ParameterInterpolator,
@@ -13,6 +14,7 @@ export default class JsonPathParameterInterpolator extends AbstractPlugin implem
 
   readonly name = 'json-path';
   readonly type = PARAMETER_INTERPOLATOR_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   interpolate<T = any>(value: string, interpolatorContext: any, throwIfNotFound = false): T {
     if (!this.isJsonPath(value)) {

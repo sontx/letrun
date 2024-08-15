@@ -1,9 +1,17 @@
-import { AbstractPlugin, AppContext, JAVASCRIPT_PLUGIN, JavaScriptEngine, ObjectType } from '@letrun/core';
+import {
+  AbstractPlugin,
+  AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
+  JAVASCRIPT_PLUGIN,
+  JavaScriptEngine,
+  ObjectType,
+} from '@letrun/core';
 import vm from 'vm';
 
 export default class DefaultJavascriptEngine extends AbstractPlugin implements JavaScriptEngine {
   readonly name = 'default';
   readonly type = JAVASCRIPT_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   async run(script: string, context: ObjectType) {
     if (!script) {

@@ -1,5 +1,6 @@
 import {
   AbstractPlugin,
+  BUILTIN_PLUGIN_PRIORITY,
   childHasStatus,
   countTasks,
   ExecutablePlugin,
@@ -27,6 +28,7 @@ const PRE_TASK_RUN = 'pre-task-run';
 export default class DefaultWorkflowRunner extends AbstractPlugin implements WorkflowRunner {
   readonly name = 'default';
   readonly type = WORKFLOW_RUNNER_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   async execute(input: WorkflowRunnerInput) {
     const { workflow } = input;
