@@ -3,6 +3,7 @@ import { TaskHandlerInput } from '@letrun/core';
 import { InvalidParameterError } from '@letrun/core/dist';
 import path from 'node:path';
 import fs from 'fs';
+import { Subject } from 'rxjs';
 
 const jest = import.meta.jest;
 
@@ -71,7 +72,15 @@ describe('DefaultTaskInvoker', () => {
 
   it('loads without errors', async () => {
     const invoker = new DefaultTaskInvoker();
-    await expect(invoker.load()).resolves.toBeUndefined();
+    const context = {
+      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), debug: jest.fn() }),
+      getConfigProvider: jest.fn(() => ({
+        get changes$() {
+          return new Subject<any>();
+        },
+      })),
+    };
+    await expect(invoker.load(context as any)).resolves.toBeUndefined();
   });
 
   it('unloads without errors', async () => {

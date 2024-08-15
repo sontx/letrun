@@ -1,5 +1,6 @@
 import DefaultJavascriptEngine from '@src/default-javascript-engine';
 import { AppContext } from '@letrun/core';
+import { Subject } from "rxjs";
 
 const jest = import.meta.jest;
 
@@ -31,8 +32,17 @@ describe('DefaultJavascriptEngine', () => {
 
   it('loads configuration correctly', async () => {
     const context = {
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      })),
       getConfigProvider: jest.fn().mockReturnValue({
         getAll: jest.fn().mockReturnValue({ javascript: { default: { key: 'value' } } }),
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const engine = new DefaultJavascriptEngine();

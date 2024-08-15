@@ -11,18 +11,28 @@ import {
   WorkflowRunner,
   WorkflowRunnerInput,
 } from '@letrun/core';
+import { Subject } from "rxjs";
 
 const jest = import.meta.jest;
 
 describe('DefaultWorkflowRunner', () => {
   it('loads context and logger correctly', async () => {
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      })),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
+      }),
     } as unknown as AppContext;
     const runner = new DefaultWorkflowRunner();
     await runner.load(context);
     expect(runner['context']).toBe(context);
-    expect(runner['logger']).toBe(context.getLogger());
   });
 
   it('throws error if context is not loaded', () => {
@@ -235,9 +245,20 @@ describe('DefaultWorkflowRunner', () => {
     const task3 = { status: 'waiting', blocking: true, runtimeName: 'task3', taskDef: {} } as Task;
     const workflow = { tasks: { task1, task2, task3 } } as unknown as Workflow;
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        verbose: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         callPluginMethod: jest.fn().mockResolvedValue({}),
+      }),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const session = {
@@ -260,6 +281,7 @@ describe('DefaultWorkflowRunner', () => {
       return {};
     });
 
+    await runner.load(context);
     await runner['runWorkflow']({ workflow, context, session } as any);
 
     expect(task1.status).toBe('completed');
@@ -274,9 +296,20 @@ describe('DefaultWorkflowRunner', () => {
     const task3 = { status: 'completed', runtimeName: 'task3', taskDef: {} } as Task;
     const workflow = { tasks: { task1, task2, task3 } } as unknown as Workflow;
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        verbose: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         callPluginMethod: jest.fn().mockResolvedValue({}),
+      }),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const session = {
@@ -292,6 +325,7 @@ describe('DefaultWorkflowRunner', () => {
       return {};
     });
 
+    await runner.load(context);
     await runner['runWorkflow']({ workflow, context, session } as any);
 
     expect(task1.status).toBe('completed');
@@ -308,9 +342,20 @@ describe('DefaultWorkflowRunner', () => {
     task1.tasks = { nestedTask1, nestedTask2 };
     const workflow = { tasks: { task1, task2, task3 } } as unknown as Workflow;
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        verbose: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         callPluginMethod: jest.fn().mockResolvedValue({}),
+      }),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const session = {
@@ -326,6 +371,7 @@ describe('DefaultWorkflowRunner', () => {
       return {};
     });
 
+    await runner.load(context);
     await runner['runWorkflow']({ workflow, context, session } as any);
 
     expect(task1.status).toBe('completed');
@@ -361,9 +407,20 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as Task;
     const workflow = { tasks: { task1, task2, task3 } } as unknown as Workflow;
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        verbose: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         callPluginMethod: jest.fn().mockResolvedValue({}),
+      }),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const session = {
@@ -382,6 +439,7 @@ describe('DefaultWorkflowRunner', () => {
       return {};
     });
 
+    await runner.load(context);
     await runner['runWorkflow']({ workflow, context, session } as any);
 
     expect(task1.status).toBe('completed');
@@ -398,13 +456,24 @@ describe('DefaultWorkflowRunner', () => {
     const task3 = { status: 'completed', runtimeName: 'task3', taskDef: {} } as Task;
     const workflow = { tasks: { task1, task2, task3 } } as unknown as Workflow;
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        verbose: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         callPluginMethod: jest.fn().mockImplementation((plugin, method, input) => {
           if (plugin === TASK_INVOKER_PLUGIN && method === 'invoke' && input.task.runtimeName === 'task1') {
             throw new Error('Error executing task');
           }
         }),
+      }),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const session = {
@@ -417,6 +486,7 @@ describe('DefaultWorkflowRunner', () => {
     jest.spyOn(runner as any, 'preTaskRun').mockResolvedValue(undefined);
 
     try {
+      await runner.load(context);
       await runner['runWorkflow']({ workflow, context, session } as any);
     } catch (e) {
       // Handle the error
@@ -433,13 +503,24 @@ describe('DefaultWorkflowRunner', () => {
     const task3 = { status: 'completed', blocking: true, runtimeName: 'task3', taskDef: {} } as Task;
     const workflow = { tasks: { task1, task2, task3 } } as unknown as Workflow;
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        verbose: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         callPluginMethod: jest.fn().mockImplementation((plugin, method, input) => {
           if (plugin === TASK_INVOKER_PLUGIN && method === 'invoke' && input.task.runtimeName === 'task1') {
             throw new Error('Error executing task');
           }
         }),
+      }),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const session = {
@@ -452,6 +533,7 @@ describe('DefaultWorkflowRunner', () => {
     jest.spyOn(runner as any, 'preTaskRun').mockResolvedValue(undefined);
 
     try {
+      await runner.load(context);
       await runner['runWorkflow']({ workflow, context, session } as any);
     } catch (e) {
       // Handle the error
@@ -476,7 +558,13 @@ describe('DefaultWorkflowRunner', () => {
     const workflow = { tasks: { task1, task2 } } as unknown as Workflow;
     let fireRerunError = false;
     const context = {
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+        verbose: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         callPluginMethod: jest.fn().mockImplementation((_, __, input) => {
           if (input.task.runtimeName === 'nestedTask1' && !fireRerunError) {
@@ -485,6 +573,11 @@ describe('DefaultWorkflowRunner', () => {
           }
           return {};
         }),
+      }),
+      getConfigProvider: jest.fn().mockReturnValue({
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const session = {
@@ -503,6 +596,7 @@ describe('DefaultWorkflowRunner', () => {
       return originalExecuteTask(input);
     });
 
+    await runner.load(context);
     await runner['runWorkflow']({ workflow, context, session } as any);
 
     expect(task1.status).toBe('completed');

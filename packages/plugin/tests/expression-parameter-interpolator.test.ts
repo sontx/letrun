@@ -1,5 +1,6 @@
 import ExpressionParameterInterpolator from '@src/expression-parameter-interpolator';
 import { AppContext } from '@letrun/core';
+import { Subject } from "rxjs";
 
 const jest = import.meta.jest;
 
@@ -55,8 +56,11 @@ describe('ExpressionParameterInterpolator', () => {
     const context = {
       getConfigProvider: jest.fn().mockReturnValue({
         getAll: jest.fn().mockReturnValue({ 'parameter-interpolator': { expression: { recursive: false } } }),
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn() }),
+      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), debug: jest.fn() }),
     } as unknown as AppContext;
     const interpolator = new ExpressionParameterInterpolator();
     await interpolator.load(context);

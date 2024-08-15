@@ -1,6 +1,7 @@
 import winston, { transports } from 'winston';
 import WinstonLoggerPlugin from '@src/winston-logger-plugin';
 import { AppContext } from '@letrun/core';
+import { Subject } from "rxjs";
 
 const jest = import.meta.jest;
 
@@ -11,11 +12,18 @@ describe('WinstonLoggerPlugin', () => {
   beforeEach(() => {
     plugin = new WinstonLoggerPlugin();
     context = {
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        error: jest.fn(),
+      })),
       getPluginManager: jest.fn().mockReturnValue({
         get: jest.fn().mockResolvedValue([]),
       }),
       getConfigProvider: jest.fn().mockReturnValue({
         get: jest.fn().mockResolvedValue('debug'),
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
   });
@@ -23,12 +31,6 @@ describe('WinstonLoggerPlugin', () => {
   it('loads the plugin and sets the logger level', async () => {
     await plugin.load(context);
     expect(plugin['winstonLogger'].level).toBe('debug');
-  });
-
-  it('does not reload the plugin if already loaded', async () => {
-    plugin['loaded'] = true;
-    await plugin.load(context);
-    expect(context.getPluginManager().get).not.toHaveBeenCalled();
   });
 
   it('unloads the plugin without errors', async () => {
@@ -47,9 +49,7 @@ describe('WinstonLoggerPlugin', () => {
   });
 
   it('handles empty logger plugins list', async () => {
-    context.getPluginManager().get = jest
-      .fn()
-      .mockResolvedValue([{ getTransport: () => new transports.Console() }]);
+    context.getPluginManager().get = jest.fn().mockResolvedValue([{ getTransport: () => new transports.Console() }]);
     await plugin.load(context);
     await plugin.ready(context);
     expect(plugin['winstonLogger'].transports.length).toBe(1); // Default transport

@@ -14,8 +14,9 @@
   ],
   "scripts": {
     "build": "tsc && tsc-alias",
-    "coverage": "jest --coverage",
-    "test": "jest",
+    "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest -- --coverage",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest",
+    "jest": "jest",
     "prepublishOnly": "npm run build && npm run test"
   },
   "repository": {
@@ -30,6 +31,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@tsconfig/node20": "^20.1.2",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.5",

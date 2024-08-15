@@ -1,5 +1,6 @@
 import { AppContext } from '@letrun/core';
 import DefaultIdGenerator from '@src/default-id-generator';
+import { Subject } from "rxjs";
 
 const jest = import.meta.jest;
 
@@ -30,12 +31,21 @@ describe('DefaultIdGenerator', () => {
 
   it('loads configuration into the plugin', async () => {
     const context = {
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      })),
       getConfigProvider: jest.fn().mockReturnValue({
         getAll: jest.fn().mockResolvedValue({
           'id-generator': {
             default: { idSeparator: '-' },
           },
         }),
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
 

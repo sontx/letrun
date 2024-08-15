@@ -1,6 +1,7 @@
 import ConsoleLogger from '@src/console-logger';
 import { AppContext } from '@letrun/core';
 import { transports } from 'winston';
+import { Subject } from 'rxjs';
 
 const jest = import.meta.jest;
 
@@ -21,10 +22,19 @@ describe('ConsoleLogger', () => {
 
   it('loads configuration correctly', async () => {
     const context = {
+      getLogger: jest.fn(() => ({
+        debug: jest.fn(),
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      })),
       getConfigProvider: jest.fn().mockReturnValue({
         getBoolean: jest.fn().mockResolvedValue(true),
         get: jest.fn().mockResolvedValue('value'),
         getInt: jest.fn().mockResolvedValue(1),
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const logger = new ConsoleLogger();
