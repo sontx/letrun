@@ -326,6 +326,19 @@ export default class MyPlugin implements Plugin {
 }
 ```
 
+There is a predefined `AbstractPlugin` class that cover some common cases and reduce the repeated code.
+
+```ts
+import { AbstractPlugin } from '@letrun/core';
+
+export default class MyPlugin extends AbstractPlugin {
+  readonly name = 'my-plugin';
+  readonly type = 'command';
+
+  /* there are other methods to implement depending on the type of the plugin */
+}
+```
+
 ### Command Plugin
 
 This plugin allows you to extend the CLI tool with custom commands. We're using `commander` package to define commands.
