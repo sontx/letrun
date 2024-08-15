@@ -5,6 +5,7 @@ import { DefaultRunner } from '@src/runner';
 import fs from 'fs';
 import { SystemTaskManager } from '@src/system-task';
 import { TaskHelper } from '@src/command/libs';
+import { LogHelper } from '@src/command/libs/log-helper';
 
 const SUPPORT_RUN_SYSTEM_TASKS = ['log', 'http'];
 
@@ -20,16 +21,27 @@ export class RunCommand extends AbstractCommand {
         'group of the task, use "." if you want to search tasks  that doesn\'t have a group',
       )
       .option('-o, --output <output>', 'output file which contains the result of the task')
-      .action((name, options) => {
-        return this.doAction(name, options);
+      .option('-p, --pipe', 'Pipe the output to the next command', false)
+      .action(async (name, options) => {
+        await this.doAction(name, options);
       });
   }
 
   private async doAction(name: string, options: AbstractOptions) {
-    if (SUPPORT_RUN_SYSTEM_TASKS.includes(name)) {
-      await this.runSystemTask(name, options);
+    if (options.pipe) {
+      await LogHelper.usePipeMode(this.context, async () => {
+        return await this.decideTask(name, options);
+      });
     } else {
-      await this.runCustomTask(name, options);
+      return await this.decideTask(name, options);
+    }
+  }
+
+  private async decideTask(name: string, options: AbstractOptions) {
+    if (SUPPORT_RUN_SYSTEM_TASKS.includes(name)) {
+      return await this.runSystemTask(name, options);
+    } else {
+      return await this.runCustomTask(name, options);
     }
   }
 
@@ -37,7 +49,7 @@ export class RunCommand extends AbstractCommand {
     const systemTasks = SystemTaskManager.getSystemTasks();
     if (systemTasks[name]) {
       const task = systemTasks[name]!;
-      await this.runTask(
+      return await this.runTask(
         {
           ...task,
           fullPath: name,
@@ -68,7 +80,7 @@ export class RunCommand extends AbstractCommand {
           );
       }
     } else {
-      await this.runTask(tasks[0] as any, options);
+      return await this.runTask(tasks[0] as any, options);
     }
   }
 
@@ -94,6 +106,7 @@ export class RunCommand extends AbstractCommand {
       if (options.output) {
         await fs.promises.writeFile(options.output, JSON.stringify(ranWorkflow?.output ?? '', null, 2), 'utf8');
       }
+      return ranWorkflow?.output;
     } finally {
       await runner.unload();
     }

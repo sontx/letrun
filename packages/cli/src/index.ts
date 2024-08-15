@@ -18,8 +18,13 @@ const bootstrap = async () => {
     .name('letrun')
     .description(process.env.APP_DESCRIPTION ?? '')
     .version(process.env.APP_VERSION ?? '')
-    .hook('preAction', (command) => {
-      if (!command.optsWithGlobals().hideBanner) {
+    .hook('preAction', (command, actionCommand) => {
+      const allOpts = {
+        ...command.optsWithGlobals(),
+        ...actionCommand.opts(),
+      };
+      const skipBanner = allOpts.hideBanner || allOpts.pipe;
+      if (!skipBanner) {
         console.log(BANNER);
         console.log(`v${process.env.APP_VERSION} - from ${process.env.APP_AUTHOR} with ${EMOJIS.HEART}\n`);
       }
