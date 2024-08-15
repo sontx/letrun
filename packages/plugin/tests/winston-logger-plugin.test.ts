@@ -72,4 +72,40 @@ describe('WinstonLoggerPlugin', () => {
 
     expect(logSpy).not.toHaveBeenCalled();
   });
+
+  it('calls pre and post hooks when logging messages', async () => {
+    await plugin.load(context);
+
+    const preHook = jest.fn().mockReturnValue(false);
+    const postHook = jest.fn();
+
+    plugin.hook('pre', preHook);
+    plugin.hook('post', postHook);
+
+    const logger = plugin.getLogger();
+    logger.debug('Test message');
+
+    expect(preHook).toHaveBeenCalledWith('debug', 'Test message');
+    expect(postHook).toHaveBeenCalledWith('debug', 'Test message');
+  });
+
+  it('skips logging if a pre hook returns true', async () => {
+    await plugin.load(context);
+
+    const preHook = jest.fn().mockReturnValue(true);
+    const postHook = jest.fn();
+
+    plugin.hook('pre', preHook);
+    plugin.hook('post', postHook);
+
+    const winstonLogger = plugin['winstonLogger'];
+    const logSpy = jest.spyOn(winstonLogger, 'debug');
+
+    const logger = plugin.getLogger();
+    logger.debug('Test message');
+
+    expect(preHook).toHaveBeenCalledWith('debug', 'Test message');
+    expect(logSpy).not.toHaveBeenCalled();
+    expect(postHook).not.toHaveBeenCalled();
+  });
 });
