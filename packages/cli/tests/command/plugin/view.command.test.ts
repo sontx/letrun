@@ -39,13 +39,13 @@ describe('ViewCommand', () => {
 
   it('prints plugin details when plugin is found', async () => {
     await viewCommand['doAction']({ type: 'type1', name: 'plugin1' } as any);
-    expect(consoleSpy).toHaveBeenCalledWith('\nType: type1');
+    expect(consoleSpy).toHaveBeenCalledWith('Type: type1');
     expect(consoleSpy).toHaveBeenCalledWith('Name: plugin1');
   });
 
   it('prints plugin details when no name is provided', async () => {
     await viewCommand['doAction']({ type: 'type1' } as any);
-    expect(consoleSpy).toHaveBeenCalledWith('\nType: type1');
+    expect(consoleSpy).toHaveBeenCalledWith('Type: type1');
     expect(consoleSpy).toHaveBeenCalledWith('Name: plugin1');
   });
 

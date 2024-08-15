@@ -1,4 +1,5 @@
 export * from './logger-plugin';
+export * from './log-transport-plugin';
 export * from './persistence';
 export * from './parameter-interpolator';
 export * from './workflow-runner';
@@ -7,3 +8,4 @@ export * from './task-invoker';
 export * from './command-plugin';
 export * from './input-parameter';
 export * from './id-generator';
+export * from './abstract-plugin';

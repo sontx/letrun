@@ -2,6 +2,7 @@ import FilePersistence, { FilePersistenceUnit } from '@src/file-persistence';
 import path from 'node:path';
 import fs from 'fs';
 import { AppContext } from '@letrun/core';
+import { Subject } from "rxjs";
 
 const jest = import.meta.jest;
 const testDataDir = 'testDataDir';
@@ -74,8 +75,12 @@ describe('FilePersistence', () => {
 
   it('loads configuration correctly', async () => {
     const context = {
+      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), debug: jest.fn() }),
       getConfigProvider: jest.fn().mockReturnValue({
         get: jest.fn().mockResolvedValue('customDataDir'),
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
     } as unknown as AppContext;
     const persistence = new FilePersistence();

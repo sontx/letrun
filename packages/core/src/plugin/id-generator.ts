@@ -1,4 +1,4 @@
-import { Plugin } from '../model';
+import { Plugin } from '@src/model';
 
 export const ID_GENERATOR_PLUGIN = 'id-generator';
 

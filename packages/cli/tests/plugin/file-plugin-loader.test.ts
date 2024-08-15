@@ -1,5 +1,5 @@
 import { FilePluginLoader } from '@src/plugin/file-plugin-loader';
-import { DEFAULT_LOGGER } from '@src/logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 import fs from 'fs';
 import path from 'node:path';
 import { getEntryPointDir } from '@letrun/core';

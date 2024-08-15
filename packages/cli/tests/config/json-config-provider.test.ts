@@ -1,5 +1,5 @@
 import { JsonConfigProvider } from '@src/config/json-config-provider';
-import { DEFAULT_LOGGER } from '@src/logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 import fs from 'fs';
 
 const jest = import.meta.jest;

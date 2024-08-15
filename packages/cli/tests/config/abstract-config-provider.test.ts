@@ -1,6 +1,8 @@
 import { ConfigNotFoundError } from '@letrun/core';
 import { AbstractConfigProvider } from '@src/config/abstract-config-provider';
 
+const jest = import.meta.jest;
+
 class MockConfigProvider extends AbstractConfigProvider {
   private readonly testData: Record<string, any>;
 
@@ -28,53 +30,66 @@ describe('AbstractConfigProvider', () => {
     });
   });
 
-  test('set and getAll', async () => {
+  it('set and getAll', async () => {
     await provider.set('new.key', 'new_value');
     const allConfig = await provider.getAll();
     expect(allConfig['new.key']).toBe('new_value');
   });
 
-  test('getBoolean', async () => {
+  it('getBoolean', async () => {
     const value = await provider.getBoolean('boolean.key');
     expect(value).toBe(true);
   });
 
-  test('getFloat', async () => {
+  it('getFloat', async () => {
     const value = await provider.getFloat('number.key');
     expect(value).toBe(42.0);
   });
 
-  test('getInt', async () => {
+  it('getInt', async () => {
     const value = await provider.getInt('number.key');
     expect(value).toBe(42);
   });
 
-  test('get with exact key', async () => {
+  it('get with exact key', async () => {
     const value = await provider.get('test.key');
     expect(value).toBe('value');
   });
 
-  test('get with uppercase key', async () => {
+  it('get with uppercase key', async () => {
     const value = await provider.get('TEST_KEY');
     expect(value).toBe('uppercase_value');
   });
 
-  test('get with camel case key', async () => {
+  it('get with camel case key', async () => {
     const value = await provider.get('testKey');
     expect(value).toBe('camelCaseValue');
   });
 
-  test('get with kebab case key', async () => {
+  it('get with kebab case key', async () => {
     const value = await provider.get('test-key');
     expect(value).toBe('kebab-case-value');
   });
 
-  test('get with non-existent key and default value', async () => {
+  it('get with non-existent key and default value', async () => {
     const value = await provider.get('non.existent.key', 'default_value');
     expect(value).toBe('default_value');
   });
 
-  test('get with non-existent key and no default value', async () => {
+  it('get with non-existent key and no default value', async () => {
     await expect(provider.get('non.existent.key')).rejects.toThrow(ConfigNotFoundError);
+  });
+
+  it('config change should fire event', async () => {
+    const provider = new MockConfigProvider({
+      'initial.key': 'initial_value',
+    });
+
+    const changesSpy = jest.fn();
+    provider.changes$.subscribe(changesSpy);
+
+    await provider.set('initial.key', 'new_value');
+
+    expect(changesSpy).toHaveBeenCalledWith({ 'initial.key': 'new_value' });
   });
 });

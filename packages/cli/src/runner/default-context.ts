@@ -1,8 +1,16 @@
-import { AppContext, ConfigProvider, Logger, PluginLoader, PluginManager } from '@letrun/core';
+import {
+  AppContext,
+  ConfigProvider,
+  Logger,
+  LOGGER_PLUGIN,
+  LoggerPlugin,
+  PluginLoader,
+  PluginManager,
+} from '@letrun/core';
 import { FilePluginLoader, SimplePluginManager } from '../plugin';
-import { LoggerModule } from '../logger';
 import { ChainConfigProvider } from '../config';
 import { DefaultPluginLoader } from '@letrun/plugin';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 /**
  * Interface representing the options for the DefaultContext.
@@ -34,11 +42,11 @@ interface Options {
  * Implements the AppContext interface.
  */
 export class DefaultContext implements AppContext {
-  private readonly loggerModule: LoggerModule = new LoggerModule();
   private readonly configProvider: ConfigProvider;
   private readonly pluginManager: PluginManager;
   private defaultPluginLoader?: PluginLoader;
   private pluginLoader?: PluginLoader;
+  private logger: Logger = DEFAULT_LOGGER;
   private loaded = false;
 
   constructor(options: Options = {}) {
@@ -54,15 +62,21 @@ export class DefaultContext implements AppContext {
     }
 
     await this.initPluginManager();
-    await this.loggerModule.load(this);
-    this.loaded = true;
+    await this.initLogger();
+
     this.getLogger().info('App context loaded');
+    this.loaded = true;
   }
 
   private async initPluginManager(): Promise<void> {
     await this.loadDefaultPlugins();
     await this.loadCustomPlugins();
-    this.pluginManager.load(this);
+    await this.pluginManager.load(this);
+  }
+
+  private async initLogger() {
+    const loggerPlugin = await this.pluginManager.getOne<LoggerPlugin>(LOGGER_PLUGIN);
+    this.logger = loggerPlugin.getLogger();
   }
 
   private async loadDefaultPlugins() {
@@ -91,7 +105,6 @@ export class DefaultContext implements AppContext {
 
     this.getLogger().info('App context unloaded');
     await this.pluginManager?.unload();
-    await this.loggerModule?.unload();
     this.loaded = false;
   }
 
@@ -104,6 +117,6 @@ export class DefaultContext implements AppContext {
   }
 
   getLogger(): Logger {
-    return this.loggerModule.getLogger();
+    return this.logger;
   }
 }

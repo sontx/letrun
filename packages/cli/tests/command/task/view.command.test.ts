@@ -46,7 +46,7 @@ describe('ViewCommand', () => {
 
     await viewCommand['doAction']('systemTask1', {});
 
-    expect(consoleSpy).toHaveBeenCalledWith(`\n${EMOJIS.NUT_AND_BOLT} systemTask1`);
+    expect(consoleSpy).toHaveBeenCalledWith(`${EMOJIS.NUT_AND_BOLT} systemTask1`);
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('group: group1'));
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('description: A system task'));
   });
@@ -58,7 +58,7 @@ describe('ViewCommand', () => {
 
     await viewCommand['doAction']('customTask1', {});
 
-    expect(consoleSpy).toHaveBeenCalledWith(`\n${EMOJIS.ROBOT} customTask1`);
+    expect(consoleSpy).toHaveBeenCalledWith(`${EMOJIS.ROBOT} customTask1`);
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('group: group1'));
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('description: A custom task'));
   });

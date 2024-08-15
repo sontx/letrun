@@ -1,20 +1,20 @@
 import {
+  AbstractPlugin,
   AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
   ConfigNotFoundError,
-  loadConfigToPlugin,
-  Logger,
   PARAMETER_INTERPOLATOR_PLUGIN,
   ParameterInterpolator,
 } from '@letrun/core';
 import { JSONPath } from 'jsonpath-plus';
 
-export default class JsonPathParameterInterpolator implements ParameterInterpolator {
+export default class JsonPathParameterInterpolator extends AbstractPlugin implements ParameterInterpolator {
   private flatten: boolean = false;
   private recursive: boolean = true;
-  private logger?: Logger;
 
   readonly name = 'json-path';
   readonly type = PARAMETER_INTERPOLATOR_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   interpolate<T = any>(value: string, interpolatorContext: any, throwIfNotFound = false): T {
     if (!this.isJsonPath(value)) {
@@ -30,7 +30,7 @@ export default class JsonPathParameterInterpolator implements ParameterInterpola
         wrap: false,
         flatten: this.flatten,
       });
-      this.logger?.verbose(`Resolved JSON path: ${currentValue} --> ${result}`);
+      this.context?.getLogger()?.verbose(`Resolved JSON path: ${currentValue} --> ${result}`);
       currentValue = result;
     } while (this.recursive && this.isJsonPath(currentValue));
     if (throwIfNotFound && currentValue === undefined) {
@@ -49,13 +49,8 @@ export default class JsonPathParameterInterpolator implements ParameterInterpola
     return jsonPathRegex.test(str);
   }
 
-  async load(context: AppContext) {
-    this.logger = context.getLogger();
-    const config = context.getConfigProvider().getAll();
-    loadConfigToPlugin(config, this);
-  }
-
-  unload(): Promise<void> {
-    return Promise.resolve(undefined);
+  protected async doLoad(context: AppContext): Promise<void> {
+    await super.doLoad(context);
+    await this.injectConfig();
   }
 }

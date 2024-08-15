@@ -1,4 +1,12 @@
-import { AppContext, FunctionKeys, IllegalStateError, InterruptInvokeError, Plugin, PluginManager } from '@letrun/core';
+import {
+  AppContext,
+  DEFAULT_PLUGIN_PRIORITY,
+  FunctionKeys,
+  IllegalStateError,
+  InterruptInvokeError,
+  Plugin,
+  PluginManager,
+} from '@letrun/core';
 
 /**
  * Class representing a simple plugin manager.
@@ -14,7 +22,7 @@ export class SimplePluginManager implements PluginManager {
     plugins.push(plugin);
     this.pluginMap.set(
       plugin.type,
-      plugins.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0)),
+      plugins.sort((a, b) => (b.priority ?? DEFAULT_PLUGIN_PRIORITY) - (a.priority ?? DEFAULT_PLUGIN_PRIORITY)),
     );
   }
 
@@ -102,8 +110,15 @@ export class SimplePluginManager implements PluginManager {
     return previousInvokeResult;
   }
 
-  load(context: AppContext) {
+  async load(context: AppContext) {
     this.context = context;
+    for (const plugin of [...this.pluginMap.values()].flatMap((plugins) => plugins)) {
+      if (plugin.ready) {
+        // make sure the plugin is loaded before calling ready
+        await this.loadPluginIfNotLoaded(plugin);
+        await plugin.ready(context);
+      }
+    }
   }
 
   async unload(): Promise<void> {

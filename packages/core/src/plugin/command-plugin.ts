@@ -1,5 +1,5 @@
-import { Plugin } from '../model';
 import type { Command } from 'commander';
+import { Plugin } from '@src/model';
 
 export const COMMAND_PLUGIN = 'command';
 

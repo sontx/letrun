@@ -40,7 +40,7 @@ describe('ListCommand', () => {
 
   it('prints both system and custom tasks when no options are provided', async () => {
     await (listCommand as any)['doAction']({});
-    expect(consoleSpy).toHaveBeenCalledWith('\nTotal system tasks: 2');
+    expect(consoleSpy).toHaveBeenCalledWith('Total system tasks: 2');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('task1'));
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('task2'));
     expect(consoleSpy).toHaveBeenCalledWith('\nTotal custom tasks: 2');
@@ -57,7 +57,7 @@ describe('ListCommand', () => {
 
   it('prints system tasks when system option is provided', async () => {
     await (listCommand as any)['doAction']({ system: true });
-    expect(consoleSpy).toHaveBeenCalledWith('\nTotal system tasks: 2');
+    expect(consoleSpy).toHaveBeenCalledWith('Total system tasks: 2');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('task1'));
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('task2'));
   });

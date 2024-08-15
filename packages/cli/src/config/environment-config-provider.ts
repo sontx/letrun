@@ -1,5 +1,5 @@
-import { AbstractConfigProvider } from './abstract-config-provider';
-import { DEFAULT_LOGGER } from '../logger';
+import {AbstractConfigProvider} from './abstract-config-provider';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 /**
  * Class representing a configuration provider that loads environment variables.

@@ -1,4 +1,4 @@
-import { COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
+import { AbstractPlugin, COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
 import { Command } from 'commander';
 
 const art = `
@@ -65,7 +65,7 @@ const art = `
                            *======================*#**##*##**#*####*#####                           
                             **+++==================##*############%#`;
 
-export default class SampleCommandPlugin implements CommandPlugin {
+export default class SampleCommandPlugin extends AbstractPlugin implements CommandPlugin {
   readonly name = 'sample';
   readonly type = COMMAND_PLUGIN;
 
@@ -77,7 +77,4 @@ export default class SampleCommandPlugin implements CommandPlugin {
         console.log(art);
       });
   }
-
-  async load() {}
-  async unload() {}
 }

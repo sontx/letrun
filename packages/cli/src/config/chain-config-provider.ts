@@ -4,6 +4,7 @@ import path from 'node:path';
 import { YamlConfigProvider } from './yaml-config-provider';
 import { ConfigNotFoundError, ConfigProvider, FunctionKeys, getEntryPointDir, ObjectType } from '@letrun/core';
 import fs from 'fs';
+import { Observable, Subject } from 'rxjs';
 
 /**
  * Class representing a chain of configuration providers.
@@ -21,6 +22,11 @@ export class ChainConfigProvider implements ConfigProvider {
    * @private
    */
   private config?: Record<string, any>;
+  private readonly configChangeSubject$ = new Subject<Record<string, any>>();
+
+  get changes$(): Observable<Record<string, any>> {
+    return this.configChangeSubject$.asObservable();
+  }
 
   /**
    * Creates an instance of ChainConfigProvider.
@@ -55,6 +61,10 @@ export class ChainConfigProvider implements ConfigProvider {
     for (const configProvider of this.configProviderChain) {
       await configProvider.set(key, value);
     }
+
+    this.configChangeSubject$.next({
+      [key]: value,
+    });
   }
 
   async getAll(): Promise<ObjectType> {

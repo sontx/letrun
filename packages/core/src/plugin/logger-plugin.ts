@@ -1,5 +1,5 @@
-import type * as Transport from 'winston-transport';
-import { Plugin } from '../model';
+import { Plugin } from '@src/model';
+import { Logger } from '@src/model/logger';
 
 export const LOGGER_PLUGIN = 'logger';
 
@@ -7,9 +7,5 @@ export const LOGGER_PLUGIN = 'logger';
  * Interface representing a Logger plugin.
  */
 export interface LoggerPlugin extends Plugin {
-  /**
-   * Retrieves the transport mechanism for the logger.
-   * @returns {Transport} The transport mechanism used by the logger.
-   */
-  getTransport(): Transport;
+  getLogger(): Logger;
 }

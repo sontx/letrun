@@ -38,7 +38,7 @@ describe('ListCommand', () => {
 
   it('prints the total number of plugins and their tree structure', async () => {
     await listCommand['doAction']();
-    expect(consoleSpy).toHaveBeenCalledWith('\nTotal plugins: 3\n');
+    expect(consoleSpy).toHaveBeenCalledWith('Total plugins: 3\n');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.FOLDER} type1`));
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.GEAR} plugin1`));
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.GEAR} plugin2`));
@@ -49,14 +49,14 @@ describe('ListCommand', () => {
   it('handles empty plugin map gracefully', async () => {
     context.getPluginManager().getAll.mockResolvedValue(new Map());
     await listCommand['doAction']();
-    expect(consoleSpy).toHaveBeenCalledWith('\nTotal plugins: 0\n');
+    expect(consoleSpy).toHaveBeenCalledWith('Total plugins: 0\n');
     expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.FOLDER}`));
   });
 
   it('handles plugins without types gracefully', async () => {
     context.getPluginManager().getAll.mockResolvedValue(new Map([['', [{ name: 'plugin1' }]]]));
     await listCommand['doAction']();
-    expect(consoleSpy).toHaveBeenCalledWith('\nTotal plugins: 1\n');
+    expect(consoleSpy).toHaveBeenCalledWith('Total plugins: 1\n');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.FOLDER} `));
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`${EMOJIS.GEAR} plugin1`));
   });

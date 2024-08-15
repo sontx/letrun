@@ -1,5 +1,6 @@
 import JsonPathParameterInterpolator from '@src/json-path-parameter-interpolator';
 import { AppContext } from '@letrun/core';
+import { Subject } from "rxjs";
 
 const jest = import.meta.jest;
 
@@ -45,8 +46,11 @@ describe('JsonPathParameterInterpolator', () => {
             'json-path': { flatten: true, recursive: false },
           },
         }),
+        get changes$() {
+          return new Subject<any>();
+        },
       }),
-      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn() }),
+      getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), debug: jest.fn() }),
     } as unknown as AppContext;
     const interpolator = new JsonPathParameterInterpolator();
     await interpolator.load(context);

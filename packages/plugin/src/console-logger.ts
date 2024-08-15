@@ -4,13 +4,20 @@ import type { TransformableInfo } from 'logform';
 import { LEVEL, MESSAGE, SPLAT } from 'triple-beam';
 import { inspect, InspectOptions } from 'util';
 import { format, transports } from 'winston';
-import { AppContext, LOGGER_PLUGIN, LoggerPlugin } from '@letrun/core';
+import {
+  AbstractPlugin,
+  AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
+  LOG_TRANSPORT_PLUGIN,
+  LogTransportPlugin,
+} from '@letrun/core';
 
-export default class ConsoleLogger implements LoggerPlugin {
+export default class ConsoleLogger extends AbstractPlugin implements LogTransportPlugin {
   private options?: ConsoleFormatOptions;
 
   readonly name = 'console';
-  readonly type = LOGGER_PLUGIN;
+  readonly type = LOG_TRANSPORT_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   getTransport(): Transport {
     const consoleFormat = new ConsoleFormat(this.options ?? {}) as any;
@@ -31,7 +38,7 @@ export default class ConsoleLogger implements LoggerPlugin {
     });
   }
 
-  async load(context: AppContext) {
+  protected async doLoad(context: AppContext) {
     const configProvider = context.getConfigProvider();
     const showMeta = await configProvider.getBoolean('logger.console.showMeta', true);
     const metaStrip = (await configProvider.get('logger.console.metaStrip', 'timestamp,service')).split(',');
@@ -58,10 +65,6 @@ export default class ConsoleLogger implements LoggerPlugin {
         compact: inspectOptionsCompact < 0 ? Infinity : inspectOptionsCompact,
       },
     };
-  }
-
-  unload(): Promise<void> {
-    return Promise.resolve(undefined);
   }
 }
 

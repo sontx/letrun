@@ -1,7 +1,7 @@
 import { getEntryPointDir, importDefault, Plugin, PluginLoader } from '@letrun/core';
 import fs from 'fs';
 import path from 'node:path';
-import { DEFAULT_LOGGER } from '../logger';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 /**
  * Class representing a file-based plugin loader.

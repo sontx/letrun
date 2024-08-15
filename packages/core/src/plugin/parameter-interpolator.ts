@@ -1,4 +1,4 @@
-import { Plugin } from '../model';
+import { Plugin } from '@src/model';
 
 export const PARAMETER_INTERPOLATOR_PLUGIN = 'parameter-interpolator';
 

@@ -1,4 +1,12 @@
-import { AppContext, getEntryPointDir, Persistence, PERSISTENCE_PLUGIN, PersistenceUnit } from '@letrun/core';
+import {
+  AbstractPlugin,
+  AppContext,
+  BUILTIN_PLUGIN_PRIORITY,
+  getEntryPointDir,
+  Persistence,
+  PERSISTENCE_PLUGIN,
+  PersistenceUnit,
+} from '@letrun/core';
 import fs from 'fs';
 import path from 'node:path';
 
@@ -47,9 +55,10 @@ export class FilePersistenceUnit implements PersistenceUnit {
   }
 }
 
-export default class FilePersistence implements Persistence {
+export default class FilePersistence extends AbstractPlugin implements Persistence {
   readonly name = 'file';
   readonly type = PERSISTENCE_PLUGIN;
+  readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   private units = new Map<string, FilePersistenceUnit>();
   private dataDir = 'data';
@@ -61,10 +70,9 @@ export default class FilePersistence implements Persistence {
     return this.units.get(name)!;
   }
 
-  async load(context: AppContext) {
+  protected async doLoad(context: AppContext): Promise<void> {
+    await super.doLoad(context);
     const dataDir = await context.getConfigProvider().get('persistence.dir', 'data');
     this.dataDir = path.resolve(getEntryPointDir(), dataDir);
   }
-
-  async unload() {}
 }
