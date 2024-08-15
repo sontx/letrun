@@ -137,4 +137,36 @@ describe('SimplePluginManager', () => {
 
     await expect(pluginManager.getOne<Plugin>('typeA')).rejects.toThrow(IllegalStateError);
   });
+
+  it('calls load and ready methods if plugin has ready method', async () => {
+    const plugin: Plugin = {
+      type: 'typeA',
+      name: 'PluginA',
+      load: jest.fn(),
+      ready: jest.fn(),
+    } as any;
+
+    pluginManager.register(plugin);
+    await pluginManager.load(mockContext);
+
+    const loadCallOrder = (plugin.load as jest.Mock).mock.invocationCallOrder[0];
+    const readyCallOrder = (plugin.ready as jest.Mock).mock.invocationCallOrder[0];
+
+    expect(plugin.load).toHaveBeenCalledWith(mockContext);
+    expect(plugin.ready).toHaveBeenCalledWith(mockContext);
+    expect(loadCallOrder).toBeLessThan(readyCallOrder!);
+  });
+
+  it('does not call load method if plugin does not have ready method', async () => {
+    const plugin: Plugin = {
+      type: 'typeA',
+      name: 'PluginA',
+      load: jest.fn(),
+    } as any;
+
+    pluginManager.register(plugin);
+    await pluginManager.load(mockContext);
+
+    expect(plugin.load).not.toHaveBeenCalled();
+  });
 });
