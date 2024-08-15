@@ -1,5 +1,6 @@
 import { ConfigNotFoundError, ConfigProvider, ObjectType } from '@letrun/core';
 import { JSONPath } from 'jsonpath-plus';
+import { Observable, Subject } from 'rxjs';
 
 const EMPTY: any = {};
 
@@ -19,6 +20,11 @@ export abstract class AbstractConfigProvider implements ConfigProvider {
    * @private
    */
   private matchedResult = new Map<string, any>();
+  private readonly configChangeSubject$ = new Subject<Record<string, any>>();
+
+  get changes$(): Observable<Record<string, any>> {
+    return this.configChangeSubject$.asObservable();
+  }
 
   /**
    * Abstract method to load the configuration data.
@@ -35,6 +41,9 @@ export abstract class AbstractConfigProvider implements ConfigProvider {
     }
     this.matchedResult.delete(key);
     this.config[key] = value;
+    this.configChangeSubject$.next({
+      [key]: value,
+    });
   }
 
   /**
@@ -125,7 +134,7 @@ export abstract class AbstractConfigProvider implements ConfigProvider {
    * @param {string} key - The configuration key.
    * @returns {Promise<any>} A promise that resolves with the value of the key.
    */
-  async getExactKey(key: string): Promise<any> {
+  private async getExactKey(key: string): Promise<any> {
     const config = await this.getAll();
     if (key in config) {
       return config[key];
@@ -143,7 +152,7 @@ export abstract class AbstractConfigProvider implements ConfigProvider {
    * @param {string} key - The configuration key.
    * @returns {Promise<any>} A promise that resolves with the value of the key.
    */
-  getUppercaseKey(key: string): Promise<any> {
+  private getUppercaseKey(key: string): Promise<any> {
     return this.getExactKey(key.toUpperCase());
   }
 
@@ -152,7 +161,7 @@ export abstract class AbstractConfigProvider implements ConfigProvider {
    * @param {string} key - The configuration key.
    * @returns {Promise<any>} A promise that resolves with the value of the key.
    */
-  getCamelCaseKey(key: string): Promise<any> {
+  private getCamelCaseKey(key: string): Promise<any> {
     const effectiveKey = key.replace(/-([a-z])/g, (g) => g[1]!.toUpperCase());
     return this.getExactKey(effectiveKey) ?? this.getUppercaseKey(effectiveKey);
   }
@@ -162,7 +171,7 @@ export abstract class AbstractConfigProvider implements ConfigProvider {
    * @param {string} key - The configuration key.
    * @returns {Promise<any>} A promise that resolves with the value of the key.
    */
-  getKebabCaseKey(key: string): Promise<any> {
+  private getKebabCaseKey(key: string): Promise<any> {
     const effectiveKey = key
       .replace(/([a-z])([A-Z])/g, '$1-$2')
       .replace(/-/g, '_')

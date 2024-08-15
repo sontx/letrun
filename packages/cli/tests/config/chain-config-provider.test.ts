@@ -102,4 +102,13 @@ describe('ChainConfigProvider', () => {
 
     expect(result).toBe(42);
   });
+
+  it('config change should fire event', async () => {
+    const changesSpy = jest.fn();
+    chainConfigProvider.changes$.subscribe(changesSpy);
+
+    await chainConfigProvider.set('initial.key', 'new_value');
+
+    expect(changesSpy).toHaveBeenCalledWith({ 'initial.key': 'new_value' });
+  });
 });

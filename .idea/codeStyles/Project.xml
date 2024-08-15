@@ -2,6 +2,7 @@
   <code_scheme name="Project" version="173">
     <TypeScriptCodeStyleSettings version="0">
       <option name="FILE_NAME_STYLE" value="LISP_CASE" />
+      <option name="SPACES_WITHIN_IMPORTS" value="true" />
     </TypeScriptCodeStyleSettings>
     <codeStyleSettings language="JavaScript">
       <indentOptions>
