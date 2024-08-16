@@ -2,15 +2,15 @@ import {
   AbstractPlugin,
   AppContext,
   BUILTIN_PLUGIN_PRIORITY,
-  JAVASCRIPT_PLUGIN,
-  JavaScriptEngine,
   ObjectType,
+  SCRIPT_ENGINE_PLUGIN,
+  ScriptEngine,
 } from '@letrun/core';
 import vm from 'vm';
 
-export default class DefaultJavascriptEngine extends AbstractPlugin implements JavaScriptEngine {
-  readonly name = 'default';
-  readonly type = JAVASCRIPT_PLUGIN;
+export default class JavascriptEngine extends AbstractPlugin implements ScriptEngine {
+  readonly name = 'javascript';
+  readonly type = SCRIPT_ENGINE_PLUGIN;
   readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   async run(script: string, context: ObjectType) {
@@ -20,6 +20,10 @@ export default class DefaultJavascriptEngine extends AbstractPlugin implements J
 
     const val = vm.runInNewContext(script, context);
     return val instanceof Promise ? await val : val;
+  }
+
+  support(extension: string): boolean {
+    return extension === 'js';
   }
 
   protected async doLoad(context: AppContext): Promise<void> {

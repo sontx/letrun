@@ -3,14 +3,15 @@ import {
   IllegalStateError,
   InvalidParameterError,
   isWorkflowTaskDefsEmpty,
-  JAVASCRIPT_PLUGIN,
-  JavaScriptEngine,
+  SCRIPT_ENGINE_PLUGIN,
+  ScriptEngine,
   TaskDef,
   TaskHandler,
   TaskHandlerInput,
   validateParameters,
 } from '@letrun/core';
 import Joi from 'joi';
+import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
 /**
  * Interface representing the parameters for the SwitchTaskHandler.
@@ -23,10 +24,10 @@ interface TaskParameters {
   expression: string;
 
   /**
-   * The type of evaluator to use.
-   * @type {'value' | 'javascript'}
+   * The language of the expression.
+   * Default is 'javascript'.
    */
-  evaluatorType: 'value' | 'javascript';
+  language?: string;
 }
 
 /**
@@ -34,12 +35,9 @@ interface TaskParameters {
  */
 const Schema = Joi.object<TaskParameters>({
   expression: Joi.string().description('The result of this expression will be matched with the target case').required(),
-  evaluatorType: Joi.string()
-    .description(
-      '- value: expression will be treated as other parameter\n- javascript: expression will be evaluate as a js script',
-    )
-    .valid('value', 'javascript')
-    .default('value'),
+  language: Joi.string().description(
+    'The language of the expression, if not provided, the expression will be treated as other parameter',
+  ),
 });
 
 /**
@@ -100,16 +98,14 @@ export class SwitchTaskHandler implements TaskHandler {
    * @throws {InvalidParameterError} If the evaluator type is invalid.
    */
   private async evaluateDecisionCase({ task, context, workflow }: TaskHandlerInput): Promise<string> {
-    const { expression, evaluatorType } = validateParameters(task.parameters, Schema);
-    switch (evaluatorType) {
-      case 'value':
-        return expression?.trim();
-      case 'javascript':
-        const javascriptEngine = await context.getPluginManager().getOne<JavaScriptEngine>(JAVASCRIPT_PLUGIN);
-        return await javascriptEngine.run(expression, { task, workflow });
-      default:
-        throw new InvalidParameterError(`Invalid evaluatorType: ${evaluatorType}`);
+    const { expression, language } = validateParameters(task.parameters, Schema);
+    if (!language) {
+      return expression?.trim();
     }
+
+    const scriptEngines = await context.getPluginManager().get<ScriptEngine>(SCRIPT_ENGINE_PLUGIN);
+    const engineWrapper = new ScriptEngineWrapper(scriptEngines);
+    return await engineWrapper.run(expression, { language, input: { task, workflow } });
   }
 }
 

@@ -3,9 +3,9 @@ import {
   getTasksByStatus,
   InvalidParameterError,
   isWorkflowTaskDefsEmpty,
-  JAVASCRIPT_PLUGIN,
-  JavaScriptEngine,
   RerunError,
+  SCRIPT_ENGINE_PLUGIN,
+  ScriptEngine,
   Task,
   TaskDef,
   TaskHandler,
@@ -13,6 +13,7 @@ import {
   validateParameters,
 } from '@letrun/core';
 import Joi from 'joi';
+import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
 /**
  * Interface representing the parameters for the CatchTaskHandler.
@@ -25,10 +26,16 @@ interface TaskParameters {
   errorName?: string;
 
   /**
-   * The JavaScript expression to evaluate to determine if the catch should be executed.
+   * The script expression to evaluate to determine if the catch should be executed.
    * @type {string}
    */
   expression?: string;
+
+  /**
+   * The language of the expression.
+   * Default is 'javascript'.
+   */
+  language?: string;
 }
 
 /**
@@ -37,8 +44,9 @@ interface TaskParameters {
 const Schema = Joi.object<TaskParameters>({
   errorName: Joi.string().description('The error name to match against the caught error if the catch is executed'),
   expression: Joi.string().description(
-    'The javascript expression to evaluate to determine if the catch should be executed',
+    'The script expression to evaluate to determine if the catch should be executed',
   ),
+  language: Joi.string().description('The language of the expression').default('javascript'),
 }).oxor('errorName', 'expression');
 
 /**
@@ -144,7 +152,7 @@ export class CatchTaskHandler implements TaskHandler {
    */
   private async handleCatchBlock(errorTaskArray: Task[], input: TaskHandlerInput): Promise<void | never> {
     const { task, context, session } = input;
-    const { errorName, expression } = validateParameters(task.parameters, Schema);
+    const { errorName, expression, language } = validateParameters(task.parameters, Schema);
 
     const errors = errorTaskArray.map((errorTask) => errorTask.error);
     const firstError = errorTaskArray[0]!.error;
@@ -161,7 +169,7 @@ export class CatchTaskHandler implements TaskHandler {
       return;
     }
 
-    if (expression && !(await this.matchesExpression(expression, errors, input))) {
+    if (expression && !(await this.matchesExpression(expression, language, errors, input))) {
       context.getLogger().debug(`Expression ${expression} does not match any of the caught errors`);
       // save the error to throw after the finally block is executed
       task.delayError = firstError;
@@ -218,22 +226,20 @@ export class CatchTaskHandler implements TaskHandler {
     return errors.some((e) => e.name === errorName);
   }
 
-  /**
-   * Checks if the expression matches any of the caught errors.
-   * @private
-   * @param {string} expression - The expression to evaluate.
-   * @param {Error[]} errors - The array of caught errors.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<boolean>} A promise that resolves with true if the expression matches, false otherwise.
-   */
   private async matchesExpression(
     expression: string,
+    language: string | undefined,
     errors: Error[],
     { context, task, workflow }: TaskHandlerInput,
   ): Promise<boolean> {
-    const javascriptEngine = await context.getPluginManager().getOne<JavaScriptEngine>(JAVASCRIPT_PLUGIN);
+    const scriptEngines = await context.getPluginManager().get<ScriptEngine>(SCRIPT_ENGINE_PLUGIN);
+    const engineWrapper = new ScriptEngineWrapper(scriptEngines);
+
     for (const error of errors) {
-      const val = await javascriptEngine.run(expression, { task, workflow, error });
+      const val = await engineWrapper.run(expression, {
+        language,
+        input: { task, workflow, error },
+      });
       if (val) {
         return true;
       }
