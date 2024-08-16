@@ -50,4 +50,5 @@ For example, you can use the JavaScript script engine to evaluate JavaScript exp
 
 ## Summary
 
-The Script Engine Plugin allows you to extend the CLI tool with custom script engines using the `ScriptEngine` interface. Implement the `ScriptEngine` interface, register your script engine, and place the plugin in the appropriate directory to use it.
+The Script Engine Plugin allows you to extend the CLI tool with custom script engines using the `ScriptEngine` interface.
+Implement the `ScriptEngine` interface, register your script engine, and place the plugin in the appropriate directory to use it.

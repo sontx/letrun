@@ -9,6 +9,8 @@ import {
   IllegalStateError,
   InterruptInvokeError,
   isTerminatedStatus,
+  POST_RUN_TASK_PLUGIN,
+  PRE_RUN_TASK_PLUGIN,
   RerunError,
   scanAllTasks,
   Task,
@@ -21,9 +23,6 @@ import {
   WorkflowRunnerInput,
   WorkflowTasks,
 } from '@letrun/core';
-
-const POST_TASK_RUN = 'post-task-run';
-const PRE_TASK_RUN = 'pre-task-run';
 
 export default class DefaultWorkflowRunner extends AbstractPlugin implements WorkflowRunner {
   readonly name = 'default';
@@ -60,7 +59,7 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
 
     // there may be some parent tasks that are in executing status,
     // we need to close them whenever all their children are completed or one of them failed
-    this.closeParentTasks(workflow);
+    await this.closeParentTasks(workflow);
 
     //Open any waiting (and available) tasks
     this.openNextAvailableTask(workflow);
@@ -143,7 +142,7 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
         return await this.runWorkflow(input, result.length === 1 ? result[0] : result);
       } catch (e: any) {
         // close parent tasks if there is an error in the task execution
-        this.closeParentTasks(workflow);
+        await this.closeParentTasks(workflow);
         throw e;
       }
     } else {
@@ -162,9 +161,11 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
     this.context?.getLogger()?.verbose(`All task: ${allTaskStatuses.join(', ')}`);
   }
 
-  private closeParentTasks(workflow: Workflow) {
+  private async closeParentTasks(workflow: Workflow) {
     const executingTasks = getTasksByStatus(workflow, 'executing', true);
+    const terminatedTasks: Task[] = [];
     scanAllTasks(executingTasks, false, (task, name) => {
+      const oldStatus = task.status;
       const areAllChildrenCompleted = childHasStatus(task, 'completed', true);
       if (areAllChildrenCompleted) {
         task.status = 'completed';
@@ -176,8 +177,18 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
         task.status = 'error';
         this.context?.getLogger()?.debug(`Task ${name} is error because it has error children.`);
       }
+
+      // if the task is completed or error, we need to send the post task run event
+      if (oldStatus !== task.status && (task.status === 'completed' || task.status === 'error')) {
+        terminatedTasks.push(task);
+      }
+
       return true;
     });
+
+    for (const task of terminatedTasks) {
+      await this.postTaskRun(workflow, task, task.output, task.error);
+    }
   }
 
   private async setTaskDataValues(session: ExecutionSession, task: Task) {
@@ -301,7 +312,11 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
       task.output = output;
     }
 
-    await this.postTaskRun(input.workflow, task, output, error);
+    // only terminated task will need to send the post task run event,
+    // some tasks may be still executing at this point
+    if (task.status === 'error' || task.status === 'completed') {
+      await this.postTaskRun(input.workflow, task, output, error);
+    }
 
     if (error && task.status === 'error') {
       throw new Error(`Error executing task ${taskName}`, { cause: error });
@@ -331,7 +346,7 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
 
   private async preTaskRun(workflow: Workflow, task: Task) {
     const pluginManager = this.getContext().getPluginManager();
-    await pluginManager.callPluginMethod<ExecutablePlugin>(PRE_TASK_RUN, 'execute', {
+    await pluginManager.callPluginMethod<ExecutablePlugin>(PRE_RUN_TASK_PLUGIN, 'execute', {
       workflow,
       task,
       context: this.getContext(),
@@ -340,7 +355,7 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
 
   private async postTaskRun(workflow: Workflow, task: Task, result: any, error: any) {
     const pluginManager = this.getContext().getPluginManager();
-    await pluginManager.callPluginMethod<ExecutablePlugin>(POST_TASK_RUN, 'execute', {
+    await pluginManager.callPluginMethod<ExecutablePlugin>(POST_RUN_TASK_PLUGIN, 'execute', {
       workflow,
       task,
       result,

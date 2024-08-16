@@ -39,4 +39,5 @@ If a task has a parameter with the value `${name}`, the interpolator will replac
 
 ## Summary
 
-The Parameter Interpolator Plugin allows you to extend the CLI tool with custom parameter interpolation logic using the `ParameterInterpolator` interface. Implement the `ParameterInterpolator` interface, register your interpolator, and place the plugin in the appropriate directory to use it.
+The Parameter Interpolator Plugin allows you to extend the CLI tool with custom parameter interpolation logic using the `ParameterInterpolator` interface.
+Implement the `ParameterInterpolator` interface, register your interpolator, and place the plugin in the appropriate directory to use it.

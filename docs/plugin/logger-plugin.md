@@ -42,4 +42,5 @@ You can see different log behaviors based on the logger you implement. In the ex
 
 ## Summary
 
-The Logger Plugin allows you to extend the CLI tool with custom logging functionality using the `LoggerPlugin` interface. Implement the `LoggerPlugin` interface, register your logger, and place the plugin in the appropriate directory to use it.
+The Logger Plugin allows you to extend the CLI tool with custom logging functionality using the `LoggerPlugin` interface.
+Implement the `LoggerPlugin` interface, register your logger, and place the plugin in the appropriate directory to use it.

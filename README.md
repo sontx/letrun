@@ -11,18 +11,6 @@ A simple and efficient tool for running declarative workflows with ease.
 - [Usage](#usage)
 - [Commands](#commands)
 - [Plugin](#plugin)
-  - [Command Plugin](#command-plugin)
-  - [Script Engine](#script-engine)
-  - [Logger Plugin](#logger-plugin)
-  - [Log Transport Plugin](#log-transport-plugin)
-  - [Parameter Interpolator](#parameter-interpolator)
-  - [Persistence](#persistence)
-  - [Input Parameter](#input-parameter)
-  - [Id Generator](#id-generator)
-  - [Task Invoker](#task-invoker)
-  - [Workflow Runner](#workflow-runner)
-  - [Pre/Post Run Workflow Plugin](#pre-post-run-workflow-plugin)
-  - [Pre/Post Run Task Plugin](#pre-post-run-task-plugin)
 - [Task Handler](#task-handler)
   - [System Tasks](#system-tasks)
   - [Custom Tasks](#custom-tasks)
@@ -156,6 +144,8 @@ letrun [command] [options]
 ## Plugin
 
 Plugins are used to extend the functionality of the CLI tool.
+All main features are implemented as plugins (system plugins), so any of them can be replaced or extended by custom plugins.
+
 A plugin is a JavaScript file that exports default a class that implements the `Plugin` interface.
 Plugins are stored in the `plugins` directory (by default), you can change the directory by setting the `plugin.dir` configuration.
 
@@ -191,69 +181,28 @@ export default class MyPlugin extends AbstractPlugin {
 }
 ```
 
-### Input Parameter
+You can control the priority of the plugin by setting the `priority` field in the plugin class.
+Plugins are executed in descending order of priority.
+In some cases, there is only one plugin that can handle the task, you can set the priority to a higher value or even to `Infinity`.
 
-This plugin is used to parse or load the raw input parameter to the desired format.
-The [default implementation](packages/plugin/src/default-input-parameter.ts) supports JSON string and file input (JSON and YAML format)
-and converts the input to an object.
+> System plugins have a priority of `-1`, thus any custom plugin without a priority (default is `0`) will have a higher priority than system plugins.
 
-### Task Invoker
+All available plugins can be listed using the `letrun plugin list` command.
 
-This plugin is used to invoke task handlers which is used by the [workflow-runner](#workflow-runner) plugin.
-Invoking is a process of resolve the task handler to a [task](#concept-task) and call it with input values.
+Here are supported plugin types:
 
-With the custom tasks, the default implementation will look up in this order:
-
-1. If this is an absolute path, we will use it as is.
-2. Resolve it from the current directory.
-3. Resolve it from the runner directory, where `letrun` is placed.
-4. Append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory).
-
-### Workflow Runner
-
-This plugin is used to run workflows, control the execution flow, and handle errors.
-This is the most complex plugin, and it's responsible for the core functionality of the CLI tool.
-The default implementation is [default-workflow-runner.ts](packages/plugin/src/default-workflow-runner.ts).
-
-### Pre/Post Run Workflow Plugin
-
-This plugin is used to run some jobs before or after running a workflow.
-There may be multiple plugins, and they will be called in chain.
-
-They must be implemented by [ExecutablePlugin](packages/core/src/model/plugin.ts) interface.
-
-#### Pre-run Workflow Plugin
-
-Plugin type: `pre-workflow-run`.
-
-Run jobs before running a workflow. You can use this to modify the workflow, validate input, etc.
-If the output is a workflow, it will be used to run instead of the original one.
-
-#### Post-run Workflow Plugin
-
-Plugin type: `post-workflow-run`.
-
-Run jobs after a workflow is terminated (completed/error). You can use this to save the result, send notifications, etc.
-If the output is a workflow, it will be used to return instead of the original one.
-
-### Pre/Post Run Task Plugin
-
-This plugin is used to run some jobs before or after running a task.
-There may be multiple plugins, and they will be called in chain.
-
-They must be implemented by [ExecutablePlugin](packages/core/src/model/plugin.ts) interface.
-
-#### Pre-run Task Plugin
-
-Plugin type: `pre-task-run`.
-
-Run jobs before running a task. You can use this to modify the task, validate input, etc.
-
-#### Post-run Task Plugin
-
-Plugin type: `post-task-run`.
-
-Run jobs after a task is terminated (completed/error). You can use this to save/modify the result, send notifications, etc.
+1. [Command Plugin](docs/plugin/command-plugin.md)
+2. [Script Engine](docs/plugin/script-engine.md)
+3. [Logger Plugin](docs/plugin/logger-plugin.md)
+4. [Log Transport Plugin](docs/plugin/log-transport-plugin.md)
+5. [Parameter Interpolator](docs/plugin/parameter-interpolator.md)
+6. [Persistence](docs/plugin/persistence.md)
+7. [Input Parameter](docs/plugin/input-parameter.md)
+8. [Id Generator](docs/plugin/id-generator.md)
+9. [Task Invoker](docs/plugin/task-invoker.md)
+10. [Workflow Runner](docs/plugin/workflow-runner.md)
+11. [Pre/Post Run Workflow Plugin](docs/plugin/pre-post-run-workflow-plugin.md)
+12. [Pre/Post Run Task Plugin](docs/plugin/pre-post-run-task-plugin.md)
 
 ## Task Handler
 
@@ -261,7 +210,7 @@ A task handler is a function that executes a task. There are two types of tasks:
 
 ### System Tasks
 
-System tasks are built-in tasks that come with the CLI tool. They are defined in the [system-task](packages/cli/src/system-task) directory.
+System tasks are built-in tasks that come with the CLI tool. They are defined in the [system-task](packages/cli/src/system-task).
 
 1. `if`: Executes tasks based on conditions.
 2. `switch`: Chooses tasks based on input values.
@@ -285,7 +234,7 @@ A task handler should have the following structure:
 - `name`: The name of the task.
 - `description`: A brief description of the task, this is optional.
 - `parameters`: An object that describes the input parameters of the task for showing help.
-- `handler`: The function that executes the task.
+- `handle`: The function that executes the task.
 
 We support grouping tasks by placing them in subdirectories, the group name will be the directory name.
 

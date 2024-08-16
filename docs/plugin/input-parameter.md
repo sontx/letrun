@@ -51,4 +51,5 @@ The custom input parameter support the input as a URL or JSON string.
 
 ## Summary
 
-The Input Parameter Plugin allows you to extend the CLI tool with custom input parameter handling logic using the `InputParameter` interface. Implement the `InputParameter` interface, register your input parameter handler, and place the plugin in the appropriate directory to use it.
+The Input Parameter Plugin allows you to extend the CLI tool with custom input parameter handling logic using the `InputParameter` interface.
+Implement the `InputParameter` interface, register your input parameter handler, and place the plugin in the appropriate directory to use it.

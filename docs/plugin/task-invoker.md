@@ -48,4 +48,5 @@ For the example above, only system task handlers are supported. If the task hand
 
 ## Summary
 
-The Task Invoker Plugin allows you to extend the CLI tool with custom task invocation logic using the `TaskInvoker` interface. Implement the `TaskInvoker` interface, register your task invoker, and place the plugin in the appropriate directory to use it.
+The Task Invoker Plugin allows you to extend the CLI tool with custom task invocation logic using the `TaskInvoker` interface.
+Implement the `TaskInvoker` interface, register your task invoker, and place the plugin in the appropriate directory to use it.

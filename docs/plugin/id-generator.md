@@ -44,4 +44,5 @@ The `CustomIdGenerator` plugin will generate IDs with a `-` separator for parent
 
 ## Summary
 
-The Id Generator Plugin allows you to extend the CLI tool with custom ID generation logic using the `IdGenerator` interface. Implement the `IdGenerator` interface, register your ID generator, and place the plugin in the appropriate directory to use it.
+The Id Generator Plugin allows you to extend the CLI tool with custom ID generation logic using the `IdGenerator` interface.
+Implement the `IdGenerator` interface, register your ID generator, and place the plugin in the appropriate directory to use it.

@@ -38,4 +38,5 @@ The output of the `CustomLogTransportPlugin` will be a file named `error.log` th
 
 ## Summary
 
-The Log Transport Plugin allows you to extend the CLI tool with custom logging transports using the `LogTransportPlugin` interface. Implement the `LogTransportPlugin` interface, register your transport, and place the plugin in the appropriate directory to use it.
+The Log Transport Plugin allows you to extend the CLI tool with custom logging transports using the `LogTransportPlugin` interface.
+Implement the `LogTransportPlugin` interface, register your transport, and place the plugin in the appropriate directory to use it.

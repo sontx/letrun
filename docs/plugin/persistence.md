@@ -60,4 +60,5 @@ The Persistence Plugin allows you to persist data to in-memory storage.
 
 ## Summary
 
-The Persistence Plugin allows you to extend the CLI tool with custom persistence functionality using the `Persistence` interface. Implement the `Persistence` interface, register your persistence units, and place the plugin in the appropriate directory to use it.
+The Persistence Plugin allows you to extend the CLI tool with custom persistence functionality using the `Persistence` interface.
+Implement the `Persistence` interface, register your persistence units, and place the plugin in the appropriate directory to use it.

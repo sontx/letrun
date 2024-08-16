@@ -6,6 +6,8 @@ import {
   IllegalStateError,
   InvalidParameterError,
   Logger,
+  POST_RUN_WORKFLOW_PLUGIN,
+  PRE_RUN_WORKFLOW_PLUGIN,
   Runner,
   TasksFactory,
   Workflow,
@@ -19,9 +21,6 @@ import { ContainerDefSchema } from './workflow-schema';
 import { SystemTaskManager } from '../system-task';
 import { DefaultTasksFactory } from './default-tasks-factory';
 import { DefaultExecutionSession } from './default-execution-session';
-
-const POST_WORKFLOW_RUN = 'post-workflow-run';
-const PRE_WORKFLOW_RUN = 'pre-workflow-run';
 
 /**
  * Class representing the default runner.
@@ -76,7 +75,7 @@ export class DefaultRunner implements Runner {
 
       const modifiedWorkflow = await this.firePreOrPostWorkflowRun({
         workflow,
-        event: PRE_WORKFLOW_RUN,
+        event: PRE_RUN_WORKFLOW_PLUGIN,
       });
 
       workflow = modifiedWorkflow ?? workflow;
@@ -111,7 +110,7 @@ export class DefaultRunner implements Runner {
         workflow.handlerDuration = Date.now() - startTime;
         workflow = await this.firePreOrPostWorkflowRun({
           workflow,
-          event: POST_WORKFLOW_RUN,
+          event: POST_RUN_WORKFLOW_PLUGIN,
           result: workflow.status === 'completed' ? workflow.result : undefined,
           error: workflow.status === 'error' ? workflow.errorMessage : undefined,
         });
