@@ -6,6 +6,12 @@ This plugin uses the `ScriptEngine` interface to define script engines.
 
 Currently, we support JavaScript (default) and Python script engines.
 
+There are known limitations with the Python script engine:
+
+- The context wil be loaded into a `context` variable as a dictionary in the evaluation script.
+- The output should be assigned to a variable named `output` in the evaluation script.
+- Python should be installed on the system to use the Python script engine. If the python executable is not in the system path, you can configure the `script-engine.python.pythonPath` to the python executable path.
+
 There are several built-in tasks that support expression evaluation: `while`, `catch`, `switch` and `lambda`.
 
 ## Usage

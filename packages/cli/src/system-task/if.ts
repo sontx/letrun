@@ -73,6 +73,10 @@ const Schema = Joi.object<TaskParameters>({
       'is not empty',
       'is defined',
       'is not defined',
+      'truly',
+      'is truly',
+      'falsy',
+      'is falsy',
     )
     .required(),
   right: Joi.any(),
@@ -131,8 +135,9 @@ export class IfTaskHandler implements TaskHandler {
     const { left, right, operator } = parameters;
     switch (operator.toLowerCase()) {
       case '==':
-      case '=':
         return left === right;
+      case '=':
+        return left == right;
       case '!=':
       case '<>':
         return left !== right;
@@ -145,9 +150,9 @@ export class IfTaskHandler implements TaskHandler {
       case '<=':
         return left <= right;
       case 'in':
-        return right?.includes(left);
+        return this.isIn(right, left);
       case 'not in':
-        return !right?.includes(left);
+        return !this.isIn(right, left);
       case 'contains':
         return right?.includes(left);
       case 'not contains':
@@ -155,16 +160,40 @@ export class IfTaskHandler implements TaskHandler {
       case 'matches regex':
         return new RegExp(right).test(left);
       case 'is empty':
-        return left === '';
+        return this.isEmpty(left);
       case 'is not empty':
-        return left !== '';
+        return !this.isEmpty(left);
       case 'is defined':
         return left !== undefined && left !== null;
       case 'is not defined':
         return left === undefined || left === null;
+      case 'is truly':
+      case 'truly':
+        return !!left;
+      case 'is falsy':
+      case 'falsy':
+        return !left;
       default:
         throw new InvalidParameterError(`Invalid operator: ${operator}`);
     }
+  }
+
+  private isIn(right: any, left: any): boolean {
+    return typeof right === 'string' || Array.isArray(right)
+      ? right.includes(left)
+      : typeof right === 'object'
+        ? Object.keys(right).includes(left)
+        : false;
+  }
+
+  private isEmpty(value: any): boolean {
+    return typeof value === 'string'
+      ? value === ''
+      : Array.isArray(value)
+        ? value.length === 0
+        : typeof value === 'object'
+          ? Object.keys(value).length === 0
+          : false;
   }
 }
 

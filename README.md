@@ -49,22 +49,22 @@ This is an example of a workflow file:
 ### Task <a id="concept-task"></a>
 
 A task is a unit of work that can be executed by the workflow.
-A tasks can contain nested tasks, and it can be executed concurrently or orderly.
+A task can contain nested tasks (in most cases), and it can be executed concurrently or orderly.
 
 A task should have the following structure:
 
-- `name`: The name of the task. This is required if it's defined in an array.
+- `name`: The name of the task. This is required if it's defined in an array. We recommend using a unique name for each task and task name should contain only letters, numbers, and underscores.
 - `title`: A brief description of the task. This is optional.
 - `handler`: The name of the task handler. This is required. Please refer to the [Task Handler](#task-handler) section for more details.
-- `parameters`: An object that provides input and configuration for the task. This field supports interpolation, see the [Parameter Interpolator](#parameter-interpolator) section for more details.
+- `parameters`: An object that provides input and configuration for the task. This field supports interpolation that means you can reference other tasks' output or the workflow input. This is optional.
 - `ignoreError`: Whether to ignore errors during task execution and let other tasks continue running. This is optional.
-- `then`: Tasks to execute when the handler is `if` and the condition is true. This is optional.
-- `else`: Tasks to execute when the handler is `if` and the condition is false. This is optional.
-- `decisionCases`: Decision cases containing case-task mappings, executed when the handler is `switch` and there is a matched case. This is optional.
-- `defaultCase`: Tasks to execute when the handler is `switch` and there is no matched case. This is optional.
-- `loopOver`: Tasks to execute when the handler is `for`, `while`, or `iterate`. This is optional.
-- `catch`: Tasks to execute when the handler is `catch` and an error occurs. This is optional.
-- `finally`: Tasks to execute when the handler is `catch` and after the catch tasks are executed. This is useful for cleanup resources. This is optional.
+- `then`: Tasks to execute when the handler is [If](docs/system-task/if.md) and the condition is true. This is optional.
+- `else`: Tasks to execute when the handler is [If](docs/system-task/if.md) and the condition is false. This is optional.
+- `decisionCases`: Decision cases containing case-task mappings, executed when the handler is [Switch](docs/system-task/switch.md) and there is a matched case. This is optional.
+- `defaultCase`: Tasks to execute when the handler is [Switch](docs/system-task/switch.md) and there is no matched case. This is optional.
+- `loopOver`: Tasks to execute when the handler is [For](docs/system-task/for.md), [White](docs/system-task/while.md), or [Iterate](docs/system-task/iterate.md). This is optional.
+- `catch`: Tasks to execute when the handler is [Catch](docs/system-task/catch.md) and an error occurs. This is optional.
+- `finally`: Tasks to execute when the handler is [Catch](docs/system-task/catch.md) and after the catch tasks are executed. This is useful for cleanup resources. This is optional.
 - `tasks`: An array of tasks to be executed (will be executed orderly) or an object of tasks (will be executed concurrently). This is optional.
 
 This is an example of a task:
@@ -84,9 +84,9 @@ The `handler` can refer to a custom task by:
 
 - Define an absolute path to the task file.
 - Define a relative path to the task file.
-- Define a task name, the CLI tool will look up in the custom tasks directory (default is `tasks` directory).
+- Define a task name, the CLI tool will append with `.js` extension and look up in the tasks directory (default is `tasks` directory).
 
-> More details about look up custom tasks can be found in the [Task Invoker](#task-invoker) plugin.
+> More details about look up custom tasks can be found in the [Task Invoker](docs/plugin/task-invoker.md) plugin.
 
 This is an example of a task that refers to a custom task:
 
@@ -212,20 +212,23 @@ A task handler is a function that executes a task. There are two types of tasks:
 
 System tasks are built-in tasks that come with the CLI tool. They are defined in the [system-task](packages/cli/src/system-task).
 
-1. `if`: Executes tasks based on conditions.
-2. `switch`: Chooses tasks based on input values.
-3. `for`: Loops through a specified range and performs tasks.
-4. `while`: Loops through tasks until a condition is met.
-5. `iterate`: Loops through a list of items and performs tasks.
-6. `catch`: Handles errors during task execution.
-7. `log`: Outputs messages or errors for debugging purposes.
-8. `http`: Sends HTTP requests and processes responses.
-9. `run-workflow`: Runs another workflow within the current workflow.
-10. `lambda`: Executes a lambda script (javascript or python).
+To show all available system tasks, you can use the `letrun task list -s` command.
+
+Here the full list of system tasks:
+
+- [If](docs/system-task/if.md)
+- [Switch](docs/system-task/switch.md)
+- [For](docs/system-task/for.md)
+- [While](docs/system-task/while.md)
+- [Iterate](docs/system-task/iterate.md)
+- [Catch](docs/system-task/catch.md)
+- [Log](docs/system-task/log.md)
+- [Run Workflow](docs/system-task/run-workflow.md)
+- [Lambda](docs/system-task/lambda.md)
 
 ### Custom Tasks
 
-Custom tasks are tasks that are defined by the user and loaded by the CLI dynamically, you can see more details in the [Task Invoker](#task-invoker) plugin.
+Custom tasks are tasks that are defined by the user and loaded by the CLI dynamically.
 They are written in JavaScript and implement from the [TaskHandler](packages/core/src/model/task-handler.ts) interface.
 They should be placed in the `tasks` directory (by default), you can change the directory by setting the `task.dir` configuration.
 
@@ -264,6 +267,8 @@ export default class GreatingTaskHandler implements TaskHandler {
 ```
 
 > If you write custom task in TypeScript, you need to compile and bundle it to JavaScript before using.
+
+To show all available custom tasks, you can use the `letrun task list -c` command.
 
 ## Configuration
 
