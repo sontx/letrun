@@ -24,7 +24,7 @@ letrun workflow list [options]
 letrun workflow list
 ```
 
-![command-workflow-list.png](../images/command-workflow-list.png)
+![command-workflow-list.png](../../images/command-workflow-list.png)
 
 #### List a maximum of 10 workflows
 
@@ -44,4 +44,4 @@ letrun workflow list -o 5
 letrun workflow list -w id,status
 ```
 
-![command-workflow-list.png](../images/command-workflow-list-w.png)
+![command-workflow-list.png](../../images/command-workflow-list-w.png)

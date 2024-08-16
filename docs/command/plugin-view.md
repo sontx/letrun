@@ -3,7 +3,7 @@
 The `view` command is used to display the details of a plugin.
 This command allows you to specify the type of the plugin and optionally the name of the plugin.
 
-![command-plugin-view.png](../images/command-plugin-view.png)
+![command-plugin-view.png](../../images/command-plugin-view.png)
 
 ## Usage
 

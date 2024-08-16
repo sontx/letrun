@@ -10,19 +10,6 @@ A simple and efficient tool for running declarative workflows with ease.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Commands](#commands)
-  - [run](#run)
-  - [workflow](#workflow-command)
-    - [list](#workflow-list)
-    - [view](#workflow-view)
-    - [delete](#delete)
-    - [clear](#clear)
-  - [plugin](#plugin-command)
-    - [list](#plugin-list)
-    - [view](#plugin-view)
-  - [task](#task-command)
-    - [list](#task-list)
-    - [view](#task-view)
-    - [run](#task-run)
 - [Plugin](#plugin)
   - [Command Plugin](#command-plugin)
   - [Script Engine](#script-engine)
@@ -146,162 +133,25 @@ letrun [command] [options]
 
 ## Commands
 
-### run
+We have several commands to interact with the CLI tool:
 
-Run a workflow.
-
-```sh
-letrun run <path> [options]
+```shell
+letrun [command] [options]
 ```
 
-Alternatively, you can pass the workflow file directly to the command:
-
-```sh
-letrun <path> [options]
-```
-
-Arguments:
-
-- `<path>`: Path to the workflow file either in JSON or YAML format.
-
-Options:
-
-- `-i, --input <input>`: Input for the workflow, can be a file path or a JSON string.
-- `-s, --save`: Whether to save the workflow after running it.
-- `-o, --output <output>`: Output file which contains the result of the workflow.
-- `-p, --pipe`: Pipe the output to the next command.
-
-### workflow <a id="workflow-command"></a>
-
-Manage workflows.
-
-#### list <a id="workflow-list"></a>
-
-List all saved workflows.
-
-```sh
-letrun workflow list [options]
-```
-
-Options:
-
-- `-m, --max <max>`: The maximum number of workflows to list (default: 30)
-- `-o, --offset <offset>`: The offset to start listing workflows (default: 0)
-- `-w, --with <with>`: With additional fields, e.g., id,status
-
-#### view <a id="workflow-view"></a>
-
-View a workflow.
-
-```sh
-letrun workflow view <pathOrId> [options]
-```
-
-Arguments:
-
-- `<pathOrId>`: The path to the workflow file or the ID of the saved workflow.
-
-Options:
-
-- `-w, --with <with>`: Show additional fields, e.g., id,status
-
-#### delete
-
-Delete a saved workflow.
-
-```sh
-letrun workflow delete <id>
-```
-
-Arguments:
-
-- `<id>`: The ID of the workflow to delete.
-
-#### clear
-
-Clear all saved workflows.
-
-```sh
-letrun workflow clear
-```
-
-### plugin <a id="plugin-command"></a>
-
-Manage plugins.
-
-#### list <a id="plugin-list"></a>
-
-list all installed plugins.
-
-```sh
-letrun plugin list
-```
-
-#### view <a id="plugin-view"></a>
-
-View a plugin.
-
-```sh
-letrun plugin view [options]
-```
-
-Options:
-
-- `-n, --name <name>`: The name of the plugin to view.
-- `-t, --type <type>`: The type of the plugin to view.
-
-### task <a id="task-command"></a>
-
-Manage tasks.
-
-#### list <a id="task-list"></a>
-
-List all tasks.
-
-```sh
-letrun task list [options]
-```
-
-Options:
-
-- `-c, --custom`: List custom tasks only.
-- `-s, --system`: List system tasks only.
-- `-w, --with <with>`: Show additional fields, e.g., id,status
-
-#### view <a id="task-view"></a>
-
-view detail of a task.
-
-```sh
-letrun task view <name> [options]
-```
-
-Arguments:
-
-- `<name>`: The name of the task to view.
-
-Options:
-
-- `-g, --group <group>`: Group of the task, use `.` if you want to search tasks that doesn't have a group.
-
-#### run <a id="task-run"></a>
-
-Run a task.
-
-```sh
-letrun task run <name> [options]
-```
-
-Arguments:
-
-- `<name>`: The name of the task to run.
-
-Options:
-
-- `-i, --input <input>`: Input for the task, can be a file path or a JSON string.
-- `-g, --group <group>`: Group of the task, use `.` if you want to search tasks that doesn't have a group.
-- `-o, --output <output>`: Output file which contains the result of the task.
-- `-p, --pipe`: Pipe the output to the next command.
+- [run](docs/command/run): Execute a workflow defined in a JSON or YAML file.
+- workflow: Manage saved workflows.
+  - [show](docs/command/workflow-list): Show a list of saved workflows.
+  - [view](docs/command/workflow-view): View the details of a saved workflow.
+  - [delete](docs/command/workflow-delete): Delete a saved workflow.
+  - [clear](docs/command/workflow-clear): Clear all saved workflows.
+- plugin: Manage plugins.
+  - [list](docs/command/plugin-list): List all available plugins.
+  - [view](docs/command/plugin-view): View the details of a plugin.
+- task: View custom tasks.
+  - [list](docs/command/task-list): List all available system/custom tasks.
+  - [view](docs/command/task-view): View the details of a system/custom task.
+  - [run](docs/command/task-run): Run a task directly without a workflow.
 
 ## Plugin
 
@@ -341,52 +191,11 @@ export default class MyPlugin extends AbstractPlugin {
 }
 ```
 
-### Command Plugin
-
-This plugin allows you to extend the CLI tool with custom commands. We're using `commander` package to define commands.
-Please refer to this sample for more details: [sample-command-plugin.ts](packages/plugin/src/sample-command-plugin.ts).
-
-### Script Engine
-
-This plugin allows some tasks to run script code in a sandboxed environment.
-The code is executed in a separate process to prevent side effects.
-
-Currently, we support JavaScript and Python (with some limitations) scripts.
-
-Almost system tasks (switch, while, lambda) that support expression input can be evaluated as a script.
-
-### Logger Plugin
-
-This plugin allows you to config how the CLI tool logs messages.
-The [default implementation](packages/plugin/src/winston-logger-plugin.ts) uses the `winston` package under the hook.
-Be aware that changing the implementation may affect the [Log Transport Plugin](#log-transport-plugin) as well.
-
-### Log Transport Plugin
-
-This plugin allows you to add more log transports which using `winston` package by default.
-This is useful if you want to send logs to a remote server, a file, etc.
-The default implementation logs messages to the [console](packages/plugin/src/console-logger.ts).
-
-### Parameter Interpolator
-
-This plugin is used by the [workflow-runner](#workflow-runner) plugin to interpolate parameters values.
-`Interpolation` is a process of replacing placeholders in a string with actual values which are used in expressions like `${task1.output.name}`.
-The default implementation is [expression-parameter-interpolator.ts](packages/plugin/src/expression-parameter-interpolator.ts).
-
-### Persistence
-
-This plugin is used to persist data to a storage. The default implementation uses a [file-based storage](packages/plugin/src/file-persistence.ts).
-
 ### Input Parameter
 
 This plugin is used to parse or load the raw input parameter to the desired format.
 The [default implementation](packages/plugin/src/default-input-parameter.ts) supports JSON string and file input (JSON and YAML format)
 and converts the input to an object.
-
-### Id Generator
-
-This plugin is used to generate unique IDs for tasks and can look up the parent id from any child id.
-The [default implementation](packages/plugin/src/default-id-generator.ts) is using `/` as a separator for the parent id.
 
 ### Task Invoker
 

@@ -3,7 +3,7 @@
 The `view` command is used to display the details of a task.
 This command allows you to specify the name of the task and optionally the group to which the task belongs.
 
-![command-task-view.png](../images/command-task-view.png)
+![command-task-view.png](../../images/command-task-view.png)
 
 ## Usage
 

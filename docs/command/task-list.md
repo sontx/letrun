@@ -3,7 +3,7 @@
 The `list` command is used to list all tasks.
 This command allows you to specify whether to list custom tasks, system tasks, or both, and include additional fields in the output.
 
-![command-task-list.png](../images/command-task-list.png)
+![command-task-list.png](../../images/command-task-list.png)
 
 ## Usage
 

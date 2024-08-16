@@ -3,7 +3,7 @@
 The `view` command is used to display the details of a workflow.
 This command allows you to specify the path to the workflow file or the workflow ID and include additional fields in the output.
 
-![command-workflow-view.png](../images/command-workflow-view.png)
+![command-workflow-view.png](../../images/command-workflow-view.png)
 
 ## Usage
 
@@ -39,4 +39,4 @@ letrun workflow view workflow-id
 letrun workflow view workflow-id -w id,status
 ```
 
-![command-workflow-view-w.png](../images/command-workflow-view-w.png)
+![command-workflow-view-w.png](../../images/command-workflow-view-w.png)
