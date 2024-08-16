@@ -9,18 +9,22 @@ describe('WhileTaskHandler', () => {
   let mockSession: jest.Mocked<any>;
   let mockTask: jest.Mocked<Task>;
   let mockTasksFactory: jest.Mocked<any>;
+  let mockJavascriptEngine: any;
 
   beforeEach(() => {
     handler = new WhileTaskHandler();
+    mockJavascriptEngine = {
+      name: 'javascript',
+      run: jest.fn().mockResolvedValue('result'),
+      support: jest.fn(ex => ex === 'js'),
+    };
     mockContext = {
       getLogger: jest.fn().mockReturnValue({
         debug: jest.fn(),
         verbose: jest.fn(),
       }),
       getPluginManager: jest.fn().mockReturnValue({
-        getOne: jest.fn().mockResolvedValue({
-          run: jest.fn().mockImplementation(async (expression) => eval(expression)),
-        }),
+        get: jest.fn().mockResolvedValue([mockJavascriptEngine]),
       }),
     };
     mockTasksFactory = {
@@ -49,9 +53,7 @@ describe('WhileTaskHandler', () => {
     mockTask.parameters = { expression: 'true', mode: 'doWhile' };
     mockTask.output = { iteration: 1 };
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
-    jest.spyOn(mockContext.getPluginManager(), 'getOne').mockResolvedValue({
-      run: jest.fn().mockResolvedValue(true),
-    });
+    jest.spyOn(mockJavascriptEngine, 'run').mockResolvedValue(true);
     await expect(handler.handle(input)).rejects.toThrow(RerunError);
     expect(mockTask.output.iteration).toBe(2);
     expect(mockSession.setTasks).toHaveBeenCalled();
@@ -61,9 +63,7 @@ describe('WhileTaskHandler', () => {
     mockTask.parameters = { expression: 'false', mode: 'doWhile' };
     mockTask.output = { iteration: 1 };
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
-    jest.spyOn(mockContext.getPluginManager(), 'getOne').mockResolvedValue({
-      run: jest.fn().mockResolvedValue(false),
-    });
+    jest.spyOn(mockJavascriptEngine, 'run').mockResolvedValue(false);
     const result = await handler.handle(input);
     expect(result).toEqual({ iteration: 1 });
     expect(mockSession.setTasks).not.toHaveBeenCalled();
@@ -72,9 +72,7 @@ describe('WhileTaskHandler', () => {
   it('initializes while loop and evaluates condition first for whileDo mode', async () => {
     mockTask.parameters = { expression: 'true', mode: 'whileDo' };
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
-    jest.spyOn(mockContext.getPluginManager(), 'getOne').mockResolvedValue({
-      run: jest.fn().mockResolvedValue(true),
-    });
+    jest.spyOn(mockJavascriptEngine, 'run').mockResolvedValue(true);
     await expect(handler.handle(input)).rejects.toThrow(RerunError);
     expect(mockTask.output.iteration).toBe(1);
     expect(mockSession.setTasks).toHaveBeenCalled();
@@ -83,9 +81,7 @@ describe('WhileTaskHandler', () => {
   it('stops loop when condition is false for whileDo mode', async () => {
     mockTask.parameters = { expression: 'false', mode: 'whileDo' };
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
-    jest.spyOn(mockContext.getPluginManager(), 'getOne').mockResolvedValue({
-      run: jest.fn().mockResolvedValue(false),
-    });
+    jest.spyOn(mockJavascriptEngine, 'run').mockResolvedValue(false);
     const result = await handler.handle(input);
     expect(result).toEqual({ iteration: 0 });
     expect(mockSession.setTasks).not.toHaveBeenCalled();
@@ -105,5 +101,25 @@ describe('WhileTaskHandler', () => {
   it('throws error for while task definition without tasks', () => {
     const taskDef: TaskDef = { name: 'whileTask' } as any;
     expect(() => validateWhileTask(taskDef)).toThrow(InvalidParameterError);
+  });
+
+  it('evaluates expression with specified language in while task handler', async () => {
+    const pythonEngineMock = {
+      name: 'python',
+      run: jest.fn().mockResolvedValue(true),
+    } as any;
+    mockContext.getPluginManager().get = jest.fn().mockResolvedValue([pythonEngineMock]);
+    mockTask.parameters = { expression: '2 + 2', language: 'python', mode: 'whileDo' };
+    const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
+    await expect(handler.handle(input)).rejects.toThrow(RerunError);
+    expect(pythonEngineMock.run).toHaveBeenCalledWith('2 + 2', { input: { task: mockTask, workflow: {} } });
+    expect(mockTask.output.iteration).toBe(1);
+  });
+
+  it('throws error when specified language is not found', async () => {
+    mockContext.getPluginManager().get = jest.fn().mockResolvedValue([]);
+    mockTask.parameters = { expression: '2 + 2', language: 'nonexistent', mode: 'whileDo' };
+    const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
+    await expect(handler.handle(input)).rejects.toThrow('No script engine found for language: nonexistent');
   });
 });

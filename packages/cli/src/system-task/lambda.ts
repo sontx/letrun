@@ -1,29 +1,20 @@
 import Joi from 'joi';
-import {
-  AppContext,
-  JAVASCRIPT_PLUGIN,
-  JavaScriptEngine,
-  TaskHandler,
-  TaskHandlerInput,
-  validateParameters,
-} from '@letrun/core';
+import { SCRIPT_ENGINE_PLUGIN, ScriptEngine, TaskHandler, TaskHandlerInput, validateParameters } from '@letrun/core';
 import fs from 'fs';
+import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
 interface TaskParameters {
   expression?: string;
   file?: string;
   input?: any;
-  language?: 'javascript';
+  language?: string;
 }
 
 const Schema = Joi.object<TaskParameters>({
   expression: Joi.string().description('The expression to evaluate.'),
   file: Joi.string().description('The file to read the expression from.'),
   input: Joi.any().description('The input to use when evaluating the expression.'),
-  language: Joi.string()
-    .valid('javascript')
-    .default('javascript')
-    .description('The language to use when evaluating the expression.'),
+  language: Joi.string().description('The language to use when evaluating the expression.'),
 })
   .xor('expression', 'file')
   .required();
@@ -33,7 +24,8 @@ export class LambdaTaskHandler implements TaskHandler {
   description = 'Evaluates a lambda expression.';
   parameters = Schema.describe();
 
-  async handle({ task, context }: TaskHandlerInput) {
+  async handle(taskInput: TaskHandlerInput) {
+    const { task, context } = taskInput;
     const { expression, file, input, language } = validateParameters(task.parameters, Schema);
 
     let effectiveExpression = expression!;
@@ -44,17 +36,13 @@ export class LambdaTaskHandler implements TaskHandler {
       effectiveExpression = await fs.promises.readFile(file, 'utf8');
     }
 
-    switch (language) {
-      case 'javascript':
-        context.getLogger().debug(`Evaluating JavaScript expression: ${effectiveExpression}`);
-        return await this.runJavaScript(context, effectiveExpression, input);
-      default:
-        throw new Error(`Unsupported language: ${language}`);
-    }
-  }
+    const scriptEngines = await context.getPluginManager().get<ScriptEngine>(SCRIPT_ENGINE_PLUGIN);
+    const engineWrapper = new ScriptEngineWrapper(scriptEngines);
 
-  private async runJavaScript(context: AppContext, expression: string, input: any) {
-    const javascriptEngine = await context.getPluginManager().getOne<JavaScriptEngine>(JAVASCRIPT_PLUGIN);
-    return await javascriptEngine.run(expression, { input });
+    return await engineWrapper.run(effectiveExpression, {
+      input,
+      file,
+      language,
+    });
   }
 }

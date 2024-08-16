@@ -1,7 +1,7 @@
 import {
-  JAVASCRIPT_PLUGIN,
-  JavaScriptEngine,
   RerunError,
+  SCRIPT_ENGINE_PLUGIN,
+  ScriptEngine,
   TaskDef,
   TaskHandler,
   TaskHandlerInput,
@@ -9,6 +9,7 @@ import {
 } from '@letrun/core';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
+import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
 /**
  * Interface representing the parameters for the WhileTaskHandler.
@@ -25,6 +26,12 @@ interface TaskParameters {
    * @type {'doWhile' | 'whileDo'}
    */
   mode: 'doWhile' | 'whileDo';
+
+  /**
+   * The language of the expression.
+   * Default is 'javascript'.
+   */
+  language?: string;
 }
 
 /**
@@ -36,6 +43,7 @@ const Schema = Joi.object<TaskParameters>({
     .valid('doWhile', 'whileDo')
     .description('- doWhile: do tasks first, check condition after\n- whileDo: check condition first, do tasks after')
     .default('doWhile'),
+  language: Joi.string().description('The language of the expression').default('javascript'),
 });
 
 /**
@@ -68,7 +76,7 @@ export class WhileTaskHandler implements TaskHandler {
    * @throws {RerunError} To notify the engine to rerun the task for another iteration.
    */
   async handle({ task, workflow, context, session }: TaskHandlerInput): Promise<any> {
-    const { expression, mode } = validateParameters(task.parameters, Schema);
+    const { expression, mode, language } = validateParameters(task.parameters, Schema);
 
     if (typeof task.output?.iteration !== 'number') {
       context.getLogger().debug(`Initializing while loop with expression ${expression}`);
@@ -87,8 +95,12 @@ export class WhileTaskHandler implements TaskHandler {
     }
 
     const canContinue = async () => {
-      const javascriptEngine = await context.getPluginManager().getOne<JavaScriptEngine>(JAVASCRIPT_PLUGIN);
-      const val = await javascriptEngine.run(expression, { task, workflow });
+      const scriptEngines = await context.getPluginManager().get<ScriptEngine>(SCRIPT_ENGINE_PLUGIN);
+      const engineWrapper = new ScriptEngineWrapper(scriptEngines);
+      const val = await engineWrapper.run(expression, {
+        input: { task, workflow },
+        language,
+      });
       return !!val;
     };
 

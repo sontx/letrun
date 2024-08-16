@@ -10,8 +10,14 @@ import { PythonShell } from 'python-shell';
 import tmp from 'tmp';
 import fs from 'fs';
 
+/**
+ * Evaluates Python script, there are some limitations:
+ * - The context will be loaded into a 'context' variable as a dictionary in the script.
+ * - The output should be assigned to the 'output' variable.
+ * - The python executable path can be configured in the 'pythonPath' property if it's not found from the environment.
+ */
 export default class PythonEngine extends AbstractPlugin implements ScriptEngine {
-  readonly name = 'javascript';
+  readonly name = 'python';
   readonly type = SCRIPT_ENGINE_PLUGIN;
   readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
@@ -22,15 +28,21 @@ export default class PythonEngine extends AbstractPlugin implements ScriptEngine
       return undefined;
     }
 
-    const inputFile = tmp.fileSync({ postfix: '.json', prefix: 'letrun-' });
+    if (this.pythonPath && !fs.existsSync(this.pythonPath)) {
+      throw new Error(`Python executable not found at ${this.pythonPath}`);
+    }
+
+    const inputFile = tmp.fileSync({ postfix: '.json', prefix: 'letrun' });
     await fs.promises.writeFile(inputFile.name, JSON.stringify(context));
 
     try {
       const effectiveScript = `
 import json
+output = None
 with open('${inputFile.name.replaceAll(/\\/g, '/')}', 'r') as file:
-    input = json.load(file)
+    context = json.load(file)
 ${script}
+print(json.dumps(output))
 `;
       const resultArray = await PythonShell.runString(effectiveScript, {
         mode: 'text',

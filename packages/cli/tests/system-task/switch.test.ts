@@ -8,17 +8,21 @@ describe('SwitchTaskHandler', () => {
   let mockContext: jest.Mocked<any>;
   let mockSession: jest.Mocked<any>;
   let mockTask: jest.Mocked<Task>;
+  let mockJavascriptEngine: any;
 
   beforeEach(() => {
     handler = new SwitchTaskHandler();
+    mockJavascriptEngine = {
+      name: 'javascript',
+      run: jest.fn().mockResolvedValue('result'),
+      support: jest.fn(ex => ex === 'js'),
+    };
     mockContext = {
       getLogger: jest.fn().mockReturnValue({
         debug: jest.fn(),
       }),
       getPluginManager: jest.fn().mockReturnValue({
-        getOne: jest.fn().mockResolvedValue({
-          run: jest.fn().mockResolvedValue('case1'),
-        }),
+        get: jest.fn().mockResolvedValue([mockJavascriptEngine]),
       }),
     };
     mockSession = {
@@ -32,7 +36,7 @@ describe('SwitchTaskHandler', () => {
   });
 
   it('switches to the correct case based on value evaluator', async () => {
-    mockTask.parameters = { expression: 'case1', evaluatorType: 'value' };
+    mockTask.parameters = { expression: 'case1' };
     mockTask.decisionCases = { case1: { task1: {} } } as any;
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
     const result = await handler.handle(input);
@@ -41,21 +45,19 @@ describe('SwitchTaskHandler', () => {
   });
 
   it('switches to the correct case based on javascript evaluator', async () => {
-    mockTask.parameters = { expression: '"case" + 1', evaluatorType: 'javascript' };
+    mockTask.parameters = { expression: '"case" + 1', language: 'javascript' };
     mockTask.decisionCases = { case1: { task1: {} } } as any;
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
-    jest.spyOn(mockContext.getPluginManager(), 'getOne').mockResolvedValue({
-      run: jest.fn().mockImplementation(async (expression) => {
-        return eval(expression);
-      }),
-    });
+    jest.spyOn(mockJavascriptEngine, 'run').mockImplementation(async (expression: any) => {
+      return eval(expression);
+    })
     const result = await handler.handle(input);
     expect(result).toBe('case1');
     expect(mockSession.setTasks).toHaveBeenCalledWith(mockTask, mockTask.decisionCases?.case1);
   });
 
   it('switches to the default case when no matching case is found', async () => {
-    mockTask.parameters = { expression: 'case2', evaluatorType: 'value' };
+    mockTask.parameters = { expression: 'case2' };
     mockTask.defaultCase = { task1: {} } as any;
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
     const result = await handler.handle(input);
@@ -64,7 +66,7 @@ describe('SwitchTaskHandler', () => {
   });
 
   it('throws error when no matching case and no default case is found', async () => {
-    mockTask.parameters = { expression: 'case2', evaluatorType: 'value' };
+    mockTask.parameters = { expression: 'case2' };
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
     await expect(handler.handle(input)).rejects.toThrow(IllegalStateError);
   });

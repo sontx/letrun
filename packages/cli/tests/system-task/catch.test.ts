@@ -90,10 +90,23 @@ describe('CatchTaskHandler', () => {
   });
 
   it('matches expression successfully', async () => {
+    const mockJavascriptEngine = {
+      name: 'javascript',
+      run: jest.fn().mockResolvedValue('result'),
+      support: jest.fn((ex) => ex === 'js'),
+    };
+    mockContext.getPluginManager().get = jest.fn().mockResolvedValue([mockJavascriptEngine]);
     const errors = [new Error('Test error')];
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
-    const result = await handler['matchesExpression']('true', errors, input);
+    const result = await handler['matchesExpression']('true', undefined, errors, input);
     expect(result).toBe(true);
+    expect(mockJavascriptEngine.run).toHaveBeenCalledWith('true', {
+      input: {
+        task: mockTask,
+        error: errors[0],
+        workflow: {},
+      },
+    });
   });
 
   it('validates catch task definition with valid tasks', () => {
