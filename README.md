@@ -25,7 +25,7 @@ A simple and efficient tool for running declarative workflows with ease.
     - [run](#task-run)
 - [Plugin](#plugin)
   - [Command Plugin](#command-plugin)
-  - [JavaScript Engine](#javascript-engine)
+  - [Script Engine](#script-engine)
   - [Logger Plugin](#logger-plugin)
   - [Log Transport Plugin](#log-transport-plugin)
   - [Parameter Interpolator](#parameter-interpolator)
@@ -346,10 +346,14 @@ export default class MyPlugin extends AbstractPlugin {
 This plugin allows you to extend the CLI tool with custom commands. We're using `commander` package to define commands.
 Please refer to this sample for more details: [sample-command-plugin.ts](packages/plugin/src/sample-command-plugin.ts).
 
-### JavaScript Engine
+### Script Engine
 
-This plugin allows some tasks to run JavaScript code in a sandboxed environment. The code is executed in a separate process to prevent side effects.
-Please refer to this default implementation for more details: [default-javascript-engine.ts](packages/plugin/src/default-javascript-engine.ts).
+This plugin allows some tasks to run script code in a sandboxed environment.
+The code is executed in a separate process to prevent side effects.
+
+Currently, we support JavaScript and Python (with some limitations) scripts.
+
+Almost system tasks (switch, while, lambda) that support expression input can be evaluated as a script.
 
 ### Logger Plugin
 
@@ -459,6 +463,7 @@ System tasks are built-in tasks that come with the CLI tool. They are defined in
 7. `log`: Outputs messages or errors for debugging purposes.
 8. `http`: Sends HTTP requests and processes responses.
 9. `run-workflow`: Runs another workflow within the current workflow.
+10. `lambda`: Executes a lambda script (javascript or python).
 
 ### Custom Tasks
 
