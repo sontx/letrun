@@ -2,6 +2,7 @@
 
 ![NPM Version](https://img.shields.io/npm/v/%40letrun%2Fcli)
 ![NPM Downloads](https://img.shields.io/npm/dw/%40letrun%2Fcli)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sontx/letrun/build-and-test.yml)
 ![GitHub License](https://img.shields.io/github/license/sontx/letrun)
 
 A simple and efficient tool for running declarative workflows with ease.
