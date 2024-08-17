@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "npm run test -ws",
+    "coverage": "npm run coverage -ws",
     "build": "npm run build -ws && npm run clean && npm run copy",
     "clean": "rm -rf ./dist/**",
     "copy": "npm run copy:cli && npm run copy:task",

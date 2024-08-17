@@ -19,6 +19,7 @@ const config: Config = {
     '^@src/(.*)$': '<rootDir>/src/$1',
   },
   testMatch: ['**/tests/**/*.test.ts'],
+  coverageReporters: ['json-summary'],
 };
 
 export default config;
