@@ -87,7 +87,7 @@ export class WhileTaskHandler implements TaskHandler {
 
     const isFirstIteration = task.output.iteration === 0;
     if (isFirstIteration && mode === 'doWhile') {
-      context.getLogger().verbose(`Running iteration ${task.output.iteration} with index ${task.output.index}`);
+      context.getLogger().verbose(`Running iteration ${task.output.iteration}`);
       initNewIteration(task, session);
       task.output.iteration++;
       // notify the engine to rerun the task for another iteration
@@ -109,7 +109,7 @@ export class WhileTaskHandler implements TaskHandler {
       context.getLogger().debug(`'While' loop finished after looping ${task.output.iteration} times`);
       return task.output;
     } else {
-      context.getLogger().verbose(`Running iteration ${task.output.iteration} with index ${task.output.index}`);
+      context.getLogger().verbose(`Running iteration ${task.output.iteration}`);
       initNewIteration(task, session);
       task.output.iteration++;
       // notify the engine to rerun the task for another iteration
