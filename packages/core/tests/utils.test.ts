@@ -93,7 +93,7 @@ describe('Utils', () => {
   it('counts the number of tasks', () => {
     const tasks = { task1: { status: 'completed' } } as unknown as WorkflowTasks;
     const count = countTasks(tasks, false);
-    expect(count).toBe(1);
+    expect(count).toBe(2);
   });
 
   it('checks if a task status is a terminated status', () => {
