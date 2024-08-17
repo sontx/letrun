@@ -11,5 +11,4 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
     uses: sontx/letrun/.github/workflows/build-and-test.yml@feature/badges
