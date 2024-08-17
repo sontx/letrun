@@ -1,6 +1,6 @@
 {
   "name": "@letrun/plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "The plugins package for LetRun",
   "type": "module",
@@ -39,7 +39,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/core": "*",
+    "@letrun/core": "^0.0.2",
     "commander": "^12.1.0",
     "glob": "^11.0.0",
     "joi": "^17.13.3",
