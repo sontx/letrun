@@ -1,8 +1,11 @@
 import { DefaultRunner } from '@src/runner/default-runner';
 import {
-  AppContext, IdGenerator,
+  AppContext,
+  IdGenerator,
   IllegalStateError,
   InvalidParameterError,
+  POST_RUN_WORKFLOW_PLUGIN,
+  PRE_RUN_WORKFLOW_PLUGIN,
   Workflow,
   WorkflowDef,
   WorkflowRunner,
@@ -112,7 +115,7 @@ describe('DefaultRunner', () => {
     const fireEventSpy = jest.spyOn(runner as any, 'firePreOrPostWorkflowRun');
     await runner.load(mockContext);
     await runner.run(workflow);
-    expect(fireEventSpy).toHaveBeenCalledWith(expect.objectContaining({ event: 'pre-workflow-run' }));
-    expect(fireEventSpy).toHaveBeenCalledWith(expect.objectContaining({ event: 'post-workflow-run' }));
+    expect(fireEventSpy).toHaveBeenCalledWith(expect.objectContaining({ event: PRE_RUN_WORKFLOW_PLUGIN }));
+    expect(fireEventSpy).toHaveBeenCalledWith(expect.objectContaining({ event: POST_RUN_WORKFLOW_PLUGIN }));
   });
 });

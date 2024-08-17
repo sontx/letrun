@@ -1,6 +1,7 @@
 {
   "name": "@letrun/plugin",
   "version": "0.0.1",
+  "private": true,
   "description": "The plugins package for LetRun",
   "type": "module",
   "main": "src/index.ts",
