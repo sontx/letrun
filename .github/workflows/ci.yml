@@ -14,4 +14,4 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: ./.github/workflows/build-and-test.yml
+      - uses: sontx/letrun/.github/workflows/build-and-test.yml@feature/badges
