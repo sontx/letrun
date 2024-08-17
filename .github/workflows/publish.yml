@@ -1,9 +1,6 @@
 name: Publish to npm on Release
 
-on:
-  release:
-    types:
-      - created  # Trigger when a new release is created
+on: workflow_dispatch
 
 jobs:
   build-and-test:
