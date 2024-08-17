@@ -26,6 +26,7 @@ Here the full list of system tasks:
 - [Log](system-task/log.md): output messages or errors for debugging purposes.
 - [Run Workflow](system-task/run-workflow.md): run another workflow within the current workflow.
 - [Lambda](system-task/lambda.md): execute a lambda function such as JavaScript or Python code.
+- [Http](system-task/http.md): make an HTTP request and process the response.
 
 ## Custom Tasks
 
