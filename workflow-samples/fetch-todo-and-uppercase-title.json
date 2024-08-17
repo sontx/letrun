@@ -1,0 +1,28 @@
+{
+  "name": "fetch_todo_and_uppercase_title",
+  "tasks": [
+    {
+      "name": "fetch_todo",
+      "handler": "http",
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/todos/1",
+        "method": "GET"
+      }
+    },
+    {
+      "name": "extract_title",
+      "handler": "lambda",
+      "parameters": {
+        "expression": "'${fetch_todo.output.title}'"
+      }
+    },
+    {
+      "name": "uppercase_title",
+      "handler": "lambda",
+      "parameters": {
+        "expression": "output = '${extract_title.output}'.upper()",
+        "language": "python"
+      }
+    }
+  ]
+}

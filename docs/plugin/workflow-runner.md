@@ -42,13 +42,7 @@ To create a Workflow Runner Plugin, you need to implement the `WorkflowRunner` i
 Here is an example of a Workflow Runner Plugin:
 
 ```typescript
-import {
-  AbstractPlugin,
-  WorkflowRunner,
-  WorkflowRunnerInput,
-  WORKFLOW_RUNNER_PLUGIN,
-  Task,
-} from '@letrun/core';
+import { AbstractPlugin, WorkflowRunner, WorkflowRunnerInput, WORKFLOW_RUNNER_PLUGIN, Task } from '@letrun/core';
 
 export default class CustomWorkflowRunner extends AbstractPlugin implements WorkflowRunner {
   readonly name = 'custom';
@@ -62,7 +56,7 @@ export default class CustomWorkflowRunner extends AbstractPlugin implements Work
     }
     return lastTaskResult;
   }
-  
+
   private async executeTask(task: Task) {
     console.log(`Executing task: ${task.name}`);
     return task.name;
@@ -76,7 +70,7 @@ To register the Workflow Runner Plugin, place it in the `plugins` directory (or 
 
 ### Output
 
-The custom workflow runner executes each task in the workflow sequentially and logs the task name. 
+The custom workflow runner executes each task in the workflow sequentially and logs the task name.
 In the real-world scenario, you would replace the `executeTask` method with your custom logic to execute the task and use the Task Invoker plugin to invoke the task's handler.
 
 Customize the Workflow Runner Plugin is not a common use case, but it can be useful if you need to implement custom logic for workflow execution.

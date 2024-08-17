@@ -53,7 +53,7 @@ Here is an example of a For Task in a workflow file:
 
 > The task's name of tasks in the `loopOver` array will be suffixed with the iteration index.
 > Task name in this case will be `log_iteration__0`, `log_iteration__1`, `log_iteration__2`, `log_iteration__3`, and `log_iteration__4`.
-> For more details about the generated tasks, see the [Workflow Runner](../plugin/workflow-runner.md) documentation.
+> For more details about the generated tasks, see the [Workflow Runner](../../plugin/workflow-runner.md) documentation.
 
 ## Output
 

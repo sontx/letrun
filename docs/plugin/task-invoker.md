@@ -29,7 +29,11 @@ export default class CustomTaskInvoker extends AbstractPlugin implements TaskInv
   readonly type = TASK_INVOKER_PLUGIN;
 
   async invoke(input: TaskHandlerInput): Promise<TaskHandlerOutput> {
-    const { task, session: { systemTasks }, context } = input;
+    const {
+      task,
+      session: { systemTasks },
+      context,
+    } = input;
     if (systemTasks[task.taskDef.handler]) {
       return await systemTasks[task.taskDef.handler]?.handle(input);
     }
