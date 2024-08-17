@@ -23,10 +23,5 @@ jobs:
       - name: Run build
         run: npm run build -w @letrun/core && npm run build -w @letrun/plugin npm run build -w @letrun/task && npm run build -w @letrun/cli
 
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
       - name: Run tests
         run: npm run test
