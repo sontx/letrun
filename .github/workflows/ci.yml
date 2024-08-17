@@ -12,6 +12,4 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
-    steps:
-      - uses: sontx/letrun/.github/workflows/build-and-test.yml@feature/badges
+    uses: sontx/letrun/.github/workflows/build-and-test.yml@feature/badges
