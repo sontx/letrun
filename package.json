@@ -25,13 +25,16 @@
     "url": "https://github.com/sontx/letrun/issues"
   },
   "homepage": "https://github.com/sontx/letrun#readme",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "engines": {
     "node": ">=20",
     "npm": ">=10"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
+    "lerna": "^8.1.8",
     "prettier": "^3.3.3"
   }
 }
