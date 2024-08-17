@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-test:
-    uses: sontx/letrun/.github/workflows/build-and-test.yml@feature/badges
+    uses: sontx/letrun/.github/workflows/build-and-test.yml@main
 
   publish:
     needs: build-and-test
