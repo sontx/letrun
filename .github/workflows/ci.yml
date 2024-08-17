@@ -1,0 +1,17 @@
+name: Build on Pull Request
+
+# Trigger the workflow on pull request events
+on:
+  pull_request:
+    branches:
+      - main  # Runs when a pull request targets the main branch
+  push:
+    branches:
+      - main  # Runs when code is pushed to the main branch (e.g., after merging a PR)
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: ./.github/workflows/build-and-test.yml

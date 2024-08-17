@@ -1,13 +1,7 @@
-name: Build on Pull Request
+name: Build and Test
 
-# Trigger the workflow on pull request events
 on:
-  pull_request:
-    branches:
-      - main  # Runs when a pull request targets the main branch
-  push:
-    branches:
-      - main  # Runs when code is pushed to the main branch (e.g., after merging a PR)
+  workflow_call:
 
 jobs:
   build:
@@ -29,5 +23,10 @@ jobs:
       - name: Run build
         run: npm run build -w @letrun/core && npm run build -w @letrun/plugin npm run build -w @letrun/task && npm run build -w @letrun/cli
 
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
       - name: Run tests
         run: npm run test
