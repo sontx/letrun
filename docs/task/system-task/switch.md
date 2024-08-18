@@ -24,8 +24,7 @@ Here is an example of a Switch Task in a workflow file:
       "name": "choose_case",
       "handler": "switch",
       "parameters": {
-        "expression": "${input.value}",
-        "language": "javascript"
+        "expression": "${input.value}"
       },
       "decisionCases": {
         "case1": [
