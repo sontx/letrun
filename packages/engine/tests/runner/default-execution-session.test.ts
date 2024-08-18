@@ -20,8 +20,10 @@ describe('DefaultExecutionSession', () => {
   let mockSystemTasks: Record<string, jest.Mocked<TaskHandler>>;
   let mockWorkflow: jest.Mocked<Workflow>;
   let mockIdGenerator: jest.Mocked<IdGenerator>;
+  let abortController: AbortController;
 
   beforeEach(() => {
+    abortController = new AbortController();
     mockContext = {
       getLogger: jest.fn().mockReturnValue({
         warn: jest.fn(),
@@ -51,6 +53,7 @@ describe('DefaultExecutionSession', () => {
       mockTasksFactory,
       mockRunner,
       mockSystemTasks,
+      abortController.signal,
       mockContext,
       mockIdGenerator,
     );
