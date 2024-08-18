@@ -4,8 +4,8 @@ import { AbstractPlugin, AppContext, BUILTIN_PLUGIN_PRIORITY, ID_GENERATOR_PLUGI
  * Class responsible for generating unique IDs.
  */
 export default class DefaultIdGenerator extends AbstractPlugin implements IdGenerator {
-  name = 'default';
-  type = ID_GENERATOR_PLUGIN;
+  readonly name = 'default';
+  readonly type = ID_GENERATOR_PLUGIN;
   readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   private idSeparator = '/';

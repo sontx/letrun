@@ -1,6 +1,5 @@
 import DefaultRetryPlugin from '@src/default-retry-plugin';
-import { ExecutionSession, InterruptInvokeError, RetryConfig, Task, WorkflowRunner } from '@letrun/core';
-import DefaultWorkflowRunner from '@src/default-workflow-runner';
+import { InterruptInvokeError } from '@letrun/core';
 
 const jest = import.meta.jest;
 
@@ -152,42 +151,4 @@ describe('DefaultRetryPlugin', () => {
     const delayMilliseconds2 = retryPlugin['getRetryDelay'](1, config);
     expect(delayMilliseconds2).toBe(1500); // 1 * 1.5 * 1 * 1000
   }, 6000);
-
-  it('returns correct retry configuration for a task', () => {
-    const task = {
-      taskDef: {
-        retryCount: 3,
-        retryDelaySeconds: 2,
-        retryStrategy: 'exponential_backoff',
-      },
-    } as Task;
-
-    const session = {
-      getParameter: jest.fn().mockReturnValue(undefined),
-    } as unknown as ExecutionSession;
-
-    const expectedConfig: RetryConfig = {
-      retryCount: 3,
-      retryDelaySeconds: 2,
-      retryStrategy: 'exponential_backoff',
-    };
-
-    const runner = new DefaultWorkflowRunner();
-    const config = runner['lookupRetryConfig'](task, session);
-
-    expect(config).toEqual(expectedConfig);
-  });
-
-  it('should lookup retry config from parent task', () => {
-    const childTask = { taskDef: { retryCount: undefined } } as Task;
-    const parentTask = { taskDef: { retryCount: 3 } } as Task;
-    const session = {
-      getParentTask: jest.fn((task) => (task === childTask ? parentTask : undefined)),
-    } as unknown as ExecutionSession;
-
-    const runner = new DefaultWorkflowRunner() as WorkflowRunner;
-    const retryConfig = runner['lookupRetryConfig'](childTask, session);
-
-    expect(retryConfig.retryCount).toBe(3);
-  });
 });

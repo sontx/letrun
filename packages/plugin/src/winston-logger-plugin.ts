@@ -93,8 +93,8 @@ class DefaultLogger implements Logger, Pick<LoggerPlugin, 'hook'> {
 }
 
 export default class WinstonLoggerPlugin extends AbstractPlugin implements LoggerPlugin {
-  name = 'winston-logger';
-  type = LOGGER_PLUGIN;
+  readonly name = 'winston-logger';
+  readonly type = LOGGER_PLUGIN;
   readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
   private winstonLogger = createLogger({

@@ -201,6 +201,9 @@ export class DefaultRunner implements Runner {
       name: workflowDef.name,
       status: 'open',
       tasks: tasksFactory.createTasks(taskDefs),
+      retryCount: workflowDef.retryCount,
+      retryStrategy: workflowDef.retryStrategy,
+      retryDelaySeconds: workflowDef.retryDelaySeconds,
     };
   }
 }

@@ -5,7 +5,7 @@ import {
   IllegalStateError,
   InterruptInvokeError,
   RerunError,
-  RETRY_PLUGIN,
+  RETRY_PLUGIN, RetryConfig,
   Task,
   TASK_INVOKER_PLUGIN,
   Workflow,
@@ -635,5 +635,57 @@ describe('DefaultWorkflowRunner', () => {
     expect(nestedTask1.status).toBe('completed');
     expect(nestedTask2.status).toBe('completed');
     expect(executionOrder).toEqual(['nestedTask1', 'nestedTask1', 'nestedTask2', 'task1', 'task2']);
+  });
+
+  it('returns correct retry configuration for a task', () => {
+    const task = {
+      taskDef: {
+        retryCount: 3,
+        retryDelaySeconds: 2,
+        retryStrategy: 'exponential_backoff',
+      },
+    } as Task;
+
+    const session = {
+      getParameter: jest.fn().mockReturnValue(undefined),
+    } as unknown as ExecutionSession;
+
+    const expectedConfig: RetryConfig = {
+      retryCount: 3,
+      retryDelaySeconds: 2,
+      retryStrategy: 'exponential_backoff',
+    };
+
+    const runner = new DefaultWorkflowRunner();
+    const config = runner['lookupRetryConfig'](task, session, {} as any);
+
+    expect(config).toEqual(expectedConfig);
+  });
+
+  it('should lookup retry config from parent task', () => {
+    const childTask = { taskDef: { retryCount: undefined } } as Task;
+    const parentTask = { taskDef: { retryCount: 3 } } as Task;
+    const session = {
+      getParentTask: jest.fn((task) => (task === childTask ? parentTask : undefined)),
+    } as unknown as ExecutionSession;
+
+    const runner = new DefaultWorkflowRunner() as WorkflowRunner;
+    const retryConfig = runner['lookupRetryConfig'](childTask, session, {} as any);
+
+    expect(retryConfig.retryCount).toBe(3);
+  });
+
+  it('should lookup retry config from workflow if task and parent task do not have config', () => {
+    const childTask = { taskDef: { retryCount: undefined } } as Task;
+    const parentTask = { taskDef: { retryCount: undefined } } as Task;
+    const workflow = { retryCount: 5 } as Workflow;
+    const session = {
+      getParentTask: jest.fn((task) => (task === childTask ? parentTask : undefined)),
+    } as unknown as ExecutionSession;
+    const runner = new DefaultWorkflowRunner() as WorkflowRunner;
+
+    const retryConfig = runner['lookupRetryConfig'](childTask, session, workflow);
+
+    expect(retryConfig.retryCount).toBe(5);
   });
 });

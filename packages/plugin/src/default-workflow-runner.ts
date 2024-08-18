@@ -276,7 +276,7 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
       const retryPlugin = await pluginManager.getOne<RetryPlugin>(RETRY_PLUGIN);
       output = await retryPlugin.retry({
         retryable: task,
-        config: this.lookupRetryConfig(task, input.session),
+        config: this.lookupRetryConfig(task, input.session, input.workflow),
         shouldRetryFn: (err) => !SYSTEM_ERRORS.includes(err.name),
         doJob: () => pluginManager.callPluginMethod<TaskInvoker>(TASK_INVOKER_PLUGIN, 'invoke', input),
         signal: input.session.signal,
@@ -349,10 +349,26 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
     return input.task.output;
   }
 
-  private lookupRetryConfig(task: Task, session: ExecutionSession): RetryConfig {
+  private lookupRetryConfig(task: Task, session: ExecutionSession, workflow: Workflow): RetryConfig {
     const config: RetryConfig = {};
 
     let currentTask: Task | undefined = task;
+
+    const updateConfig = (retryConfig: RetryConfig) => {
+      // Check if the current task has any of the retry config properties
+      if (isDefined(retryConfig.retryCount) && !isDefined(config.retryCount)) {
+        config.retryCount = retryConfig.retryCount;
+      }
+      if (isDefined(retryConfig.retryStrategy) && !isDefined(config.retryStrategy)) {
+        config.retryStrategy = retryConfig.retryStrategy;
+      }
+      if (isDefined(retryConfig.retryDelaySeconds) && !isDefined(config.retryDelaySeconds)) {
+        config.retryDelaySeconds = retryConfig.retryDelaySeconds;
+      }
+    };
+
+    const isAllPropertiesFound = () =>
+      isDefined(config.retryCount) && isDefined(config.retryStrategy) && isDefined(config.retryDelaySeconds);
 
     while (currentTask) {
       const taskDef = currentTask.taskDef;
@@ -360,24 +376,19 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
         break;
       }
 
-      // Check if the current task has any of the retry config properties
-      if (isDefined(taskDef.retryCount) && !isDefined(config.retryCount)) {
-        config.retryCount = taskDef.retryCount;
-      }
-      if (isDefined(taskDef.retryStrategy) && !isDefined(config.retryStrategy)) {
-        config.retryStrategy = taskDef.retryStrategy;
-      }
-      if (isDefined(taskDef.retryDelaySeconds) && !isDefined(config.retryDelaySeconds)) {
-        config.retryDelaySeconds = taskDef.retryDelaySeconds;
-      }
+      updateConfig(taskDef);
 
       // If all properties are found, break the loop
-      if (isDefined(config.retryCount) && isDefined(config.retryStrategy) && isDefined(config.retryDelaySeconds)) {
-        break;
+      if (isAllPropertiesFound()) {
+        return config;
       }
 
       // Get the parent task and continue the search
       currentTask = session.getParentTask(currentTask);
+    }
+
+    if (workflow && !isAllPropertiesFound()) {
+      updateConfig(workflow);
     }
 
     return config;
