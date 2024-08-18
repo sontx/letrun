@@ -9,8 +9,10 @@ describe('RunWorkflowTaskHandler', () => {
   let mockContext: jest.Mocked<any>;
   let mockSession: jest.Mocked<any>;
   let mockTask: jest.Mocked<Task>;
+  let abortController: AbortController;
 
   beforeEach(() => {
+    abortController = new AbortController();
     handler = new RunWorkflowTaskHandler();
     mockContext = {
       getLogger: jest.fn().mockReturnValue({
@@ -22,6 +24,7 @@ describe('RunWorkflowTaskHandler', () => {
       runner: {
         run: jest.fn(),
       },
+      signal: abortController.signal,
     };
     mockTask = {
       parameters: {},

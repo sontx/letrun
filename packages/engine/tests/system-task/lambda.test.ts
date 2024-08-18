@@ -8,6 +8,8 @@ describe('LambdaTaskHandler', () => {
   let lambdaTaskHandler: LambdaTaskHandler;
   let context: AppContext;
   let javascriptEngineMock: any;
+  let abortController: AbortController;
+  let mockSession: jest.Mocked<any>;
 
   beforeEach(() => {
     lambdaTaskHandler = new LambdaTaskHandler();
@@ -15,6 +17,10 @@ describe('LambdaTaskHandler', () => {
       name: 'javascript',
       run: jest.fn().mockResolvedValue('result'),
       support: jest.fn((ex) => ex === 'js'),
+    };
+    abortController = new AbortController();
+    mockSession = {
+      signal: abortController.signal,
     };
     context = {
       getPluginManager: jest.fn().mockReturnValue({
@@ -27,6 +33,7 @@ describe('LambdaTaskHandler', () => {
     const taskInput: TaskHandlerInput = {
       task: { parameters: { expression: 'input.a + input.b', input: { a: 1, b: 2 } } },
       context,
+      session: mockSession,
     } as any;
     const result = await lambdaTaskHandler.handle(taskInput);
     expect(javascriptEngineMock.run).toHaveBeenCalledWith('input.a + input.b', { input: { a: 1, b: 2 } });
@@ -42,6 +49,7 @@ describe('LambdaTaskHandler', () => {
     const taskInput: TaskHandlerInput = {
       task: { parameters: { expression: '2 + 2', language: 'python' } },
       context,
+      session: mockSession,
     } as any;
     const result = await lambdaTaskHandler.handle(taskInput);
     expect(pythonEngineMock.run).toHaveBeenCalledWith('2 + 2', { input: undefined });
@@ -54,6 +62,7 @@ describe('LambdaTaskHandler', () => {
     const taskInput: TaskHandlerInput = {
       task: { parameters: { file: 'path/to/file.js' } },
       context,
+      session: mockSession,
     } as any;
     const result = await lambdaTaskHandler.handle(taskInput);
     expect(javascriptEngineMock.run).toHaveBeenCalledWith('2 + 2', { input: undefined });
@@ -84,6 +93,7 @@ describe('LambdaTaskHandler', () => {
     const taskInput: TaskHandlerInput = {
       task: { parameters: { expression: '2 + 2', language: 'nonexistent' } },
       context,
+      session: mockSession,
     } as any;
     await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow(
       'No script engine found for language: nonexistent',
@@ -97,6 +107,7 @@ describe('LambdaTaskHandler', () => {
     const taskInput: TaskHandlerInput = {
       task: { parameters: { file: 'path/to/file.nonexistent' } },
       context,
+      session: mockSession,
     } as any;
     await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow(
       'No script engine found for file extension: nonexistent',
