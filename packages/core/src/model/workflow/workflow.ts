@@ -1,12 +1,13 @@
-import { ObjectType } from '@src/types';
+import { RetryConfig } from '../retry-config';
 import { Container } from './container';
+import { ObjectType } from '../../types';
 
 /**
  * Interface representing a workflow, generated based on the {@link WorkflowDef} automatically.
  * Holds the runtime information of the workflow.
  * Extends the Container interface.
  */
-export interface Workflow extends Container {
+export interface Workflow extends Container, RetryConfig {
   /** The status of the workflow. */
   status: WorkflowStatus;
   /** Optional variables associated with the workflow. All tasks inside this workflow can access and change variables whenever they want. */

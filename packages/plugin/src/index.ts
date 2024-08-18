@@ -9,6 +9,7 @@ import DefaultIdGenerator from './default-id-generator';
 import WinstonLoggerPlugin from './winston-logger-plugin';
 import JavascriptEngine from './javascript-engine';
 import PythonEngine from './python-engine';
+import DefaultRetryPlugin from './default-retry-plugin';
 
 const DEFAULT_PLUGINS: Plugin[] = [
   new ConsoleLogger(),
@@ -21,6 +22,7 @@ const DEFAULT_PLUGINS: Plugin[] = [
   new WinstonLoggerPlugin(),
   new JavascriptEngine(),
   new PythonEngine(),
+  new DefaultRetryPlugin(),
 ];
 
 export class DefaultPluginLoader implements PluginLoader {

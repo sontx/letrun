@@ -9,3 +9,5 @@ export * from './plugin-manager';
 export * from './runner';
 export * from './task-handler';
 export * from './tasks-factory';
+export * from './retryable';
+export * from './retry-config';

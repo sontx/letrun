@@ -10,3 +10,4 @@ export * from './input-parameter';
 export * from './id-generator';
 export * from './abstract-plugin';
 export * from './common';
+export * from './retry-plugin';

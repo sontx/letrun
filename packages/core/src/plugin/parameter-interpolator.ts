@@ -6,6 +6,8 @@ export const PARAMETER_INTERPOLATOR_PLUGIN = 'parameter-interpolator';
  * Interface representing a Parameter Interpolator plugin.
  */
 export interface ParameterInterpolator extends Plugin {
+  readonly type: typeof PARAMETER_INTERPOLATOR_PLUGIN;
+
   /**
    * Interpolates a given value within a specified context.
    * @param {string} value - The value to interpolate.

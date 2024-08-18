@@ -39,6 +39,8 @@ export interface PersistenceUnit {
  * Interface representing a Persistence plugin.
  */
 export interface Persistence extends Plugin {
+  readonly type: typeof PERSISTENCE_PLUGIN;
+
   /**
    * Retrieves a persistence unit by name.
    * @param {string} name - The name of the persistence unit.

@@ -2,13 +2,14 @@ import { ObjectType } from '@src/types';
 import { WorkflowTasks } from './workflow-tasks';
 import { Container } from './container';
 import { TaskDef } from './task-def';
+import { Retryable } from '../retryable';
 
 /**
  * Interface representing a task, generated based on the {@link TaskDef} automatically.
  * Holds the runtime information of the task.
  * Extends the Container interface.
  */
-export interface Task extends Container {
+export interface Task extends Container, Retryable {
   /** Runtime name of the task. It may be the same as the {@link TaskDef.name} in most cases.
    * In looping cases, it may depend on the iteration.
    * */

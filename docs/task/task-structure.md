@@ -10,6 +10,11 @@ A task should have the following structure:
 - `parameters`: An object that provides input and configuration for the task. This field supports interpolation, which means you can reference the output of other tasks or the workflow input. This field is optional.
 - `ignoreError`: Whether to ignore errors during task execution and let other tasks continue running. This is optional.
 - `tasks`: An array of tasks to be executed (will be executed orderly) or an object of tasks (will be executed concurrently). This is optional.
+- `retryCount`: The number of times to retry the task if it fails (defaults to 3). This is optional.
+- `retryStrategy`: The strategy to use for retrying the task (defaults to 'fixed'). This is optional.
+- `retryDelaySeconds`: The delay between retries in seconds (defaults to 3 seconds). This is optional.
+
+> For retrying configuration, they are inherited from the parent container (workflow or task) if not defined.
 
 There are some special fields that depend on the handler:
 
