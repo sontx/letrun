@@ -13,6 +13,7 @@ import {
 import { DefaultContext } from '@src/runner/default-context';
 import { DefaultTasksFactory } from '@src/runner/default-tasks-factory';
 import { SystemTaskManager } from '@src/system-task';
+import { BootstrapUtils } from "@src/libs/bootstrap-utils";
 
 const jest = import.meta.jest;
 
@@ -117,5 +118,43 @@ describe('DefaultRunner', () => {
     await runner.run(workflow);
     expect(fireEventSpy).toHaveBeenCalledWith(expect.objectContaining({ event: PRE_RUN_WORKFLOW_PLUGIN }));
     expect(fireEventSpy).toHaveBeenCalledWith(expect.objectContaining({ event: POST_RUN_WORKFLOW_PLUGIN }));
+  });
+});
+
+describe('DefaultRunner.create', () => {
+  let mockContext: jest.Mocked<AppContext>;
+
+  beforeEach(() => {
+    mockContext = {
+      getLogger: jest.fn().mockReturnValue({
+        info: jest.fn(),
+        error: jest.fn(),
+        debug: jest.fn(),
+      }),
+      getConfigProvider: jest.fn(() => ({
+        set: jest.fn()
+      })),
+      getPluginManager: jest.fn(),
+      unload: jest.fn(),
+    } as unknown as jest.Mocked<AppContext>;
+  });
+
+  it('initializes a DefaultRunner instance correctly', async () => {
+    const runner = await DefaultRunner.create();
+    expect(runner).toBeInstanceOf(DefaultRunner);
+  });
+
+  it('sets the context and log level correctly', async () => {
+    const setGlobalLogLevelSpy = jest.spyOn(BootstrapUtils, 'setGlobalLogLevel');
+    const runner = await DefaultRunner.create(mockContext, 'debug') as any;
+    expect(runner['context']).toBe(mockContext);
+    expect(setGlobalLogLevelSpy).toHaveBeenCalledWith(mockContext, 'debug');
+  });
+
+  it('handles the absence of a context correctly', async () => {
+    const loadSpy = jest.spyOn(DefaultContext.prototype, 'load');
+    const runner = await DefaultRunner.create() as any;
+    expect(runner['context']).toBeInstanceOf(DefaultContext);
+    expect(loadSpy).toHaveBeenCalled();
   });
 });

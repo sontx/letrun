@@ -21,6 +21,7 @@ import { ContainerDefSchema } from './workflow-schema';
 import { SystemTaskManager } from '../system-task';
 import { DefaultTasksFactory } from './default-tasks-factory';
 import { DefaultExecutionSession } from './default-execution-session';
+import { BootstrapUtils } from '@src/libs/bootstrap-utils';
 
 /**
  * Class representing the default runner.
@@ -30,6 +31,21 @@ export class DefaultRunner implements Runner {
   private context?: AppContext;
   private logger?: Logger;
   private isExternalContext = false;
+
+  static async create(context?: AppContext, logLevel?: string): Promise<Runner> {
+    if (!context) {
+      context = new DefaultContext();
+      await context.load();
+    }
+    if (logLevel) {
+      await BootstrapUtils.setGlobalLogLevel(context, logLevel);
+    }
+    const runner = new DefaultRunner();
+    await runner.load(context);
+    // make sure the context is unloaded when the runner is destroyed
+    runner.isExternalContext = false;
+    return runner;
+  }
 
   async load(context?: AppContext): Promise<void> {
     if (!context) {

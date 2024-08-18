@@ -91,8 +91,48 @@ Alternatively, you can download the standalone executable file from the [release
 
 ## Usage
 
+Run a workflow defined in a JSON or YAML file with the CLI tool:
+
 ```sh
 letrun run <workflow-file>
+```
+
+If you want to run a workflow programmatically, you can use the engine library
+
+- Make sure you have installed the `@letrun/engine` package:
+
+```sh
+npm install @letrun/engine
+```
+
+- Then you can run a workflow programmatically:
+
+```ts
+import { DefaultRunner } from '@letrun/engine';
+
+const runner = DefaultRunner.create();
+try {
+  const result = await runner.run(
+    {
+      name: 'simple-workflow',
+      tasks: [
+        {
+          name: 'task1',
+          handler: 'lambda',
+          parameters: {
+            expression: '"Hello ${input.name}"',
+          },
+        },
+      ],
+    },
+    {
+      name: 'world',
+    },
+  );
+  console.log('Workflow result: ', result);
+} finally {
+  await runner.unload();
+}
 ```
 
 ## Commands
