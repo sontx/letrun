@@ -57,6 +57,10 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
 
     const { workflow } = input;
 
+    if (input.session.signal.aborted) {
+      return lastResult;
+    }
+
     // there may be some parent tasks that are in executing status,
     // we need to close them whenever all their children are completed or one of them failed
     await this.closeParentTasks(workflow);

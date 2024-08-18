@@ -9,8 +9,10 @@ describe('RunWorkflowTaskHandler', () => {
   let mockContext: jest.Mocked<any>;
   let mockSession: jest.Mocked<any>;
   let mockTask: jest.Mocked<Task>;
+  let abortController: AbortController;
 
   beforeEach(() => {
+    abortController = new AbortController();
     handler = new RunWorkflowTaskHandler();
     mockContext = {
       getLogger: jest.fn().mockReturnValue({
@@ -22,6 +24,7 @@ describe('RunWorkflowTaskHandler', () => {
       runner: {
         run: jest.fn(),
       },
+      signal: abortController.signal,
     };
     mockTask = {
       parameters: {},
@@ -80,5 +83,36 @@ describe('RunWorkflowTaskHandler', () => {
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: mockSession, workflow: {} as any };
     jest.spyOn(fs.promises, 'readFile').mockRejectedValue(new Error('File read error'));
     await expect(handler.handle(input)).rejects.toThrow('File read error');
+  });
+
+  it('aborts while running sub-workflow', async () => {
+    const abortController = new AbortController();
+    mockTask.parameters = { workflow: { name: 'testWorkflow' }, input: { key: 'value' } };
+    const input: TaskHandlerInput = {
+      task: mockTask,
+      context: mockContext,
+      session: { ...mockSession, signal: abortController.signal },
+      workflow: {} as any,
+    };
+
+    let runTimeout: NodeJS.Timeout | undefined;
+    mockSession.runner.run.mockImplementation(() => {
+      return new Promise((resolve) => {
+        runTimeout = global.setTimeout(() => {
+          resolve('result');
+        }, 2000);
+      });
+    });
+
+    global.setTimeout(() => {
+      abortController.abort();
+    }, 1000);
+
+    const startTime = Date.now();
+    await expect(handler.handle(input)).rejects.toThrow('Aborted');
+    expect(Date.now() - startTime).toBeLessThan(2000);
+    expect(mockSession.runner.run).toHaveBeenCalled();
+
+    clearTimeout(runTimeout);
   });
 });

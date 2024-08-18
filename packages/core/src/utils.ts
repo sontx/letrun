@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { ObjectType } from './types';
-import { InvalidParameterError } from './error';
+import { InterruptInvokeError, InvalidParameterError } from './error';
 import type Joi from 'joi';
 import { Container, Plugin, Task, TaskDef, TaskStatus, WorkflowTaskDefs, WorkflowTasks } from '@src/model';
 
@@ -36,10 +36,33 @@ export function getEntryPointDir(): string {
 /**
  * Delays execution for a specified number of milliseconds.
  * @param {number} ms - The number of milliseconds to delay.
+ * @param abortSignal - The abort signal to use for aborting the delay.
  * @returns {Promise<void>} A promise that resolves after the specified delay.
  */
-export function delayMs(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function delayMs(ms: number, abortSignal?: AbortSignal): Promise<void> {
+  return new Promise((resolve) => {
+    if (abortSignal?.aborted) {
+      resolve();
+      return;
+    }
+
+    let id: NodeJS.Timeout;
+    const cancel = () => {
+      clearTimeout(id);
+      resolve();
+    };
+
+    id = setTimeout(() => {
+      if (abortSignal) {
+        abortSignal.removeEventListener('abort', cancel);
+      }
+      resolve();
+    }, ms);
+
+    if (abortSignal) {
+      abortSignal.addEventListener('abort', cancel, { once: true });
+    }
+  });
 }
 
 /**
@@ -192,4 +215,32 @@ export function countTasks(tasks: WorkflowTasks | undefined, deep: boolean = tru
 export function isTerminatedStatus(status: TaskStatus): boolean {
   const terminatedStatuses: TaskStatus[] = ['completed', 'error', 'cancelled'];
   return terminatedStatuses.includes(status);
+}
+
+export function wrapPromiseWithAbort<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+  return new Promise((resolve, reject) => {
+    // If the signal is already aborted, reject the promise immediately
+    if (signal.aborted) {
+      return reject(new InterruptInvokeError('Aborted'));
+    }
+
+    // Attach an abort event listener to reject the promise if aborted
+    const onAbort = () => {
+      reject(new InterruptInvokeError('Aborted'));
+    };
+
+    signal.addEventListener('abort', onAbort);
+
+    // Resolve or reject the promise as normal
+    promise.then(
+      (value) => {
+        signal.removeEventListener('abort', onAbort);
+        resolve(value);
+      },
+      (error) => {
+        signal.removeEventListener('abort', onAbort);
+        reject(error);
+      },
+    );
+  });
 }

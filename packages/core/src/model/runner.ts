@@ -33,4 +33,9 @@ export interface Runner {
    * @returns A promise that resolves to the workflow.
    */
   run(workflowDef: WorkflowDef | Workflow, input?: any): Promise<Workflow | undefined>;
+
+  /**
+   * Aborts the running workflow.
+   */
+  abort(): void;
 }

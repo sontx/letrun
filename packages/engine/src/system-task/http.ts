@@ -102,7 +102,7 @@ export class HttpTaskHandler implements TaskHandler {
    * @returns {Promise<TaskHandlerOutput>} The output of the task.
    * @throws {Error} If the HTTP request fails.
    */
-  async handle({ task }: TaskHandlerInput): Promise<TaskHandlerOutput> {
+  async handle({ task, session }: TaskHandlerInput): Promise<TaskHandlerOutput> {
     const value = validateParameters(task.parameters, Schema);
     const url = new URL(value.url);
     if (value.params) {
@@ -117,7 +117,7 @@ export class HttpTaskHandler implements TaskHandler {
       method: value.method,
       headers: value.headers,
       body: value.body,
-      signal: value.timeoutMs ? AbortSignal.timeout(value.timeoutMs) : undefined,
+      signal: value.timeoutMs ? AbortSignal.any([AbortSignal.timeout(value.timeoutMs), session.signal]) : undefined,
     });
 
     if (!response.ok) {

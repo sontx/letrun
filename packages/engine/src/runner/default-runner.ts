@@ -4,6 +4,7 @@ import {
   ID_GENERATOR_PLUGIN,
   IdGenerator,
   IllegalStateError,
+  InterruptInvokeError,
   InvalidParameterError,
   Logger,
   POST_RUN_WORKFLOW_PLUGIN,
@@ -31,6 +32,7 @@ export class DefaultRunner implements Runner {
   private context?: AppContext;
   private logger?: Logger;
   private isExternalContext = false;
+  private abortController?: AbortController;
 
   static async create(context?: AppContext, logLevel?: string): Promise<Runner> {
     if (!context) {
@@ -65,6 +67,10 @@ export class DefaultRunner implements Runner {
     }
   }
 
+  abort() {
+    this.abortController?.abort();
+  }
+
   async run(workflowDef: WorkflowDef | Workflow, input?: any): Promise<Workflow | undefined> {
     if (this.isWorkflowDef(workflowDef)) {
       const { error } = ContainerDefSchema.validate(workflowDef);
@@ -77,6 +83,8 @@ export class DefaultRunner implements Runner {
     if (!pluginManager) {
       throw new IllegalStateError('Plugin manager not found');
     }
+
+    this.abortController = new AbortController();
 
     const workflowRunner = await pluginManager.getOne<WorkflowRunner>(WORKFLOW_RUNNER_PLUGIN);
     const idGenerator = await pluginManager.getOne<IdGenerator>(ID_GENERATOR_PLUGIN);
@@ -103,24 +111,28 @@ export class DefaultRunner implements Runner {
           tasksFactory,
           this,
           SystemTaskManager.getSystemTasks(),
+          this.abortController.signal,
           this.context!,
           idGenerator,
         ),
       });
       workflow.output = result;
-
-      this.logger?.info(`Workflow "${workflow.name}"(${workflow.id}) completed`);
-      this.logger?.debug(`Workflow "${workflow.name}"(${workflow.id}) result: ${JSON.stringify(result)}`);
-
-      workflow.status = 'completed';
+      workflow.status = this.abortController.signal.aborted ? 'cancelled' : 'completed';
       workflow.timeCompleted = Date.now();
+
+      this.logger?.info(`Workflow "${workflow.name}"(${workflow.id}) is ${workflow.status}`);
+      this.logger?.debug(`Workflow "${workflow.name}"(${workflow.id}) result: ${JSON.stringify(result)}`);
     } catch (e: any) {
       if (workflow) {
-        workflow.status = 'error';
+        workflow.status = e.name === InterruptInvokeError.name ? 'cancelled' : 'error';
         workflow.errorMessage = e.message;
       }
 
-      this.logger?.error(`Error executing workflow "${workflow?.name}"(${workflow?.id}):`, e);
+      if (e.name !== InterruptInvokeError.name) {
+        this.logger?.error(`Error executing workflow "${workflow?.name}"(${workflow?.id}):`, e);
+      } else {
+        this.logger?.info(`Workflow "${workflow?.name}"(${workflow?.id}) is cancelled`);
+      }
     } finally {
       if (workflow) {
         workflow.handlerDuration = Date.now() - startTime;

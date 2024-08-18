@@ -158,3 +158,62 @@ describe('DefaultRunner.create', () => {
     expect(loadSpy).toHaveBeenCalled();
   });
 });
+
+describe('DefaultRunner.abort', () => {
+  let runner: DefaultRunner;
+  let mockContext: jest.Mocked<AppContext>;
+
+  beforeEach(() => {
+    mockContext = {
+      getLogger: jest.fn().mockReturnValue({
+        info: jest.fn(),
+        error: jest.fn(),
+        debug: jest.fn(),
+      }),
+      getPluginManager: jest.fn(),
+      unload: jest.fn(),
+    } as unknown as jest.Mocked<AppContext>;
+
+    runner = new DefaultRunner();
+  });
+
+  it('sets the abortController signal to aborted', async () => {
+    await runner.load(mockContext);
+    runner['abortController'] = new AbortController();
+    const abortSpy = jest.spyOn(runner['abortController'], 'abort');
+    runner.abort();
+    expect(abortSpy).toHaveBeenCalled();
+  });
+
+  it('does not throw an error if abortController is not set', () => {
+    expect(() => runner.abort()).not.toThrow();
+  });
+
+  it('aborts the workflow while running', async () => {
+    const mockWorkflowRunner = {
+      execute: jest.fn().mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 1000))),
+    } as unknown as jest.Mocked<WorkflowRunner>;
+
+    mockContext = {
+      getLogger: jest.fn().mockReturnValue({
+        info: jest.fn(),
+        error: jest.fn(),
+        debug: jest.fn(),
+      }),
+      getPluginManager: jest.fn().mockReturnValue({
+        getOne: jest.fn().mockResolvedValue(mockWorkflowRunner),
+        callPluginMethod: jest.fn(),
+      }),
+      unload: jest.fn(),
+    } as unknown as jest.Mocked<AppContext>;
+
+    runner = new DefaultRunner();
+
+    const workflowDef = { name: 'test', tasks: {} } as WorkflowDef;
+    await runner.load(mockContext);
+    const runPromise = runner.run(workflowDef);
+    runner.abort();
+    const result = await runPromise;
+    expect(result?.status).toBe('cancelled');
+  });
+});

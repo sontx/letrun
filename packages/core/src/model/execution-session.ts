@@ -18,6 +18,9 @@ export interface ExecutionSession {
    */
   readonly systemTasks: Record<string, TaskHandler>;
 
+  /** The signal to abort the workflow execution. */
+  readonly signal: AbortSignal;
+
   /**
    * Sets tasks for a parent task.
    * @param parentTask - The parent task.

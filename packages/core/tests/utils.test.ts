@@ -32,13 +32,6 @@ describe('Utils', () => {
     expect(dir).toBeDefined();
   });
 
-  it('delays execution for specified milliseconds', async () => {
-    const start = Date.now();
-    await delayMs(100);
-    const end = Date.now();
-    expect(end - start).toBeGreaterThanOrEqual(100);
-  });
-
   it('loads configuration into a plugin', () => {
     const plugin = { type: 'test', name: 'plugin' } as Plugin;
     const config = { test: { plugin: { key: 'value' } } };
@@ -99,5 +92,72 @@ describe('Utils', () => {
   it('checks if a task status is a terminated status', () => {
     expect(isTerminatedStatus('completed')).toBe(true);
     expect(isTerminatedStatus('executing')).toBe(false);
+  });
+});
+
+import { wrapPromiseWithAbort } from '@src/utils';
+import { InterruptInvokeError } from '@src/error';
+
+describe('wrapPromiseWithAbort', () => {
+  it('resolves the promise successfully when not aborted', async () => {
+    const promise = new Promise((resolve) => setTimeout(() => resolve('success'), 100));
+    const abortController = new AbortController();
+    const wrappedPromise = wrapPromiseWithAbort(promise, abortController.signal);
+
+    await expect(wrappedPromise).resolves.toBe('success');
+  });
+
+  it('rejects the promise immediately if the signal is already aborted', async () => {
+    const promise = new Promise((resolve) => setTimeout(() => resolve('success'), 100));
+    const abortController = new AbortController();
+    abortController.abort();
+    const wrappedPromise = wrapPromiseWithAbort(promise, abortController.signal);
+
+    await expect(wrappedPromise).rejects.toThrow(InterruptInvokeError);
+  });
+
+  it('rejects the promise when the abort signal is triggered during execution', async () => {
+    const promise = new Promise((resolve) => setTimeout(() => resolve('success'), 100));
+    const abortController = new AbortController();
+    const wrappedPromise = wrapPromiseWithAbort(promise, abortController.signal);
+
+    setTimeout(() => abortController.abort(), 50);
+
+    await expect(wrappedPromise).rejects.toThrow(InterruptInvokeError);
+  });
+});
+
+describe('delayMs', () => {
+  it('delays execution for specified milliseconds', async () => {
+    const start = Date.now();
+    await delayMs(100);
+    const end = Date.now();
+    expect(end - start).toBeGreaterThanOrEqual(100);
+  });
+
+  it('resolves the delay successfully when not aborted', async () => {
+    const abortController = new AbortController();
+    const start = Date.now();
+    await delayMs(100, abortController.signal);
+    const end = Date.now();
+    expect(end - start).toBeGreaterThanOrEqual(100);
+  });
+
+  it('resolves the delay immediately if the signal is already aborted', async () => {
+    const abortController = new AbortController();
+    abortController.abort();
+    const start = Date.now();
+    await delayMs(100, abortController.signal);
+    const end = Date.now();
+    expect(end - start).toBeLessThan(10);
+  });
+
+  it('resolves the delay when the abort signal is triggered during execution', async () => {
+    const abortController = new AbortController();
+    const start = Date.now();
+    setTimeout(() => abortController.abort(), 50);
+    await delayMs(100, abortController.signal);
+    const end = Date.now();
+    expect(end - start).toBeLessThan(100);
   });
 });

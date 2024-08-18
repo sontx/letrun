@@ -6,9 +6,15 @@ const jest = import.meta.jest;
 describe('HttpTaskHandler', () => {
   let handler: HttpTaskHandler;
   let mockTask: jest.Mocked<Task>;
+  let abortController: AbortController;
+  let mockSession: jest.Mocked<any>;
 
   beforeEach(() => {
     handler = new HttpTaskHandler();
+    abortController = new AbortController();
+    mockSession = {
+      signal: abortController.signal,
+    };
     mockTask = {
       parameters: {},
     } as unknown as jest.Mocked<Task>;
@@ -50,7 +56,12 @@ describe('HttpTaskHandler', () => {
 
   it('handles request timeout', async () => {
     mockTask.parameters = { url: 'https://api.example.com/data', method: 'GET', timeoutMs: 1 };
-    const input: TaskHandlerInput = { task: mockTask, context: {}, session: {}, workflow: {} as any } as any;
+    const input: TaskHandlerInput = {
+      task: mockTask,
+      context: {},
+      session: mockSession,
+      workflow: {} as any,
+    } as any;
     global.fetch = jest
       .fn()
       .mockImplementation(() => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2)));
@@ -76,5 +87,27 @@ describe('HttpTaskHandler', () => {
       status: 500,
     });
     await expect(handler.handle(input)).rejects.toThrow('HTTP request failed with status 500');
+  });
+
+  it('aborts while requesting', async () => {
+    const abortController = new AbortController();
+    mockTask.parameters = { url: 'https://api.example.com/data', method: 'GET' };
+    const input: TaskHandlerInput = {
+      task: mockTask,
+      context: {},
+      session: { signal: abortController.signal },
+      workflow: {} as any,
+    } as any;
+
+    global.fetch = jest.fn().mockImplementation(
+      () =>
+        new Promise((_, reject) => {
+          abortController.abort();
+          reject(new Error('The operation was aborted.'));
+        }),
+    );
+
+    await expect(handler.handle(input)).rejects.toThrow('The operation was aborted.');
+    expect(global.fetch).toHaveBeenCalled();
   });
 });

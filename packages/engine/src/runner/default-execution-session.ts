@@ -30,6 +30,7 @@ export class DefaultExecutionSession implements ExecutionSession {
     public readonly tasksFactory: TasksFactory,
     public readonly runner: Runner,
     public readonly systemTasks: Record<string, TaskHandler>,
+    public readonly signal: AbortSignal,
     private readonly context: AppContext,
     private readonly idGenerator: IdGenerator,
   ) {
