@@ -11,7 +11,7 @@ A task handler should follow certain basic principles:
 
 ## System Tasks
 
-System tasks are built-in tasks that come with the CLI tool. They are defined in the [system-task](../../packages/cli/src/system-task).
+System tasks are built-in tasks that come with the CLI tool. They are defined in the [system-task](../../packages/engine/src/system-task).
 
 To show all available system tasks, you can use the `letrun task list -s` command.
 

@@ -1,7 +1,6 @@
 import { AbstractCommand, AbstractOptions } from './abstract.command';
 import { Command } from 'commander';
 import fs from 'fs';
-import { DefaultRunner } from '../runner';
 import {
   INPUT_PARAMETER_PLUGIN,
   InputParameter,
@@ -11,6 +10,7 @@ import {
   WorkflowDef,
 } from '@letrun/core';
 import { LogHelper } from '@src/command/libs/log-helper';
+import { DefaultRunner } from '@letrun/engine';
 
 export class RunCommand extends AbstractCommand {
   load(program: Command): void {

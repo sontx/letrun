@@ -1,9 +1,9 @@
 import { RunCommand } from '@src/command/run.command';
-import { DefaultRunner } from '@src/runner';
 import { INPUT_PARAMETER_PLUGIN, Persistence, PERSISTENCE_PLUGIN } from '@letrun/core';
 import { Command } from 'commander';
 import fs from 'fs';
 import { LogHelper } from '@src/command/libs/log-helper';
+import { DefaultRunner } from '@letrun/engine';
 
 const jest = import.meta.jest;
 

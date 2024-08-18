@@ -10,7 +10,8 @@
   "scripts": {
     "test": "npm run test -ws",
     "coverage": "npm run coverage -ws",
-    "build": "npm run build -ws && npm run clean && npm run copy",
+    "build": "npm run build:all && npm run clean && npm run copy",
+    "build:all": "npm run build -w @letrun/core && npm run build -w @letrun/plugin npm run build -w @letrun/task && npm run build -w @letrun/engine && npm run build -w @letrun/cli",
     "clean": "rm -rf ./dist/**",
     "copy": "npm run copy:cli && npm run copy:task",
     "copy:cli": "copyfiles -f ./packages/cli/dist/**/*.js ./dist",

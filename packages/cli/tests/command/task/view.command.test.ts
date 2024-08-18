@@ -1,8 +1,8 @@
 import { ViewCommand } from '@src/command/task/view.command';
 import { Command } from 'commander';
 import { EMOJIS } from '@src/ui';
-import { SystemTaskManager } from '@src/system-task';
 import { TaskHelper } from '@src/command/libs';
+import { SystemTaskManager } from '@letrun/engine';
 
 const jest = import.meta.jest;
 

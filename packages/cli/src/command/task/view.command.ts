@@ -2,9 +2,9 @@ import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import treeify, { TreeObject } from 'treeify';
 import { EMOJIS } from '@src/ui';
-import { SystemTaskManager } from '@src/system-task';
 import { TaskHandler } from '@letrun/core';
 import { TaskHelper } from '@src/command/libs';
+import { SystemTaskManager } from '@letrun/engine';
 
 export class ViewCommand extends AbstractCommand {
   load(program: Command): void {
