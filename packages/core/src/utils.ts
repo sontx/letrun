@@ -41,6 +41,11 @@ export function getEntryPointDir(): string {
  */
 export function delayMs(ms: number, abortSignal?: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
+    if (abortSignal?.aborted) {
+      resolve();
+      return;
+    }
+
     let id: NodeJS.Timeout;
     const cancel = () => {
       clearTimeout(id);

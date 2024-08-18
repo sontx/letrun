@@ -11,11 +11,16 @@ import {
   WorkflowRunner,
   WorkflowRunnerInput,
 } from '@letrun/core';
-import { Subject } from "rxjs";
+import { Subject } from 'rxjs';
 
 const jest = import.meta.jest;
 
 describe('DefaultWorkflowRunner', () => {
+  let abortController: AbortController;
+  beforeEach(() => {
+    abortController = new AbortController();
+  });
+
   it('loads context and logger correctly', async () => {
     const context = {
       getLogger: jest.fn(() => ({
@@ -263,6 +268,7 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as AppContext;
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
+      signal: abortController.signal,
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -314,6 +320,7 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as AppContext;
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
+      signal: abortController.signal,
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -360,6 +367,7 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as AppContext;
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
+      signal: abortController.signal,
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -425,6 +433,7 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as AppContext;
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
+      signal: abortController.signal,
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -478,6 +487,7 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as AppContext;
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
+      signal: abortController.signal,
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -525,6 +535,7 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as AppContext;
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
+      signal: abortController.signal,
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -582,6 +593,7 @@ describe('DefaultWorkflowRunner', () => {
     } as unknown as AppContext;
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
+      signal: abortController.signal,
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
