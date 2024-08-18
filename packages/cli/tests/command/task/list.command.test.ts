@@ -1,6 +1,6 @@
 import { ListCommand } from '@src/command/task/list.command';
 import { TaskHelper } from '@src/command/libs/task-helper';
-import { SystemTaskManager } from '@src/system-task';
+import { SystemTaskManager } from '@letrun/engine';
 
 const jest = import.meta.jest;
 

@@ -21,7 +21,7 @@ jobs:
         run: npm ci
 
       - name: Run build
-        run: npm run build -w @letrun/core && npm run build -w @letrun/plugin npm run build -w @letrun/task && npm run build -w @letrun/cli
+        run: npm run build -w @letrun/core && npm run build -w @letrun/plugin npm run build -w @letrun/task && npm run build -w @letrun/engine && npm run build -w @letrun/cli
 
       - name: Run tests
         run: npm run test

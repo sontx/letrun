@@ -1,4 +1,4 @@
-import { getOptionValue } from '@src/command/libs';
+import { getOptionValue } from '@src/libs/bootstrap-utils';
 
 describe('getOptionValue', () => {
   it('returns the value of the short option if specified', () => {

@@ -1,3 +1,11 @@
+import { AppContext } from '@letrun/core';
+import { DEFAULT_LOGGER } from '@src/libs/log-helper';
+
+export async function setGlobalLogLevel(context: AppContext, logLevel: string) {
+  DEFAULT_LOGGER.setLevel(logLevel);
+  await context.getConfigProvider().set('logger.level', logLevel);
+}
+
 // a helper function to get the value of an option from the command line arguments
 // use don't use the commander here because this happens before the commander is loaded
 export function getOptionValue(shortOption: string, longOption: string) {
