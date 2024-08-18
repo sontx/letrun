@@ -17,7 +17,7 @@
     "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest -- --coverage",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest",
     "jest": "jest",
-    "prepublishOnly": "npm run build && npm run test"
+    "prepublishOnly": "npm run build && npm run test && copyfiles -f ../../README.md ./dist"
   },
   "repository": {
     "type": "git",
