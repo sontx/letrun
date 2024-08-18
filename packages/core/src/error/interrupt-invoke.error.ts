@@ -1,5 +1,5 @@
 /**
- * Error thrown when an interrupt is invoked while invoking a chain of plugins.
+ * Error thrown when an interrupt is invoked while invoking a chain of plugins or tasks.
  */
 export class InterruptInvokeError extends Error {
   /** The name of the error. */

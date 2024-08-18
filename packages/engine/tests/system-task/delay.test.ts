@@ -58,4 +58,24 @@ describe('DelayTaskHandler', () => {
 
     delayMsSpy.mockRestore();
   });
+
+  it('aborts while delaying', async () => {
+    const abortController = new AbortController();
+    const taskInput: TaskHandlerInput = {
+      task: { parameters: { time: '5s' } },
+      context: mockContext,
+      session: { signal: abortController.signal },
+    } as any;
+
+    // cancel after 1s
+    global.setTimeout(() => {
+      abortController.abort();
+    }, 1000);
+
+    const startTime = Date.now();
+    await delayTaskHandler.handle(taskInput);
+    const endTime = Date.now();
+
+    expect(endTime - startTime).toBeLessThan(2000);
+  });
 });

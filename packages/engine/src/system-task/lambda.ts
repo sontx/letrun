@@ -1,5 +1,12 @@
 import Joi from 'joi';
-import { SCRIPT_ENGINE_PLUGIN, ScriptEngine, TaskHandler, TaskHandlerInput, validateParameters } from '@letrun/core';
+import {
+  SCRIPT_ENGINE_PLUGIN,
+  ScriptEngine,
+  TaskHandler,
+  TaskHandlerInput,
+  validateParameters,
+  wrapPromiseWithAbort,
+} from '@letrun/core';
 import fs from 'fs';
 import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
@@ -25,7 +32,7 @@ export class LambdaTaskHandler implements TaskHandler {
   parameters = Schema.describe();
 
   async handle(taskInput: TaskHandlerInput) {
-    const { task, context } = taskInput;
+    const { task, context, session } = taskInput;
     const { expression, file, input, language } = validateParameters(task.parameters, Schema);
 
     let effectiveExpression = expression!;
@@ -39,10 +46,13 @@ export class LambdaTaskHandler implements TaskHandler {
     const scriptEngines = await context.getPluginManager().get<ScriptEngine>(SCRIPT_ENGINE_PLUGIN);
     const engineWrapper = new ScriptEngineWrapper(scriptEngines);
 
-    return await engineWrapper.run(effectiveExpression, {
-      input,
-      file,
-      language,
-    });
+    return await wrapPromiseWithAbort(
+      engineWrapper.run(effectiveExpression, {
+        input,
+        file,
+        language,
+      }),
+      session.signal,
+    );
   }
 }

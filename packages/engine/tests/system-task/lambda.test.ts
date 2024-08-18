@@ -14,7 +14,7 @@ describe('LambdaTaskHandler', () => {
     javascriptEngineMock = {
       name: 'javascript',
       run: jest.fn().mockResolvedValue('result'),
-      support: jest.fn(ex => ex === 'js'),
+      support: jest.fn((ex) => ex === 'js'),
     };
     context = {
       getPluginManager: jest.fn().mockReturnValue({
@@ -74,7 +74,9 @@ describe('LambdaTaskHandler', () => {
       task: { parameters: {} },
       context,
     } as any;
-    await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow("Invalid parameters: \"value\" must contain at least one of [expression, file]");
+    await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow(
+      'Invalid parameters: "value" must contain at least one of [expression, file]',
+    );
   });
 
   it('throws error when no script engine is found for specified language', async () => {
@@ -83,7 +85,9 @@ describe('LambdaTaskHandler', () => {
       task: { parameters: { expression: '2 + 2', language: 'nonexistent' } },
       context,
     } as any;
-    await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow('No script engine found for language: nonexistent');
+    await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow(
+      'No script engine found for language: nonexistent',
+    );
   });
 
   it('throws error when no script engine is found for specified file extension', async () => {
@@ -94,6 +98,37 @@ describe('LambdaTaskHandler', () => {
       task: { parameters: { file: 'path/to/file.nonexistent' } },
       context,
     } as any;
-    await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow('No script engine found for file extension: nonexistent');
+    await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow(
+      'No script engine found for file extension: nonexistent',
+    );
+  });
+
+  it('aborts while running lambda script', async () => {
+    const abortController = new AbortController();
+    const taskInput: TaskHandlerInput = {
+      task: { parameters: { expression: 'while(true){}' } },
+      context,
+      session: { signal: abortController.signal },
+    } as any;
+
+    let runTimeout: NodeJS.Timeout | undefined;
+    javascriptEngineMock.run = jest.fn().mockImplementation(() => {
+      return new Promise((resolve) => {
+        runTimeout = global.setTimeout(() => {
+          resolve('result');
+        }, 2000);
+      });
+    });
+
+    global.setTimeout(() => {
+      abortController.abort();
+    }, 1000);
+
+    const startTime = Date.now();
+    await expect(lambdaTaskHandler.handle(taskInput)).rejects.toThrow('Aborted');
+    expect(Date.now() - startTime).toBeLessThan(2000);
+    expect(javascriptEngineMock.run).toHaveBeenCalled();
+
+    clearTimeout(runTimeout);
   });
 });

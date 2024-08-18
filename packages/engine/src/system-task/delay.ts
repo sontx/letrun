@@ -19,11 +19,11 @@ export class DelayTaskHandler implements TaskHandler {
   description: string = 'Delays the execution of the workflow for a specified amount of time';
   parameters: Joi.Description = Schema.describe();
 
-  async handle({ task, context }: TaskHandlerInput): Promise<TaskHandlerOutput> {
+  async handle({ task, context, session }: TaskHandlerInput): Promise<TaskHandlerOutput> {
     const { time, data } = validateParameters(task.parameters, Schema);
     const delayMillis = typeof time === 'string' ? ms(time) : time;
     context.getLogger().verbose(`Delaying execution for ${delayMillis} milliseconds`);
-    await delayMs(delayMillis);
+    await delayMs(delayMillis, session.signal);
     return data;
   }
 }

@@ -16,4 +16,4 @@ export interface Workflow extends Container {
 }
 
 /** Type representing the possible statuses of a workflow. */
-export type WorkflowStatus = 'open' | 'executing' | 'error' | 'completed';
+export type WorkflowStatus = 'open' | 'executing' | 'error' | 'completed' | 'cancelled';

@@ -1,4 +1,4 @@
-import { RunnerOptions, TaskHandler, TaskHandlerInput, validateParameters } from '@letrun/core';
+import { RunnerOptions, TaskHandler, TaskHandlerInput, validateParameters, wrapPromiseWithAbort } from '@letrun/core';
 import Joi from 'joi';
 import fs from 'fs';
 
@@ -63,7 +63,7 @@ export class RunWorkflowTaskHandler implements TaskHandler {
     }
 
     context.getLogger().info(`Running workflow: ${workflowToRun?.name}`);
-    const ranWorkflow = await session.runner.run(workflowToRun, input);
+    const ranWorkflow = await wrapPromiseWithAbort(session.runner.run(workflowToRun, input), session.signal);
     if (ranWorkflow) {
       if (ranWorkflow.status === 'completed') {
         context.getLogger().info(`Workflow ${ranWorkflow.name} completed successfully`);

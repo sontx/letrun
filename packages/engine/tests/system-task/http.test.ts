@@ -77,4 +77,18 @@ describe('HttpTaskHandler', () => {
     });
     await expect(handler.handle(input)).rejects.toThrow('HTTP request failed with status 500');
   });
+
+  it('aborts while requesting', async () => {
+    const abortController = new AbortController();
+    mockTask.parameters = { url: 'https://api.example.com/data', method: 'GET' };
+    const input: TaskHandlerInput = { task: mockTask, context: {}, session: { signal: abortController.signal }, workflow: {} as any } as any;
+
+    global.fetch = jest.fn().mockImplementation(() => new Promise((_, reject) => {
+      abortController.abort();
+      reject(new Error('The operation was aborted.'));
+    }));
+
+    await expect(handler.handle(input)).rejects.toThrow('The operation was aborted.');
+    expect(global.fetch).toHaveBeenCalled();
+  });
 });
