@@ -7,6 +7,9 @@ A Workflow Definition should have the following structure:
 - `name`: The name of the workflow. This is required.
 - `tasks`: An array of tasks to be executed (will be executed orderly) or an object of tasks (will be executed concurrently). This is required.
 - `input`: An object that provides input for the workflow. Other tasks can access this input using the `${input}` expression. You can pass the input when executing the workflow. This is optional.
+- `retryCount`: The number of times to retry the task if it fails (defaults to 3). This is optional.
+- `retryStrategy`: The strategy to use for retrying the task (defaults to 'fixed'). This is optional.
+- `retryDelaySeconds`: The delay between retries in seconds (defaults to 3 seconds). This is optional.
 
 This is an example of a workflow file:
 
