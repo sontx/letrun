@@ -21,4 +21,6 @@ export interface WorkflowRunnerInput {
 /**
  * Interface representing a Workflow Runner plugin.
  */
-export interface WorkflowRunner extends ExecutablePlugin<WorkflowRunnerInput> {}
+export interface WorkflowRunner extends ExecutablePlugin<WorkflowRunnerInput> {
+  readonly type: typeof WORKFLOW_RUNNER_PLUGIN;
+}

@@ -5,6 +5,7 @@ import {
   IllegalStateError,
   InterruptInvokeError,
   RerunError,
+  RETRY_PLUGIN,
   Task,
   TASK_INVOKER_PLUGIN,
   Workflow,
@@ -17,7 +18,17 @@ const jest = import.meta.jest;
 
 describe('DefaultWorkflowRunner', () => {
   let abortController: AbortController;
+  let pluginManagerGetOneMock: jest.Mock;
+
   beforeEach(() => {
+    pluginManagerGetOneMock = jest.fn((type) => {
+      if (type === RETRY_PLUGIN) {
+        return {
+          retry: jest.fn((input) => input.doJob()),
+        };
+      }
+      throw new Error(`Plugin type ${type} not found`);
+    });
     abortController = new AbortController();
   });
 
@@ -70,6 +81,7 @@ describe('DefaultWorkflowRunner', () => {
     const context = {
       getLogger: jest.fn().mockReturnValue({ verbose: jest.fn() }),
       getPluginManager: jest.fn().mockReturnValue({
+        getOne: pluginManagerGetOneMock,
         callPluginMethod: jest.fn().mockResolvedValue({}),
       }),
     } as unknown as AppContext;
@@ -88,6 +100,7 @@ describe('DefaultWorkflowRunner', () => {
     const error = new Error('Error executing task');
     jest.spyOn(runner, 'getContext').mockReturnValue({
       getPluginManager: jest.fn().mockReturnValue({
+        getOne: pluginManagerGetOneMock,
         callPluginMethod: jest.fn().mockImplementation((plugin, method) => {
           if (plugin === TASK_INVOKER_PLUGIN && method === 'invoke') {
             throw error;
@@ -115,10 +128,11 @@ describe('DefaultWorkflowRunner', () => {
   });
 
   it('keeps task status as open if RerunError is thrown', async () => {
-    const task = { status: 'waiting', timeStarted: Date.now(), taskDef: {} } as Task;
+    const task = { status: 'waiting', timeStarted: Date.now() } as Task;
     const context = {
       getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
       getPluginManager: jest.fn().mockReturnValue({
+        getOne: pluginManagerGetOneMock,
         callPluginMethod: jest.fn().mockImplementation((plugin, method) => {
           if (plugin === TASK_INVOKER_PLUGIN && method === 'invoke') {
             throw new RerunError();
@@ -150,6 +164,7 @@ describe('DefaultWorkflowRunner', () => {
     const context = {
       getLogger: jest.fn().mockReturnValue({ verbose: jest.fn(), info: jest.fn(), error: jest.fn() }),
       getPluginManager: jest.fn().mockReturnValue({
+        getOne: pluginManagerGetOneMock,
         callPluginMethod: jest.fn().mockImplementation((plugin, method) => {
           if (plugin === TASK_INVOKER_PLUGIN && method === 'invoke') {
             throw error;
@@ -158,7 +173,7 @@ describe('DefaultWorkflowRunner', () => {
       }),
     } as unknown as AppContext;
     const session = {
-      getParentTask: jest.fn().mockReturnValue(catchTask),
+      getParentTask: jest.fn(checkTask => checkTask !== catchTask ? catchTask : undefined),
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -473,6 +488,7 @@ describe('DefaultWorkflowRunner', () => {
         verbose: jest.fn(),
       })),
       getPluginManager: jest.fn().mockReturnValue({
+        getOne: pluginManagerGetOneMock,
         callPluginMethod: jest.fn().mockImplementation((plugin, method, input) => {
           if (plugin === TASK_INVOKER_PLUGIN && method === 'invoke' && input.task.runtimeName === 'task1') {
             throw new Error('Error executing task');
@@ -488,6 +504,7 @@ describe('DefaultWorkflowRunner', () => {
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
       signal: abortController.signal,
+      getParentTask: jest.fn().mockReturnValue(undefined),
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);
@@ -577,6 +594,7 @@ describe('DefaultWorkflowRunner', () => {
         verbose: jest.fn(),
       })),
       getPluginManager: jest.fn().mockReturnValue({
+        getOne: pluginManagerGetOneMock,
         callPluginMethod: jest.fn().mockImplementation((_, __, input) => {
           if (input.task.runtimeName === 'nestedTask1' && !fireRerunError) {
             fireRerunError = true;
@@ -594,6 +612,7 @@ describe('DefaultWorkflowRunner', () => {
     const session = {
       resolveParameter: jest.fn().mockResolvedValue({}),
       signal: abortController.signal,
+      getParentTask: jest.fn().mockReturnValue(undefined),
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);

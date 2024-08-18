@@ -244,3 +244,11 @@ export function wrapPromiseWithAbort<T>(promise: Promise<T>, signal: AbortSignal
     );
   });
 }
+
+export function isValueDefined<T>(value: T | undefined | null): value is T {
+  return value !== undefined && value !== null;
+}
+
+export function isDefined(value: any): boolean {
+  return value !== undefined && value !== null;
+}

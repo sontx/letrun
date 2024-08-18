@@ -2,16 +2,22 @@ import {
   AbstractPlugin,
   BUILTIN_PLUGIN_PRIORITY,
   childHasStatus,
+  ConfigNotFoundError,
   countTasks,
   ExecutablePlugin,
   ExecutionSession,
   getTasksByStatus,
   IllegalStateError,
   InterruptInvokeError,
+  InvalidParameterError,
+  isDefined,
   isTerminatedStatus,
   POST_RUN_TASK_PLUGIN,
   PRE_RUN_TASK_PLUGIN,
   RerunError,
+  RETRY_PLUGIN,
+  RetryConfig,
+  RetryPlugin,
   scanAllTasks,
   Task,
   TASK_INVOKER_PLUGIN,
@@ -23,6 +29,14 @@ import {
   WorkflowRunnerInput,
   WorkflowTasks,
 } from '@letrun/core';
+
+const SYSTEM_ERRORS = [
+  InterruptInvokeError.name,
+  RerunError.name,
+  InvalidParameterError.name,
+  IllegalStateError.name,
+  ConfigNotFoundError.name,
+];
 
 export default class DefaultWorkflowRunner extends AbstractPlugin implements WorkflowRunner {
   readonly name = 'default';
@@ -258,9 +272,15 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
     let error: any;
 
     try {
-      output = await this.getContext()
-        .getPluginManager()
-        .callPluginMethod<TaskInvoker>(TASK_INVOKER_PLUGIN, 'invoke', input);
+      const pluginManager = this.getContext().getPluginManager();
+      const retryPlugin = await pluginManager.getOne<RetryPlugin>(RETRY_PLUGIN);
+      output = await retryPlugin.retry({
+        retryable: task,
+        config: this.lookupRetryConfig(task, input.session),
+        shouldRetryFn: (err) => !SYSTEM_ERRORS.includes(err.name),
+        doJob: () => pluginManager.callPluginMethod<TaskInvoker>(TASK_INVOKER_PLUGIN, 'invoke', input),
+        signal: input.session.signal,
+      });
       this.context?.getLogger()?.info(`Task ${taskName} is completed successfully.`);
     } catch (e: any) {
       if (e.name === RerunError.name) {
@@ -327,6 +347,40 @@ export default class DefaultWorkflowRunner extends AbstractPlugin implements Wor
     }
 
     return input.task.output;
+  }
+
+  private lookupRetryConfig(task: Task, session: ExecutionSession): RetryConfig {
+    const config: RetryConfig = {};
+
+    let currentTask: Task | undefined = task;
+
+    while (currentTask) {
+      const taskDef = currentTask.taskDef;
+      if (!taskDef) {
+        break;
+      }
+
+      // Check if the current task has any of the retry config properties
+      if (isDefined(taskDef.retryCount) && !isDefined(config.retryCount)) {
+        config.retryCount = taskDef.retryCount;
+      }
+      if (isDefined(taskDef.retryStrategy) && !isDefined(config.retryStrategy)) {
+        config.retryStrategy = taskDef.retryStrategy;
+      }
+      if (isDefined(taskDef.retryDelaySeconds) && !isDefined(config.retryDelaySeconds)) {
+        config.retryDelaySeconds = taskDef.retryDelaySeconds;
+      }
+
+      // If all properties are found, break the loop
+      if (isDefined(config.retryCount) && isDefined(config.retryStrategy) && isDefined(config.retryDelaySeconds)) {
+        break;
+      }
+
+      // Get the parent task and continue the search
+      currentTask = session.getParentTask(currentTask);
+    }
+
+    return config;
   }
 
   private completeTask(task: Task) {

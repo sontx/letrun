@@ -11,5 +11,7 @@ export const INPUT_PARAMETER_PLUGIN = 'input-parameter';
  * Extends the Plugin interface.
  */
 export interface InputParameter extends Plugin {
+  readonly type: typeof INPUT_PARAMETER_PLUGIN;
+
   read<T = any>(rawInput: string): Promise<T | null>;
 }

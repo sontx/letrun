@@ -1,9 +1,10 @@
 import { WorkflowTaskDefs } from './workflow-task-defs';
+import { RetryConfig } from '../retry-config';
 
 /**
  * Interface representing a container definition.
  */
-export interface ContainerDef {
+export interface ContainerDef extends RetryConfig {
   /** Name of the container definition, useful for distinguishing and referencing for interpolating values
    * from either the {@link ContainerDef.input} or {@link TaskDef.parameters}.
    * */

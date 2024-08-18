@@ -10,6 +10,8 @@ export type PreHookFn = (level: string, message: string, ...args: any[]) => bool
  * Interface representing a Logger plugin.
  */
 export interface LoggerPlugin extends Plugin {
+  readonly type: typeof LOGGER_PLUGIN;
+
   getLogger(): Logger;
 
   /**

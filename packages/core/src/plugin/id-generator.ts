@@ -7,6 +7,8 @@ export const ID_GENERATOR_PLUGIN = 'id-generator';
  * Extends the Plugin interface.
  */
 export interface IdGenerator extends Plugin {
+  readonly type: typeof ID_GENERATOR_PLUGIN;
+
   /**
    * Generates a unique ID.
    * @param parentId - Optional parent ID to prefix the generated ID.
