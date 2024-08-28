@@ -1,7 +1,8 @@
 import { ContainerDef } from '@src/model';
-import { ModuleLocationResolver } from '@src/plugin';
-import * as fs from 'node:fs';
-import { defaultModuleResolver } from '@src/libs/module-resolver';
+import { LocationResolverFn } from '@src/plugin';
+import fs from 'node:fs';
+import { defaultModuleResolver, ModuleResolverFn } from '@src/libs/module-resolver';
+import { resolveLocalModuleLocation } from '@src/libs/resolve-local-module-location';
 import path from 'node:path';
 
 export interface WorkflowDependency {
@@ -15,8 +16,8 @@ export interface WorkflowDependency {
 
 export class WorkflowDepsScanner {
   constructor(
-    private resolver: ModuleLocationResolver,
-    private readonly moduleResolver = defaultModuleResolver.resolve,
+    private locationResolver: LocationResolverFn = resolveLocalModuleLocation,
+    private moduleResolver: ModuleResolverFn = defaultModuleResolver.resolve,
   ) {}
 
   async scan(container: ContainerDef): Promise<WorkflowDependency[]> {
@@ -30,7 +31,7 @@ export class WorkflowDepsScanner {
         }));
 
     for (const task of tasks) {
-      const location = await this.resolver.resolveLocation(task.handler);
+      const location = await this.locationResolver(task.handler);
       let installed = false;
       let isDirectory = false;
 
@@ -44,7 +45,7 @@ export class WorkflowDepsScanner {
         }
       }
 
-      const version = await this.getVersion(location, isDirectory);
+      const version = location && installed ? await this.getVersion(location, isDirectory) : null;
 
       dependencies.push({
         name: task.name,

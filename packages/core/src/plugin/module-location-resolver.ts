@@ -6,6 +6,8 @@ import { Plugin } from '@src/model';
  */
 export const MODULE_LOCATION_RESOLVER_PLUGIN: string = 'module-location-resolver';
 
+export type LocationResolverFn = (module: string, modulesDir?: string) => Promise<string | null>;
+
 /**
  * Interface for a module location resolver plugin.
  * Extends the Plugin interface.

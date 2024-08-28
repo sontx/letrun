@@ -47,6 +47,18 @@ describe('resolveLocation', () => {
     expect(await resolver.resolveLocation('module', customTasksDir)).toBe(customTasksDirPathWithJs);
   });
 
+  it('resolves a path from the node_modules directory', async () => {
+    const nodeModulesPath = path.resolve(getEntryPointDir(), 'node_modules', 'module.js');
+    jest
+      .spyOn(fs, 'existsSync')
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false);
+    expect(await resolver.resolveLocation('module.js', customTasksDir)).toBe(nodeModulesPath);
+  });
+
   it('throws an error when module is not found and throwsIfNotFound is true', async () => {
     jest.spyOn(fs, 'existsSync').mockReturnValue(false);
     await expect(resolver.resolveLocation('nonexistentModule', customTasksDir, true)).rejects.toThrow(
@@ -57,5 +69,23 @@ describe('resolveLocation', () => {
   it('returns null when module is not found and throwsIfNotFound is false', async () => {
     jest.spyOn(fs, 'existsSync').mockReturnValue(false);
     expect(await resolver.resolveLocation('nonexistentModule', customTasksDir, false)).toBeNull();
+  });
+
+  it('caches the resolved location', async () => {
+    const moduleName = 'module.js';
+
+    jest.spyOn(fs, 'existsSync').mockReturnValueOnce(true);
+    const resolveAndCacheSpy = jest
+      .spyOn(resolver as any, 'resolveAndCache');
+
+    // First call to resolveLocation
+    const location1 = await resolver.resolveLocation(moduleName, customTasksDir);
+
+    // Second call to resolveLocation should use the cached location
+    const location2 = await resolver.resolveLocation(moduleName, customTasksDir);
+    expect(location2).toBe(location1);
+
+    // Ensure resolveAndCache is called only once
+    expect(resolveAndCacheSpy).toHaveBeenCalledTimes(1);
   });
 });

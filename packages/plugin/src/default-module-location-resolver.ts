@@ -1,17 +1,17 @@
 import {
   AbstractPlugin,
   BUILTIN_PLUGIN_PRIORITY,
-  getEntryPointDir,
   InvalidParameterError,
   MODULE_LOCATION_RESOLVER_PLUGIN,
+  resolveLocalModuleLocation,
 } from '@letrun/core';
-import path from 'node:path';
-import fs from 'fs';
 
 export default class DefaultModuleLocationResolver extends AbstractPlugin {
   readonly name = 'default';
   readonly type = MODULE_LOCATION_RESOLVER_PLUGIN;
   readonly priority = BUILTIN_PLUGIN_PRIORITY;
+
+  private readonly cachedLocations = new Map<string, string>();
 
   /**
    * We will look up in this order:
@@ -19,45 +19,34 @@ export default class DefaultModuleLocationResolver extends AbstractPlugin {
    * 2. resolve it from the current directory
    * 3. resolve it from the runner directory
    * 4. lookup in the custom tasks directory (default is tasks directory)
-   * 5. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
+   * 5. lookup in the node_modules directory
+   * 6. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
    */
   async resolveLocation(module: string, modulesDir?: string, throwsIfNotFound?: boolean) {
-    if (path.isAbsolute(module)) {
-      return module;
+    if (this.cachedLocations.has(module)) {
+      return this.cachedLocations.get(module)!;
     }
 
-    const pathResolvedFromCurrentDir = path.resolve(process.cwd(), module);
-    if (fs.existsSync(pathResolvedFromCurrentDir)) {
-      return pathResolvedFromCurrentDir;
-    }
+    return await this.resolveAndCache(module, modulesDir, throwsIfNotFound);
+  }
 
-    const pathResolvedFromRunnerDir = path.resolve(getEntryPointDir(), module);
-    if (fs.existsSync(pathResolvedFromRunnerDir)) {
-      return pathResolvedFromRunnerDir;
-    }
+  private async resolveAndCache(module: string, modulesDir: string | undefined, throwsIfNotFound: boolean | undefined) {
+    const location = await resolveLocalModuleLocation(module, modulesDir);
 
-    if (modulesDir) {
-      const dirPathResolvedFromCustomTasksDir = path.resolve(modulesDir, module);
-      if (fs.existsSync(dirPathResolvedFromCustomTasksDir)) {
-        return dirPathResolvedFromCustomTasksDir;
-      }
-
-      const locationWithJsExtension = module.endsWith('.js') ? module : `${module}.js`;
-      const pathResolvedFromCustomTasksDir = path.resolve(modulesDir, locationWithJsExtension);
-      if (fs.existsSync(pathResolvedFromCustomTasksDir)) {
-        return pathResolvedFromCustomTasksDir;
-      }
-    }
-
-    if (throwsIfNotFound) {
+    if (!location && throwsIfNotFound) {
       throw new InvalidParameterError(`Cannot find module: ${module}, we looked up in this order:
 1. If this is an absolute path, we will use it as is
 2. Resolve it from the current directory
 3. Resolve it from the runner directory
 4. Lookup in the custom tasks directory (default is tasks directory)
-5. Append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)`);
+5. Lookup in the node_modules directory
+6. Append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)`);
     }
 
-    return null;
+    if (location) {
+      this.cachedLocations.set(module, location);
+    }
+
+    return location;
   }
 }

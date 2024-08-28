@@ -2,27 +2,25 @@ import path from 'node:path';
 import { getEntryPointDir, isRelativePath } from '../utils';
 import * as fs from 'node:fs';
 
+export type ModuleResolverFn = <T = any>(modulePath: string) => Promise<T>;
+
 /**
  * Class responsible for resolving exported default entry point of node module from module directory or file path.
  */
 export class ModuleResolver {
-  constructor() {
-    this.resolve = this.resolve.bind(this);
-  }
-
   /**
    * Resolves a module or file path to its corresponding module.
    * @param {string} modulePath - The path to the module or file.
    * @returns {Promise<T>} - The resolved module.
    */
-  async resolve<T = any>(modulePath: string): Promise<T> {
+  resolve: ModuleResolverFn = async <T = any>(modulePath: string): Promise<T> => {
     const effectivePath = isRelativePath(modulePath) ? path.resolve(getEntryPointDir(), modulePath) : modulePath;
     if (await this.isFile(effectivePath)) {
       const moduleType = effectivePath.endsWith('.cjs') ? 'commonjs' : 'module';
       return await this.resolveFile(effectivePath, moduleType);
     }
     return await this.resolveModule(effectivePath);
-  }
+  };
 
   private async resolveFile<T = any>(filePath: string, type: 'commonjs' | 'module'): Promise<T> {
     const obj = await this.dynamicImport(`file://${filePath}`);
