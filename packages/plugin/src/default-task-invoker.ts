@@ -40,13 +40,14 @@ export default class DefaultTaskInvoker extends AbstractPlugin implements TaskIn
   private async runExternalHandler(task: Task, input: TaskHandlerInput) {
     const tasksDir = await input.context.getConfigProvider().get('task.dir', 'tasks');
     const customTasksDir = path.resolve(getEntryPointDir(), tasksDir);
-    const location = this.lookupJsFileLocation(task.taskDef.handler, customTasksDir);
+    const location = this.resolveModuleLocation(task.taskDef.handler, customTasksDir);
     if (!location) {
       throw new InvalidParameterError(`Cannot find task handler: ${task.taskDef.handler}, we looked up in this order:
 1. If this is an absolute path, we will use it as is
 2. Resolve it from the current directory
 3. Resolve it from the runner directory
-4. Append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)`);
+4. Lookup in the custom tasks directory (default is tasks directory)
+5. Append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)`);
     }
 
     input.context.getLogger().verbose(`Invoking external task: ${location}`);
@@ -61,9 +62,10 @@ export default class DefaultTaskInvoker extends AbstractPlugin implements TaskIn
    * 1. if this is an absolute path, we will use it as is
    * 2. resolve it from the current directory
    * 3. resolve it from the runner directory
-   * 4. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
+   * 4. lookup in the custom tasks directory (default is tasks directory)
+   * 5. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
    */
-  private lookupJsFileLocation(location: string, customTasksDir: string): string | null {
+  private resolveModuleLocation(location: string, customTasksDir: string): string | null {
     if (path.isAbsolute(location)) {
       return location;
     }
@@ -76,6 +78,11 @@ export default class DefaultTaskInvoker extends AbstractPlugin implements TaskIn
     const pathResolvedFromRunnerDir = path.resolve(getEntryPointDir(), location);
     if (fs.existsSync(pathResolvedFromRunnerDir)) {
       return pathResolvedFromRunnerDir;
+    }
+
+    const dirPathResolvedFromCustomTasksDir = path.resolve(customTasksDir, location);
+    if (fs.existsSync(dirPathResolvedFromCustomTasksDir)) {
+      return dirPathResolvedFromCustomTasksDir;
     }
 
     const locationWithJsExtension = location.endsWith('.js') ? location : `${location}.js`;
