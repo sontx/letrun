@@ -3,6 +3,9 @@ import {
   BUILTIN_PLUGIN_PRIORITY,
   defaultModuleResolver,
   getEntryPointDir,
+  InvalidParameterError,
+  MODULE_LOCATION_RESOLVER_PLUGIN,
+  ModuleLocationResolver,
   Task,
   TASK_INVOKER_PLUGIN,
   TaskHandlerInput,
@@ -10,8 +13,6 @@ import {
   TaskInvoker,
 } from '@letrun/core';
 import path from 'node:path';
-import fs from 'fs';
-import { InvalidParameterError } from '@letrun/core/dist';
 
 export default class DefaultTaskInvoker extends AbstractPlugin implements TaskInvoker {
   readonly name = 'default';
@@ -40,14 +41,16 @@ export default class DefaultTaskInvoker extends AbstractPlugin implements TaskIn
   private async runExternalHandler(task: Task, input: TaskHandlerInput) {
     const tasksDir = await input.context.getConfigProvider().get('task.dir', 'tasks');
     const customTasksDir = path.resolve(getEntryPointDir(), tasksDir);
-    const location = this.resolveModuleLocation(task.taskDef.handler, customTasksDir);
+
+    const location = await input.context
+      .getPluginManager()
+      .callPluginMethod<
+        ModuleLocationResolver,
+        string
+      >(MODULE_LOCATION_RESOLVER_PLUGIN, 'resolveLocation', task.taskDef.handler, customTasksDir, true);
+
     if (!location) {
-      throw new InvalidParameterError(`Cannot find task handler: ${task.taskDef.handler}, we looked up in this order:
-1. If this is an absolute path, we will use it as is
-2. Resolve it from the current directory
-3. Resolve it from the runner directory
-4. Lookup in the custom tasks directory (default is tasks directory)
-5. Append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)`);
+      throw new InvalidParameterError(`Cannot find module: ${task.taskDef.handler}`);
     }
 
     input.context.getLogger().verbose(`Invoking external task: ${location}`);
@@ -55,42 +58,5 @@ export default class DefaultTaskInvoker extends AbstractPlugin implements TaskIn
     const handler = new handlerClass();
     const rawResult = handler.handle(input) as Promise<TaskHandlerOutput> | TaskHandlerOutput;
     return rawResult instanceof Promise ? await rawResult : rawResult;
-  }
-
-  /**
-   * We will look up in this order:
-   * 1. if this is an absolute path, we will use it as is
-   * 2. resolve it from the current directory
-   * 3. resolve it from the runner directory
-   * 4. lookup in the custom tasks directory (default is tasks directory)
-   * 5. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
-   */
-  private resolveModuleLocation(location: string, customTasksDir: string): string | null {
-    if (path.isAbsolute(location)) {
-      return location;
-    }
-
-    const pathResolvedFromCurrentDir = path.resolve(process.cwd(), location);
-    if (fs.existsSync(pathResolvedFromCurrentDir)) {
-      return pathResolvedFromCurrentDir;
-    }
-
-    const pathResolvedFromRunnerDir = path.resolve(getEntryPointDir(), location);
-    if (fs.existsSync(pathResolvedFromRunnerDir)) {
-      return pathResolvedFromRunnerDir;
-    }
-
-    const dirPathResolvedFromCustomTasksDir = path.resolve(customTasksDir, location);
-    if (fs.existsSync(dirPathResolvedFromCustomTasksDir)) {
-      return dirPathResolvedFromCustomTasksDir;
-    }
-
-    const locationWithJsExtension = location.endsWith('.js') ? location : `${location}.js`;
-    const pathResolvedFromCustomTasksDir = path.resolve(customTasksDir, locationWithJsExtension);
-    if (fs.existsSync(pathResolvedFromCustomTasksDir)) {
-      return pathResolvedFromCustomTasksDir;
-    }
-
-    return null;
   }
 }

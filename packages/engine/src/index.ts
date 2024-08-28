@@ -3,3 +3,4 @@ export * from './plugin';
 export * from './config';
 export * from './system-task';
 export * from './libs/bootstrap-utils';
+export * from './libs/task-helper';

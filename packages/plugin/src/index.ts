@@ -10,6 +10,7 @@ import WinstonLoggerPlugin from './winston-logger-plugin';
 import JavascriptEngine from './javascript-engine';
 import PythonEngine from './python-engine';
 import DefaultRetryPlugin from './default-retry-plugin';
+import DefaultModuleLocationResolver from './default-module-location-resolver';
 
 const DEFAULT_PLUGINS: Plugin[] = [
   new ConsoleLogger(),
@@ -23,6 +24,7 @@ const DEFAULT_PLUGINS: Plugin[] = [
   new JavascriptEngine(),
   new PythonEngine(),
   new DefaultRetryPlugin(),
+  new DefaultModuleLocationResolver(),
 ];
 
 export class DefaultPluginLoader implements PluginLoader {
