@@ -24,6 +24,8 @@ export interface TaskHandlerInput {
 export interface TaskHandler {
   /** The name of the task handler. */
   name?: string;
+  /** The version of the task handler. */
+  version?: string;
   /** Optional description of the task handler. */
   description?: string;
   /** Optional parameters for the task handler, presenting the accepted parameters. */

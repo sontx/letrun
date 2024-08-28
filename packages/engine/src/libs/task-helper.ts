@@ -3,7 +3,14 @@ import path from 'node:path';
 import * as fs from 'fs';
 
 type CustomTask = Partial<
-  TaskHandler & { path: string; fullPath: string; group?: string; isPackage?: boolean; handler?: string }
+  TaskHandler & {
+    path: string;
+    fullPath: string;
+    group?: string;
+    isPackage?: boolean;
+    handler?: string;
+    version?: string;
+  }
 >;
 
 export class TaskHelper {
@@ -59,26 +66,30 @@ export class TaskHelper {
       const declarativeHandler = isPackage ? relativePath : relativePath.replace(/\.[^/.]+$/, '');
       const group = this.extractParentDirs(relativePath).join('/');
 
-      const getTaskName = async () => {
-        if (handler?.name) {
-          return handler.name;
-        }
+      const getTaskInfo = async () => {
+        let name = handler?.name;
+        let version = handler?.version;
 
         if (isPackage) {
           const packageJsonPath = path.join(fullPath, 'package.json');
           const packageJson = await fs.promises.readFile(packageJsonPath, 'utf8').then(JSON.parse);
-          return packageJson.name;
+          name = name || packageJson.name;
+          version = version || packageJson.version || '0.0.0';
+        } else {
+          name = name || path.basename(relativePath, path.extname(relativePath));
+          version = version || '0.0.0';
         }
 
-        // file name without extension
-        return path.basename(file, path.extname(file));
+        return { name, version };
       };
-      const name = await getTaskName();
+
+      const { name, version } = await getTaskInfo();
 
       return isValidTask
         ? {
             ...handler,
             name,
+            version,
             group,
             path: relativePath,
             fullPath,
