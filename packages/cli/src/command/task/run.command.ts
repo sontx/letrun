@@ -91,7 +91,7 @@ export class RunCommand extends AbstractCommand {
       name: 'letrun',
       tasks: [
         {
-          name: task.name,
+          name: task.name!,
           parameters: input,
           handler: task.fullPath,
         },

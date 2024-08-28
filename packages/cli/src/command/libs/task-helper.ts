@@ -54,14 +54,31 @@ export class TaskHelper {
     try {
       const handlerClass = await this.moduleResolver(file);
       const handler = handlerClass ? new handlerClass() : null;
-      const isValidTask = handler?.name && handler?.handle;
+      const isValidTask = !!handler?.handle;
       const isPackage = !this.isJsFile(file);
       const declarativeHandler = isPackage ? relativePath : relativePath.replace(/\.[^/.]+$/, '');
       const group = this.extractParentDirs(relativePath).join('/');
 
+      const getTaskName = async () => {
+        if (handler?.name) {
+          return handler.name;
+        }
+
+        if (isPackage) {
+          const packageJsonPath = path.join(fullPath, 'package.json');
+          const packageJson = await fs.promises.readFile(packageJsonPath, 'utf8').then(JSON.parse);
+          return packageJson.name;
+        }
+
+        // file name without extension
+        return path.basename(file, path.extname(file));
+      };
+      const name = await getTaskName();
+
       return isValidTask
         ? {
             ...handler,
+            name,
             group,
             path: relativePath,
             fullPath,
