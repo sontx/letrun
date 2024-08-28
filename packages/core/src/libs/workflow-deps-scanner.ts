@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import { defaultModuleResolver, ModuleResolverFn } from '@src/libs/module-resolver';
 import { resolveLocalModuleLocation } from '@src/libs/resolve-local-module-location';
 import path from 'node:path';
+import { satisfies } from 'compare-versions';
+import { extractPackageNameVersion } from '@src/utils';
 
 export interface WorkflowDependency {
   name: string;
@@ -11,6 +13,8 @@ export interface WorkflowDependency {
   dependency: string;
   installed: boolean;
   version?: string;
+  requireVersion?: string;
+  incompatibleVersion?: boolean;
   type?: 'package' | 'script';
 }
 
@@ -46,13 +50,22 @@ export class WorkflowDepsScanner {
       }
 
       const version = location && installed ? await this.getVersion(location, isDirectory) : null;
+      let handler = task.handler;
+      let requireVersion: string | undefined;
+      if (isDirectory) {
+        const { name, version: packageVersion } = extractPackageNameVersion(handler);
+        handler = name;
+        requireVersion = packageVersion;
+      }
 
       dependencies.push({
         name: task.name,
-        handler: task.handler,
+        handler: handler,
         dependency: location ?? task.handler,
         installed,
         version: version || '0.0.0',
+        incompatibleVersion: version && requireVersion ? !satisfies(version, requireVersion) : false,
+        requireVersion,
         type: installed ? (isDirectory ? 'package' : 'script') : undefined,
       });
 

@@ -41,6 +41,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: '/path/to/handler1',
         installed: true,
+        incompatibleVersion: false,
         version: '1.0.0',
         type: 'script',
       },
@@ -60,6 +61,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: '/path/to/handler1',
         installed: true,
+        incompatibleVersion: false,
         version: '0.0.0',
         type: 'script',
       },
@@ -81,6 +83,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: '/path/to/handler1',
         installed: true,
+        incompatibleVersion: false,
         version: '2.0.0',
         type: 'package',
       },
@@ -101,6 +104,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: '/path/to/handler1',
         installed: true,
+        incompatibleVersion: false,
         version: 'Invalid version: Invalid version',
         type: 'script',
       },
@@ -124,8 +128,16 @@ describe('WorkflowDepsScanner', () => {
       .mockResolvedValueOnce('/path/to/handler2');
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => false } as any);
     (mockModuleResolver as jest.Mock)
-      .mockResolvedValueOnce(class { version = '1.0.0'; })
-      .mockResolvedValueOnce(class { version = '2.0.0'; });
+      .mockResolvedValueOnce(
+        class {
+          version = '1.0.0';
+        },
+      )
+      .mockResolvedValueOnce(
+        class {
+          version = '2.0.0';
+        },
+      );
 
     const result = await scanner.scan(container);
 
@@ -135,6 +147,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: '/path/to/handler1',
         installed: true,
+        incompatibleVersion: false,
         version: '1.0.0',
         type: 'script',
       },
@@ -143,6 +156,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler2',
         dependency: '/path/to/handler2',
         installed: true,
+        incompatibleVersion: false,
         version: '2.0.0',
         type: 'script',
       },
@@ -161,6 +175,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: 'handler1',
         installed: false,
+        incompatibleVersion: false,
         version: '0.0.0',
         type: undefined,
       },
@@ -181,6 +196,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: '/path/to/handler1',
         installed: false,
+        incompatibleVersion: false,
         version: '0.0.0',
       },
     ]);
@@ -199,6 +215,7 @@ describe('WorkflowDepsScanner', () => {
         handler: 'handler1',
         dependency: '/path/to/handler1',
         installed: true,
+        incompatibleVersion: false,
         version: '0.0.0',
         type: 'script',
       },
@@ -219,8 +236,78 @@ describe('WorkflowDepsScanner', () => {
         name: 'task1',
         handler: 'handler1',
         dependency: '/path/to/handler1',
+        incompatibleVersion: false,
         installed: true,
         version: '1.0.0',
+        type: 'package',
+      },
+    ]);
+  });
+
+  it('handles task handler as a package name', async () => {
+    const container: ContainerDef = { tasks: { task1: { handler: '@letrun/core@0.0.1' } } } as any;
+    (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/@letrun/core');
+    jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+    jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '0.0.1' }));
+
+    const result = await scanner.scan(container);
+
+    expect(result).toEqual([
+      {
+        name: 'task1',
+        handler: '@letrun/core',
+        dependency: '/path/to/@letrun/core',
+        installed: true,
+        incompatibleVersion: false,
+        requireVersion: '0.0.1',
+        version: '0.0.1',
+        type: 'package',
+      },
+    ]);
+  });
+
+  it('handles incompatible version', async () => {
+    const container: ContainerDef = { tasks: { task1: { handler: '@letrun/core@1.0.0' } } } as any;
+    (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/@letrun/core');
+    jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+    jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '2.0.0' }));
+
+    const result = await scanner.scan(container);
+
+    expect(result).toEqual([
+      {
+        name: 'task1',
+        handler: '@letrun/core',
+        dependency: '/path/to/@letrun/core',
+        installed: true,
+        incompatibleVersion: true,
+        requireVersion: '1.0.0',
+        version: '2.0.0',
+        type: 'package',
+      },
+    ]);
+  });
+
+  it('handles compatible version with range version', async () => {
+    const container: ContainerDef = { tasks: { task1: { handler: '@letrun/core@^1.0.0' } } } as any;
+    (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/@letrun/core');
+    jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+    jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '1.2.0' }));
+
+    const result = await scanner.scan(container);
+
+    expect(result).toEqual([
+      {
+        name: 'task1',
+        handler: '@letrun/core',
+        dependency: '/path/to/@letrun/core',
+        installed: true,
+        incompatibleVersion: false,
+        requireVersion: '^1.0.0',
+        version: '1.2.0',
         type: 'package',
       },
     ]);
