@@ -4,7 +4,6 @@ import {
   delayMs,
   getEntryPointDir,
   getTasksByStatus,
-  importDefault,
   isRelativePath,
   isTerminatedStatus,
   isWorkflowTaskDefsArray,
@@ -18,10 +17,6 @@ import { InvalidParameterError } from '@src/error';
 import Joi from 'joi';
 
 describe('Utils', () => {
-  it('throws error for imports default export from a not found module', async () => {
-    await expect(importDefault('./not-found-module.js')).rejects.toThrow(/^Cannot find module*/);
-  });
-
   it('checks if a path is relative', () => {
     expect(isRelativePath('./path')).toBe(true);
     expect(isRelativePath('/absolute/path')).toBe(false);

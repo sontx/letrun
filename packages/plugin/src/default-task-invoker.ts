@@ -1,8 +1,8 @@
 import {
   AbstractPlugin,
   BUILTIN_PLUGIN_PRIORITY,
+  defaultModuleResolver,
   getEntryPointDir,
-  importDefault,
   Task,
   TASK_INVOKER_PLUGIN,
   TaskHandlerInput,
@@ -18,7 +18,7 @@ export default class DefaultTaskInvoker extends AbstractPlugin implements TaskIn
   readonly type = TASK_INVOKER_PLUGIN;
   readonly priority = BUILTIN_PLUGIN_PRIORITY;
 
-  constructor(private readonly moduleResolver = importDefault) {
+  constructor(private readonly moduleResolver = defaultModuleResolver.resolve) {
     super();
   }
 

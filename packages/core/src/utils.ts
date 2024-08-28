@@ -5,17 +5,6 @@ import type Joi from 'joi';
 import { Container, Plugin, Task, TaskDef, TaskStatus, WorkflowTaskDefs, WorkflowTasks } from '@src/model';
 
 /**
- * Imports the default export from a module.
- * @param {string} filePath - The path to the module file.
- * @returns {Promise<any>} A promise that resolves to the default export of the module.
- */
-export async function importDefault(filePath: string): Promise<any> {
-  const effectivePath = isRelativePath(filePath) ? path.resolve(getEntryPointDir(), filePath) : filePath;
-  const obj = await import(`file://${effectivePath}`);
-  return filePath.endsWith('.cjs') ? obj.default.default : obj.default;
-}
-
-/**
  * Checks if a path is relative.
  * @param {string} path - The path to check.
  * @returns {boolean} True if the path is relative, false otherwise.

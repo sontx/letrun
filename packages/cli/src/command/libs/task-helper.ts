@@ -1,11 +1,11 @@
-import { AppContext, getEntryPointDir, importDefault, TaskHandler } from '@letrun/core';
+import { AppContext, defaultModuleResolver, getEntryPointDir, TaskHandler } from '@letrun/core';
 import path from 'node:path';
 import { promises as fs } from 'fs';
 
 type CustomTask = Partial<TaskHandler & { path: string; fullPath: string; group?: string }>;
 
 export class TaskHelper {
-  static moduleResolver = importDefault;
+  static moduleResolver = defaultModuleResolver.resolve;
   static getEntryPointDir = getEntryPointDir;
 
   static extractParentDirs(filePath: string) {

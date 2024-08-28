@@ -1,4 +1,4 @@
-import { getEntryPointDir, importDefault, Plugin, PluginLoader } from '@letrun/core';
+import { defaultModuleResolver, getEntryPointDir, Plugin, PluginLoader } from '@letrun/core';
 import fs from 'fs';
 import path from 'node:path';
 import { DEFAULT_LOGGER } from '@src/libs/log-helper';
@@ -13,7 +13,7 @@ export class FilePluginLoader implements PluginLoader {
 
   constructor(
     pluginDir: string = 'plugins',
-    private readonly moduleResolver = importDefault,
+    private readonly moduleResolver = defaultModuleResolver.resolve,
   ) {
     this.pluginDir = path.resolve(getEntryPointDir(), pluginDir);
   }
