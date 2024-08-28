@@ -8,6 +8,10 @@ const jest = import.meta.jest;
 describe('resolveLocalModuleLocation', () => {
   const customTasksDir = path.resolve('tasks');
 
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('resolves an absolute path', async () => {
     const absolutePath = path.resolve('/absolute/path/to/module.js');
     expect(await resolveLocalModuleLocation(absolutePath, customTasksDir)).toBe(absolutePath);
@@ -38,6 +42,7 @@ describe('resolveLocalModuleLocation', () => {
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce(true);
     expect(await resolveLocalModuleLocation('module', customTasksDir)).toBe(customTasksDirPathWithJs);
   });
@@ -52,5 +57,18 @@ describe('resolveLocalModuleLocation', () => {
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(false);
     expect(await resolveLocalModuleLocation('module.js', customTasksDir)).toBe(nodeModulesPath);
+  });
+
+  it('resolves a package name from the node_modules directory', async () => {
+    const packageName = '@letrun/core@0.0.1';
+    const nodeModulesPath = path.resolve(getEntryPointDir(), 'node_modules', '@letrun/core');
+    jest
+      .spyOn(fs, 'existsSync')
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+
+    expect(await resolveLocalModuleLocation(packageName, customTasksDir)).toBe(nodeModulesPath);
   });
 });

@@ -19,7 +19,7 @@ export default class DefaultModuleLocationResolver extends AbstractPlugin {
    * 2. resolve it from the current directory
    * 3. resolve it from the runner directory
    * 4. lookup in the custom tasks directory (default is tasks directory)
-   * 5. lookup in the node_modules directory
+   * 5. lookup in the node_modules directory (module name may be extracted from the package name: @letrun/core@0.0.1 -> @letrun/core)
    * 6. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
    */
   async resolveLocation(module: string, modulesDir?: string, throwsIfNotFound?: boolean) {
@@ -39,7 +39,7 @@ export default class DefaultModuleLocationResolver extends AbstractPlugin {
 2. Resolve it from the current directory
 3. Resolve it from the runner directory
 4. Lookup in the custom tasks directory (default is tasks directory)
-5. Lookup in the node_modules directory
+5. Lookup in the node_modules directory (module name may be extracted from the package name: @letrun/core@0.0.1 -> @letrun/core)
 6. Append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)`);
     }
 

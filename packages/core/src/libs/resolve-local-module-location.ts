@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs';
-import { getEntryPointDir } from '@src/utils';
+import { extractPackageNameVersion, getEntryPointDir } from '@src/utils';
 import { LocationResolverFn } from '@src/plugin';
 
 /**
@@ -9,7 +9,7 @@ import { LocationResolverFn } from '@src/plugin';
  * 2. resolve it from the current directory
  * 3. resolve it from the runner directory
  * 4. lookup in the custom tasks directory (default is tasks directory)
- * 5. lookup in the node_modules directory
+ * 5. lookup in the node_modules directory (module name may be extracted from the package name: @letrun/core@0.0.1 -> @letrun/core)
  * 6. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
  */
 export const resolveLocalModuleLocation: LocationResolverFn = async (module: string, modulesDir?: string) => {
@@ -34,7 +34,8 @@ export const resolveLocalModuleLocation: LocationResolverFn = async (module: str
     }
   }
 
-  const pathResolvedFromNodeModulesDir = path.resolve(getEntryPointDir(), 'node_modules', module);
+  const { name: effectiveModuleName = '' } = extractPackageNameVersion(module);
+  const pathResolvedFromNodeModulesDir = path.resolve(getEntryPointDir(), 'node_modules', effectiveModuleName);
   if (fs.existsSync(pathResolvedFromNodeModulesDir)) {
     return pathResolvedFromNodeModulesDir;
   }

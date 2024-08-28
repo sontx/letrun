@@ -241,3 +241,23 @@ export function isValueDefined<T>(value: T | undefined | null): value is T {
 export function isDefined(value: any): boolean {
   return value !== undefined && value !== null;
 }
+
+/**
+ * Extracts the package name and version from a string.
+ *
+ * For example, `@letrun/core@1.0.0` will return `{ name: '@letrun/core', version: '1.0.0' }`.
+ */
+export function extractPackageNameVersion(packageName: string) {
+  const match = packageName.match(/^(?:@([^/]+)\/)?([^@]+)(?:@([^@]+))?$/);
+
+  if (!match) {
+    return { name: packageName, version: undefined };
+  }
+
+  const [_, scope, name, version] = match;
+
+  return {
+    name: scope ? `@${scope}/${name}` : name,
+    version: version || undefined,
+  };
+}

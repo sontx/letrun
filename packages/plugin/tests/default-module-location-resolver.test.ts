@@ -11,6 +11,7 @@ describe('resolveLocation', () => {
 
   beforeEach(() => {
     resolver = new DefaultModuleLocationResolver();
+    jest.resetAllMocks();
   });
 
   it('resolves an absolute path', async () => {
@@ -43,6 +44,7 @@ describe('resolveLocation', () => {
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce(true);
     expect(await resolver.resolveLocation('module', customTasksDir)).toBe(customTasksDirPathWithJs);
   });
@@ -71,12 +73,24 @@ describe('resolveLocation', () => {
     expect(await resolver.resolveLocation('nonexistentModule', customTasksDir, false)).toBeNull();
   });
 
+  it('resolves a package name from the node_modules directory', async () => {
+    const packageName = '@letrun/core@0.0.1';
+    const nodeModulesPath = path.resolve(getEntryPointDir(), 'node_modules', '@letrun/core');
+    jest
+      .spyOn(fs, 'existsSync')
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+
+    expect(await resolver.resolveLocation(packageName, customTasksDir)).toBe(nodeModulesPath);
+  });
+
   it('caches the resolved location', async () => {
     const moduleName = 'module.js';
 
     jest.spyOn(fs, 'existsSync').mockReturnValueOnce(true);
-    const resolveAndCacheSpy = jest
-      .spyOn(resolver as any, 'resolveAndCache');
+    const resolveAndCacheSpy = jest.spyOn(resolver as any, 'resolveAndCache');
 
     // First call to resolveLocation
     const location1 = await resolver.resolveLocation(moduleName, customTasksDir);
