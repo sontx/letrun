@@ -1,8 +1,10 @@
 import { AppContext, defaultModuleResolver, getEntryPointDir, TaskHandler } from '@letrun/core';
 import path from 'node:path';
-import { promises as fs } from 'fs';
+import * as fs from 'fs';
 
-type CustomTask = Partial<TaskHandler & { path: string; fullPath: string; group?: string }>;
+type CustomTask = Partial<
+  TaskHandler & { path: string; fullPath: string; group?: string; isPackage?: boolean; handler?: string }
+>;
 
 export class TaskHelper {
   static moduleResolver = defaultModuleResolver.resolve;
@@ -17,14 +19,13 @@ export class TaskHelper {
   static searchTasks(tasks: CustomTask[], name: string, group?: string) {
     const searchGroup = group === '.' ? null : group;
     return tasks
-      .filter((task) => task.name === name)
-      .map((task) => {
-        const group = task.group ? task.group : this.extractParentDirs(task.path!).join('/');
-        return {
-          ...task,
-          group: group ? group : undefined,
-        };
-      })
+      .filter(
+        (task) =>
+          task.name === name ||
+          task.path === name ||
+          task.handler === name ||
+          (task.group && `${task.group}/${task.name}` === name),
+      )
       .filter((task) => (group ? task.group === searchGroup : true));
   }
 
@@ -35,54 +36,71 @@ export class TaskHelper {
   }
 
   private static async loadCustomTasks(tasksDir: string, context: AppContext) {
-    const jsFiles = await this.getAllJsFiles(tasksDir, context);
+    const taskFiles = await this.getTaskFiles(tasksDir, context);
     const tasks: CustomTask[] = [];
 
-    for (const file of jsFiles) {
-      const relativePath = path.relative(tasksDir, file).replace(/\\/g, '/');
-      const fullPath = path.resolve(tasksDir, file);
-      try {
-        const handlerClass = await this.moduleResolver(file);
-        const handler = handlerClass ? new handlerClass() : null;
-        const isValidTask = handler?.name && handler?.handle;
-        tasks.push(
-          isValidTask
-            ? {
-                ...handler,
-                path: relativePath,
-                fullPath,
-              }
-            : {
-                name: `${relativePath} (invalid task)`,
-                path: relativePath,
-                fullPath,
-              },
-        );
-      } catch (e: any) {
-        tasks.push({
-          name: `${relativePath} (${e.message})`,
-          path: relativePath,
-          fullPath,
-        });
-      }
+    for (const file of taskFiles) {
+      const task = await this.createBundledTask(file, tasksDir);
+      tasks.push(task);
     }
 
     return tasks;
   }
 
-  private static async getAllJsFiles(dir: string, context: AppContext) {
+  private static async createBundledTask(file: string, tasksDir: string) {
+    const relativePath = path.relative(tasksDir, file).replace(/\\/g, '/');
+    const fullPath = path.resolve(tasksDir, file);
+
+    try {
+      const handlerClass = await this.moduleResolver(file);
+      const handler = handlerClass ? new handlerClass() : null;
+      const isValidTask = handler?.name && handler?.handle;
+      const isPackage = !this.isJsFile(file);
+      const declarativeHandler = isPackage ? relativePath : relativePath.replace(/\.[^/.]+$/, '');
+      const group = this.extractParentDirs(relativePath).join('/');
+
+      return isValidTask
+        ? {
+            ...handler,
+            group,
+            path: relativePath,
+            fullPath,
+            isPackage,
+            handler: declarativeHandler,
+          }
+        : {
+            name: `${relativePath} (invalid task)`,
+            path: relativePath,
+            fullPath,
+            group,
+          };
+    } catch (e: any) {
+      return {
+        name: `${relativePath} (${e.message})`,
+        path: relativePath,
+        fullPath,
+      };
+    }
+  }
+
+  private static async getTaskFiles(dir: string, context: AppContext) {
     const results: string[] = [];
 
     const readDir = async (currentDir: string) => {
-      const files = await fs.readdir(currentDir);
+      const files = await fs.promises.readdir(currentDir);
 
       for (const file of files) {
         const fullPath = path.resolve(currentDir, file);
-        const stat = await fs.stat(fullPath);
+        const stat = await fs.promises.stat(fullPath);
 
         if (stat.isDirectory()) {
-          await readDir(fullPath);
-        } else if (path.extname(file) === '.js') {
+          const packageJsonPath = path.join(fullPath, 'package.json');
+          if (fs.existsSync(packageJsonPath)) {
+            results.push(fullPath);
+          } else {
+            await readDir(fullPath);
+          }
+        } else if (this.isJsFile(file)) {
           results.push(fullPath);
         }
       }
@@ -95,5 +113,9 @@ export class TaskHelper {
       return [];
     }
     return results;
+  }
+
+  private static isJsFile(file: string) {
+    return ['.js', '.cjs'].includes(path.extname(file));
   }
 }
