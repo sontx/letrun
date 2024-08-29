@@ -8,9 +8,9 @@ import { LocationResolverFn } from '@src/plugin';
  * 1. if this is an absolute path, we will use it as is
  * 2. resolve it from the current directory
  * 3. resolve it from the runner directory
- * 4. lookup in the custom tasks directory (default is tasks directory)
+ * 4. lookup in the custom modules directory if specified
  * 5. lookup in the node_modules directory (module name may be extracted from the package name: @letrun/core@0.0.1 -> @letrun/core)
- * 6. append the .js extension if missing, then look up in the custom tasks directory (default is tasks directory)
+ * 6. append the .js extension if missing, then look up in the custom modules directory if specified
  */
 export const resolveLocalModuleLocation: LocationResolverFn = async (module: string, modulesDir?: string) => {
   if (path.isAbsolute(module)) {
