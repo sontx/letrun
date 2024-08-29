@@ -4,6 +4,7 @@ import { ListCommand } from './list.command';
 import { ViewCommand } from './view.command';
 import { RunCommand } from './run.command';
 import { InstallCommand } from './install.command';
+import { VersionsCommand } from './versions.command';
 
 export class TaskCommand extends AbstractCommand {
   load(program: Command): void {
@@ -12,5 +13,6 @@ export class TaskCommand extends AbstractCommand {
     new ViewCommand(this.context).load(command);
     new RunCommand(this.context).load(command);
     new InstallCommand(this.context).load(command);
+    new VersionsCommand(this.context).load(command);
   }
 }
