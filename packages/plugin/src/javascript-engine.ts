@@ -2,6 +2,7 @@ import {
   AbstractPlugin,
   AppContext,
   BUILTIN_PLUGIN_PRIORITY,
+  extractJsExtension,
   ObjectType,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
@@ -23,7 +24,7 @@ export default class JavascriptEngine extends AbstractPlugin implements ScriptEn
   }
 
   support(extension: string): boolean {
-    return extension === 'js';
+    return !!extractJsExtension(`sample.${extension}`);
   }
 
   protected async doLoad(context: AppContext): Promise<void> {
