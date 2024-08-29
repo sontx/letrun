@@ -14,7 +14,7 @@ describe('InstallCommand', () => {
 
     program = new Command();
     npmPackageMock = new NpmPackage() as jest.Mocked<NpmPackage>;
-    jest.spyOn(npmPackageMock, 'install').mockResolvedValue(undefined);
+    jest.spyOn(npmPackageMock, 'install').mockResolvedValue({} as any);
     installCommand = new InstallCommand({} as any);
     installCommand['npmPackage'] = npmPackageMock;
   });

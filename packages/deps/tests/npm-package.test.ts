@@ -32,7 +32,7 @@ describe('NpmPackage', () => {
 
     await npmPackage.install('some-package');
 
-    expect(addDepMock).toHaveBeenCalledWith('some-package');
+    expect(addDepMock).toHaveBeenCalledWith('some-package', undefined);
     expect(installDeps).not.toHaveBeenCalled();
   });
 

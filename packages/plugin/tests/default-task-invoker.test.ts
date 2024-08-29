@@ -1,6 +1,6 @@
 import DefaultTaskInvoker from '@src/default-task-invoker';
 import { TaskHandlerInput } from '@letrun/core';
-import { InvalidParameterError } from '@letrun/core/dist';
+import { InvalidParameterError } from '@letrun/core';
 import path from 'node:path';
 import fs from 'fs';
 import { Subject } from 'rxjs';

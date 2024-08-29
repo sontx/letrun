@@ -17,6 +17,12 @@ esbuild
   .build({
     ...options,
     format: 'esm',
+    banner: {
+      js: `if (!global.require) {
+  const { createRequire } = await import('module');
+  global.require = createRequire(import.meta.url);
+}`,
+    },
     outfile: 'dist/index.mjs',
   })
   .catch(() => process.exit(1));
