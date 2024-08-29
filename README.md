@@ -233,6 +233,7 @@ There are four projects:
 - `core`: The core library that contains the shared types, interfaces, and utilities.
 - `plugin`: The plugin library that contains the system plugins.
 - `task`: The task library that contains some custom tasks.
+- `deps`: Provides a way to manage dependencies for the CLI tool.
 - `engine`: The engine library that contains the workflow engine, you can run a workflow programmatically.
 - `cli`: The CLI tool 😉
 
