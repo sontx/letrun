@@ -13,6 +13,11 @@ export default class DefaultModuleLocationResolver extends AbstractPlugin {
 
   private readonly cachedLocations = new Map<string, string>();
 
+  constructor() {
+    super();
+    this.resolveLocation = this.resolveLocation.bind(this);
+  }
+
   /**
    * We will look up in this order:
    * 1. if this is an absolute path, we will use it as is

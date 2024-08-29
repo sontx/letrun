@@ -20,25 +20,26 @@ export class NpmPackage {
   /**
    * Installs dependencies or adds a specific dependency.
    * @param packageName - The name of the package to add as a dependency.
+   * @param args - Additional arguments to pass to the `npm install` command.
    */
-  async install(packageName?: string) {
+  async install(packageName?: string, args?: string) {
     if (!fs.existsSync(`${this.workingDir}/package.json`)) {
       await this.init();
     }
 
     if (packageName) {
-      await this.addDep(packageName);
+      return await this.addDep(packageName, args);
     } else {
-      await this.installDeps();
+      return await this.installDeps(args);
     }
   }
 
-  private async addDep(packageName: string) {
-    await execAsync(`npm install ${packageName} --package-lock=false`, { cwd: this.workingDir });
+  private async addDep(packageName: string, args?: string) {
+    return await execAsync(`npm install ${packageName} --package-lock=false ${args ?? ''}`.trim(), { cwd: this.workingDir });
   }
 
-  private async installDeps() {
-    await execAsync(`npm install --package-lock=false`, { cwd: this.workingDir });
+  private async installDeps(args?: string) {
+    return await execAsync(`npm install --package-lock=false ${args ?? ''}`.trim(), { cwd: this.workingDir });
   }
 
   /**

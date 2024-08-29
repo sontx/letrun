@@ -6,3 +6,14 @@ export interface Dependency {
   version: string;
   location?: string;
 }
+
+export interface WorkflowDependency {
+  name: string;
+  handler?: string;
+  dependency: string;
+  installed: boolean;
+  version?: string;
+  requireVersion?: string;
+  incompatibleVersion?: boolean;
+  type?: 'package' | 'script';
+}

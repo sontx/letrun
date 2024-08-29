@@ -1,8 +1,6 @@
-import { WorkflowDepsScanner } from '@src/libs/workflow-deps-scanner';
-import { ContainerDef } from '@src/model';
-import { ModuleResolverFn } from '@src/libs/module-resolver';
 import fs from 'node:fs';
-import { LocationResolverFn } from '@src/plugin';
+import { WorkflowDepsScanner } from '@src/workflow-deps-scanner';
+import { ContainerDef, LocationResolverFn, ModuleResolverFn } from '@letrun/core';
 
 const jest = import.meta.jest;
 
@@ -62,7 +60,6 @@ describe('WorkflowDepsScanner', () => {
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
-        version: '0.0.0',
         type: 'script',
       },
     ]);
@@ -105,7 +102,7 @@ describe('WorkflowDepsScanner', () => {
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
-        version: 'Invalid version: Invalid version',
+        version: 'Invalid version',
         type: 'script',
       },
     ]);
@@ -176,8 +173,6 @@ describe('WorkflowDepsScanner', () => {
         dependency: 'handler1',
         installed: false,
         incompatibleVersion: false,
-        version: '0.0.0',
-        type: undefined,
       },
     ]);
   });
@@ -197,7 +192,6 @@ describe('WorkflowDepsScanner', () => {
         dependency: '/path/to/handler1',
         installed: false,
         incompatibleVersion: false,
-        version: '0.0.0',
       },
     ]);
   });
@@ -216,7 +210,6 @@ describe('WorkflowDepsScanner', () => {
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
-        version: '0.0.0',
         type: 'script',
       },
     ]);
@@ -311,5 +304,76 @@ describe('WorkflowDepsScanner', () => {
         type: 'package',
       },
     ]);
+  });
+
+  it('gets npm package version from npm repo', async () => {
+    const packageName = 'some-package';
+    const packageVersion = '^1.0.0';
+    global.fetch = jest.fn().mockResolvedValue({
+      json: jest.fn().mockResolvedValue({
+        name: packageName,
+        'dist-tags': { latest: '1.0.0' },
+      }),
+    });
+
+    const result = await scanner['tryGetNpmPackageVersion'](packageName);
+
+    expect(result).toBe(packageVersion);
+    expect(global.fetch).toHaveBeenCalledWith(`https://registry.npmjs.org/${packageName}`);
+  });
+
+  it('handles error when fetching npm package version', async () => {
+    const packageName = 'some-package';
+    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+
+    const result = await scanner['tryGetNpmPackageVersion'](packageName);
+
+    expect(result).toBeNull();
+    expect(global.fetch).toHaveBeenCalledWith(`https://registry.npmjs.org/${packageName}`);
+  });
+
+  it('resolves package version from npm repo if needed', async () => {
+    const container: ContainerDef = { tasks: { task1: { handler: 'some-package' } } } as any;
+    (mockLocationResolver as jest.Mock).mockResolvedValue(null);
+    global.fetch = jest.fn().mockResolvedValue({
+      json: jest.fn().mockResolvedValue({
+        name: 'some-package',
+        'dist-tags': { latest: '1.0.0' },
+      }),
+    });
+
+    const result = await scanner.scan(container);
+
+    expect(result).toEqual([
+      {
+        name: 'task1',
+        handler: 'some-package',
+        dependency: 'some-package',
+        installed: false,
+        incompatibleVersion: false,
+        requireVersion: '^1.0.0',
+        type: 'package',
+      },
+    ]);
+    expect(global.fetch).toHaveBeenCalledWith(`https://registry.npmjs.org/some-package`);
+  });
+
+  it('does not resolve npm package version if handler is not a package name', async () => {
+    const handler = '/this/is/invalid/package';
+    const container: ContainerDef = { tasks: { task1: { handler } } } as any;
+    (mockLocationResolver as jest.Mock).mockResolvedValue(null);
+    global.fetch = jest.fn();
+    const result = await scanner.scan(container);
+
+    expect(result).toEqual([
+      {
+        name: 'task1',
+        handler,
+        dependency: handler,
+        installed: false,
+        incompatibleVersion: false,
+      },
+    ]);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });
