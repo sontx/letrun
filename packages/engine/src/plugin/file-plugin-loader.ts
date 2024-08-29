@@ -1,4 +1,4 @@
-import { defaultModuleResolver, getEntryPointDir, Plugin, PluginLoader } from '@letrun/core';
+import { defaultModuleResolver, extractJsExtension, getEntryPointDir, Plugin, PluginLoader } from '@letrun/core';
 import fs from 'fs';
 import path from 'node:path';
 import { DEFAULT_LOGGER } from '@src/libs/log-helper';
@@ -32,7 +32,7 @@ export class FilePluginLoader implements PluginLoader {
 
       const files = await fs.promises.readdir(this.pluginDir);
       const plugins: Plugin[] = [];
-      for (const file of files.filter((file) => file.endsWith('.js') || file.endsWith('.cjs'))) {
+      for (const file of files.filter((file) => extractJsExtension(file))) {
         const pluginFile = path.resolve(this.pluginDir, file);
         try {
           const pluginClass = await this.moduleResolver(pluginFile);

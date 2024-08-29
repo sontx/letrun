@@ -2,6 +2,7 @@ import {
   childHasStatus,
   countTasks,
   delayMs,
+  extractJsExtension,
   extractPackageNameVersion,
   getEntryPointDir,
   getTasksByStatus,
@@ -163,5 +164,16 @@ describe('delayMs', () => {
     expect(extractPackageNameVersion('simple-package@^1.0.0')).toEqual({ name: 'simple-package', version: '^1.0.0' });
     expect(extractPackageNameVersion('some/wrong/module')).toEqual({ name: 'some/wrong/module', version: undefined });
     expect(extractPackageNameVersion('')).toEqual({ name: '', version: undefined });
+  });
+
+  it('extracts js extension correctly', () => {
+    expect(extractJsExtension('file.js')).toBe('.js');
+    expect(extractJsExtension('file.mjs')).toBe('.mjs');
+    expect(extractJsExtension('file.cjs')).toBe('.cjs');
+    expect(extractJsExtension('file')).toBeNull();
+    expect(extractJsExtension('file.txt')).toBeNull();
+    expect(extractJsExtension('file.js.txt')).toBeNull();
+    expect(extractJsExtension('file.mjs.txt')).toBeNull();
+    expect(extractJsExtension('file.cjs.txt')).toBeNull();
   });
 });

@@ -1,4 +1,4 @@
-import { AppContext, defaultModuleResolver, getEntryPointDir, TaskHandler } from '@letrun/core';
+import { AppContext, defaultModuleResolver, extractJsExtension, getEntryPointDir, TaskHandler } from '@letrun/core';
 import path from 'node:path';
 import * as fs from 'fs';
 import type { PackageJson } from 'type-fest';
@@ -159,6 +159,6 @@ export class TaskHelper {
   }
 
   private static isJsFile(file: string) {
-    return ['.js', '.cjs'].includes(path.extname(file));
+    return !!extractJsExtension(file);
   }
 }

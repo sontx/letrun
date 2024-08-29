@@ -261,3 +261,9 @@ export function extractPackageNameVersion(packageName: string) {
     version: version || undefined,
   };
 }
+
+export function extractJsExtension(filename: string) {
+  const regex = /\.([mc])?js$/i;
+  const match = filename.match(regex);
+  return match ? match[0] : null;
+}

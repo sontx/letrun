@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs';
-import { extractPackageNameVersion, getEntryPointDir } from '@src/utils';
+import { extractJsExtension, extractPackageNameVersion, getEntryPointDir } from '@src/utils';
 import { LocationResolverFn } from '@src/plugin';
 
 /**
@@ -41,7 +41,7 @@ export const resolveLocalModuleLocation: LocationResolverFn = async (module: str
   }
 
   if (modulesDir) {
-    const locationWithJsExtension = module.endsWith('.js') ? module : `${module}.js`;
+    const locationWithJsExtension = extractJsExtension(module) ? module : `${module}.js`;
     const pathResolvedFromCustomTasksDir = path.resolve(modulesDir, locationWithJsExtension);
     if (fs.existsSync(pathResolvedFromCustomTasksDir)) {
       return pathResolvedFromCustomTasksDir;
