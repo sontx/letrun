@@ -4,6 +4,8 @@ import { Command } from 'commander';
 import ora from 'ora';
 
 export class InstallCommand extends AbstractCommand {
+  private npmPackage = new NpmPackage();
+
   load(program: Command): void {
     program
       .command('install')
@@ -15,17 +17,18 @@ export class InstallCommand extends AbstractCommand {
   }
 
   private async doAction(name?: string) {
-    const npmPackage = new NpmPackage();
     const spinner = ora('Installing package').start();
     try {
-      await npmPackage.install(name);
+      await this.npmPackage.install(name);
       if (name) {
         spinner.succeed(`Package ${name} installed`);
       } else {
         spinner.succeed('All packages installed');
       }
+      return true;
     } catch (e: any) {
       spinner.fail(e.message);
+      return false;
     }
   }
 }
