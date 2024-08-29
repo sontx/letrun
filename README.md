@@ -149,13 +149,16 @@ letrun [command] [options]
   - [view](docs/command/workflow-view): View the details of a saved workflow.
   - [delete](docs/command/workflow-delete): Delete a saved workflow.
   - [clear](docs/command/workflow-clear): Clear all saved workflows.
+  - [install](docs/command/workflow-install): Install a workflow's dependencies.
 - plugin: Manage plugins.
   - [list](docs/command/plugin-list): List all available plugins.
   - [view](docs/command/plugin-view): View the details of a plugin.
-- task: View custom tasks.
+- task: View and manage custom tasks.
   - [list](docs/command/task-list): List all available system/custom tasks.
   - [view](docs/command/task-view): View the details of a system/custom task.
   - [run](docs/command/task-run): Run a task directly without a workflow.
+  - [install](docs/command/task-install): Install a custom task package.
+  - [versions](docs/command/task-versions): List all installed custom task packages.
 
 ## Plugin
 
