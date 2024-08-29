@@ -1,6 +1,8 @@
 import { AppContext, defaultModuleResolver, getEntryPointDir, TaskHandler } from '@letrun/core';
 import path from 'node:path';
 import * as fs from 'fs';
+import type { PackageJson } from 'type-fest';
+import { NpmPackage } from '@letrun/deps';
 
 type CustomTask = Partial<
   TaskHandler & {
@@ -43,20 +45,27 @@ export class TaskHelper {
   }
 
   private static async loadCustomTasks(tasksDir: string, context: AppContext) {
-    const taskFiles = await this.getTaskFiles(tasksDir, context);
     const tasks: CustomTask[] = [];
 
-    for (const file of taskFiles) {
+    const taskFilesFromDir = await this.getTaskFilesFromDir(tasksDir, context);
+    for (const file of taskFilesFromDir) {
       const task = await this.createBundledTask(file, tasksDir);
+      tasks.push(task);
+    }
+
+    const depsTaskFiles = await this.getDepsTaskFiles();
+    const workingDir = path.join(getEntryPointDir(), 'node_modules');
+    for (const file of depsTaskFiles) {
+      const task = await this.createBundledTask(file, workingDir);
       tasks.push(task);
     }
 
     return tasks;
   }
 
-  private static async createBundledTask(file: string, tasksDir: string) {
-    const relativePath = path.relative(tasksDir, file).replace(/\\/g, '/');
-    const fullPath = path.resolve(tasksDir, file);
+  private static async createBundledTask(file: string, rootDir: string) {
+    const relativePath = path.relative(rootDir, file).replace(/\\/g, '/');
+    const fullPath = path.resolve(rootDir, file);
 
     try {
       const handlerClass = await this.moduleResolver(file);
@@ -72,7 +81,7 @@ export class TaskHelper {
 
         if (isPackage) {
           const packageJsonPath = path.join(fullPath, 'package.json');
-          const packageJson = await fs.promises.readFile(packageJsonPath, 'utf8').then(JSON.parse);
+          const packageJson: PackageJson = await fs.promises.readFile(packageJsonPath, 'utf8').then(JSON.parse);
           name = name || packageJson.name;
           version = version || packageJson.version || '0.0.0';
         } else {
@@ -111,7 +120,7 @@ export class TaskHelper {
     }
   }
 
-  private static async getTaskFiles(dir: string, context: AppContext) {
+  private static async getTaskFilesFromDir(dir: string, context: AppContext) {
     const results: string[] = [];
 
     const readDir = async (currentDir: string) => {
@@ -141,6 +150,12 @@ export class TaskHelper {
       return [];
     }
     return results;
+  }
+
+  private static async getDepsTaskFiles() {
+    const npmPackage = new NpmPackage();
+    const deps = await npmPackage.list();
+    return deps.filter((dep) => dep.location).map((dep) => path.resolve(dep.location!));
   }
 
   private static isJsFile(file: string) {

@@ -3,6 +3,19 @@
   "version": "0.0.1",
   "description": "LetRun engine",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "author": "sontx",
   "keywords": [
     "workflow",
@@ -10,7 +23,7 @@
     "execution"
   ],
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "node ../../esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
     "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest -- --coverage",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest",
     "jest": "jest",
@@ -25,8 +38,6 @@
     "url": "https://github.com/sontx/letrun/issues"
   },
   "homepage": "https://github.com/sontx/letrun#readme",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/jest": "^29.5.12",
@@ -38,11 +49,13 @@
     "ts-jest": "^29.2.4",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
+    "type-fest": "^4.26.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "@letrun/core": "^0.0.2",
     "@letrun/plugin": "^0.0.2",
+    "@letrun/deps": "^0.0.1",
     "joi": "^17.13.3",
     "jsonpath-plus": "^9.0.0",
     "ms": "^2.1.3",

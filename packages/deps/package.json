@@ -1,7 +1,7 @@
 {
-  "name": "@letrun/core",
-  "version": "0.0.2",
-  "description": "The core package for the cli and its plugins or tasks",
+  "name": "@letrun/deps",
+  "version": "0.0.1",
+  "description": "Dependencies management",
   "type": "module",
   "exports": {
     ".": {
@@ -20,11 +20,6 @@
     "node": ">=20",
     "npm": ">=10"
   },
-  "keywords": [
-    "workflow",
-    "task",
-    "execution"
-  ],
   "scripts": {
     "build": "node ../../esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
     "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest -- --coverage",
@@ -54,9 +49,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "compare-versions": "^6.1.1",
-    "joi": "^17.13.3",
-    "rxjs": "^7.8.1"
+    "@letrun/core": "^0.0.2"
   }
 }

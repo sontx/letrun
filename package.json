@@ -10,8 +10,14 @@
   "scripts": {
     "test": "npm run test -ws",
     "coverage": "npm run coverage -ws",
-    "build": "npm run build:all && npm run clean && npm run copy",
-    "build:all": "npm run build -w @letrun/core && npm run build -w @letrun/plugin npm run build -w @letrun/task && npm run build -w @letrun/engine && npm run build -w @letrun/cli",
+    "build": "npm run build:all && npm run copy",
+    "build:all": "npm run build:core && npm run build:deps && npm run build:plugin && npm run build:task && npm run build:engine && npm run build:cli",
+    "build:core": "npm run build -w @letrun/core",
+    "build:deps": "npm run build -w @letrun/deps",
+    "build:plugin": "npm run build -w @letrun/plugin",
+    "build:task": "npm run build -w @letrun/task",
+    "build:engine": "npm run build -w @letrun/engine",
+    "build:cli": "npm run build -w @letrun/cli",
     "clean": "rm -rf ./dist/**",
     "copy": "npm run copy:cli && npm run copy:task",
     "copy:cli": "copyfiles -f ./packages/cli/dist/**/*.js ./dist",
@@ -35,7 +41,10 @@
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
+    "esbuild": "^0.19.11",
+    "esbuild-node-externals": "^1.14.0",
     "lerna": "^8.1.8",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1"
   }
 }

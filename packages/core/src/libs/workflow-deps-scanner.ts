@@ -1,9 +1,10 @@
 import { ContainerDef } from '@src/model';
 import { LocationResolverFn } from '@src/plugin';
 import fs from 'node:fs';
-import { defaultModuleResolver, ModuleResolverFn } from '@src/libs/module-resolver';
-import { resolveLocalModuleLocation } from '@src/libs/resolve-local-module-location';
+import { defaultModuleResolver, ModuleResolverFn } from './module-resolver';
+import { resolveLocalModuleLocation } from './resolve-local-module-location';
 import path from 'node:path';
+import type { PackageJson } from 'type-fest';
 import { satisfies } from 'compare-versions';
 import { extractPackageNameVersion } from '@src/utils';
 
@@ -85,7 +86,7 @@ export class WorkflowDepsScanner {
       const version = handler.version;
 
       if (isDirectory && !version) {
-        const packageJson = await fs.promises
+        const packageJson: PackageJson = await fs.promises
           .readFile(path.resolve(location, 'package.json'), { encoding: 'utf-8' })
           .then(JSON.parse);
         return packageJson.version;

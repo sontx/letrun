@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { getEntryPointDir, isRelativePath } from '../utils';
 import * as fs from 'node:fs';
+import type { PackageJson } from 'type-fest';
 
 export type ModuleResolverFn = <T = any>(modulePath: string) => Promise<T>;
 
@@ -42,13 +43,13 @@ export class ModuleResolver {
     return await this.resolveFile(mainPath, type);
   }
 
-  private async readPackageJson(modulePath: string): Promise<any> {
+  private async readPackageJson(modulePath: string): Promise<PackageJson> {
     const packageJsonPath = path.join(modulePath, 'package.json');
     if (!fs.existsSync(packageJsonPath)) {
       throw new Error(`package.json not found in ${modulePath}`);
     }
     const packageJson = await fs.promises.readFile(packageJsonPath, 'utf8');
-    return JSON.parse(packageJson);
+    return JSON.parse(packageJson) as PackageJson;
   }
 
   private async isFile(modulePath: string) {

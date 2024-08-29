@@ -24,4 +24,5 @@ export const EMOJIS = {
   NUT_AND_BOLT: get('nut_and_bolt'),
   GAME_DIE: get('game_die'),
   GEAR: get('gear'),
+  WARNING: get('warning'),
 };

@@ -60,11 +60,8 @@ export class ListCommand extends AbstractCommand {
         }
         currentNode = currentNode[parent] as TreeObject;
       }
-      currentNode[`${task.isPackage ? EMOJIS.PACKAGE : EMOJIS.ROBOT} ${task.name}`] = this.extractFields(
-        task,
-        withFields,
-        true,
-      );
+      currentNode[`${task.handler ? (task.isPackage ? EMOJIS.PACKAGE : EMOJIS.ROBOT) : EMOJIS.WARNING} ${task.name}`] =
+        this.extractFields(task, withFields, true);
     }
 
     console.log(`\nTotal custom tasks: ${customTasks.length}`);
