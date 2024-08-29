@@ -33,12 +33,27 @@ Here the full list of system tasks:
 
 Custom tasks are tasks that are defined by the user and loaded by the CLI dynamically.
 They are written in JavaScript and implement from the [TaskHandler](../../packages/core/src/model/task-handler.ts) interface.
-They should be placed in the `tasks` directory (by default), you can change the directory by setting the `task.dir` configuration.
+
+You can write custom tasks either in a simple JS file or a node package:
+
+1. Simple JS file
+   - A single JS file that exports default a class that implements the `TaskHandler` interface.
+   - In case you need to use external libraries, you must bundle them into a single file by using tools like Webpack, Rollup or esbuild.
+   - They should be placed in the `tasks` directory (by default), you can change the directory by setting the `task.dir` configuration.
+   - The file extension should be either `.js`, `.mjs` for ESM module or `.cjs` for CommonJS module.
+2. Node package
+   - A node package that exports a default class that implements the `TaskHandler` interface.
+   - The entry point should be defined in the `main` field in `package.json`.
+   - The package should be published to npm or a private registry.
+   - We recommend you name the package with `letrun-task-` prefix.
+   - You can install the package using `letrun task install <package-name>` command.
+   - We also support you place the package in the `tasks` directory manually.
 
 A task handler should have the following structure:
 
-- `name`: The name of the task.
+- `name`: The name of the task, this is optional. We'll use the file name or package name as the task name if not defined.
 - `description`: A brief description of the task, this is optional.
+- `version`: The version of the task, this is optional. We'll use the package version if not defined.
 - `parameters`: An object that describes the input parameters of the task for showing help.
 - `handle`: The function that executes the task.
 

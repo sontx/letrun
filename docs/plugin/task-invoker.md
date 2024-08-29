@@ -22,7 +22,7 @@ Here is an example of a Task Invoker Plugin:
 import { AbstractPlugin, TASK_INVOKER_PLUGIN, TaskHandlerInput, TaskHandlerOutput, TaskInvoker } from '@letrun/core';
 import path from 'node:path';
 import fs from 'fs';
-import { InvalidParameterError } from '@letrun/core/dist';
+import { InvalidParameterError } from '@letrun/core';
 
 export default class CustomTaskInvoker extends AbstractPlugin implements TaskInvoker {
   readonly name = 'custom';
