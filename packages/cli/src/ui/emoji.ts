@@ -19,8 +19,10 @@ export const EMOJIS = {
   PRAY: get('pray'),
   WINE: get('wine_glass'),
   ROBOT: get('robot'),
+  PACKAGE: get('package'),
   FOLDER: get('file_folder'),
   NUT_AND_BOLT: get('nut_and_bolt'),
   GAME_DIE: get('game_die'),
   GEAR: get('gear'),
+  WARNING: get('warning'),
 };

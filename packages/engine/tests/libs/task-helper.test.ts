@@ -1,6 +1,6 @@
-import { TaskHelper } from '@src/command/libs/task-helper';
 import { AppContext } from '@letrun/core';
 import path from 'node:path';
+import { TaskHelper } from "@src/libs/task-helper";
 
 const jest = import.meta.jest;
 (import.meta.jest as any).unstable_mockModule('fs', () => ({
@@ -24,9 +24,9 @@ describe('extractParentDirs', () => {
 
 describe('searchTasks', () => {
   const tasks = [
-    { name: 'task1', path: 'group1/task1.js' },
-    { name: 'task1', path: 'group2/task1.js' },
-    { name: 'task2', path: 'group1/task2.js' },
+    { name: 'task1', group: 'group1', path: 'group1/task1.js' },
+    { name: 'task1', group: 'group2', path: 'group2/task1.js' },
+    { name: 'task2', group: 'group1', path: 'group1/task2.js' },
   ];
 
   it('returns tasks matching the given name and group', () => {

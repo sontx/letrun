@@ -1,6 +1,6 @@
 import DefaultTaskInvoker from '@src/default-task-invoker';
 import { TaskHandlerInput } from '@letrun/core';
-import { InvalidParameterError } from '@letrun/core/dist';
+import { InvalidParameterError } from '@letrun/core';
 import path from 'node:path';
 import fs from 'fs';
 import { Subject } from 'rxjs';
@@ -41,6 +41,9 @@ describe('DefaultTaskInvoker', () => {
       context: {
         getLogger: jest.fn().mockReturnValue({ verbose: jest.fn() }),
         getConfigProvider: jest.fn().mockReturnValue({ get: jest.fn().mockResolvedValue('tasks') }),
+        getPluginManager: jest.fn().mockImplementation(() => ({
+          callPluginMethod: jest.fn().mockResolvedValue(handlerPath),
+        })),
       },
     } as unknown as TaskHandlerInput;
 
@@ -57,17 +60,14 @@ describe('DefaultTaskInvoker', () => {
       context: {
         getLogger: jest.fn().mockReturnValue({ verbose: jest.fn() }),
         getConfigProvider: jest.fn().mockReturnValue({ get: jest.fn().mockResolvedValue('tasks') }),
+        getPluginManager: jest.fn().mockImplementation(() => ({
+          callPluginMethod: jest.fn().mockResolvedValue(undefined),
+        })),
       },
     } as unknown as TaskHandlerInput;
 
     const invoker = new DefaultTaskInvoker();
     await expect(invoker.invoke(input)).rejects.toThrow(InvalidParameterError);
-  });
-
-  it('returns null if the task handler file does not exist', () => {
-    const invoker = new DefaultTaskInvoker();
-    const location = invoker['lookupJsFileLocation']('nonExistentTask', 'tasks');
-    expect(location).toBeNull();
   });
 
   it('loads without errors', async () => {

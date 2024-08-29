@@ -5,17 +5,6 @@ import type Joi from 'joi';
 import { Container, Plugin, Task, TaskDef, TaskStatus, WorkflowTaskDefs, WorkflowTasks } from '@src/model';
 
 /**
- * Imports the default export from a module.
- * @param {string} filePath - The path to the module file.
- * @returns {Promise<any>} A promise that resolves to the default export of the module.
- */
-export async function importDefault(filePath: string): Promise<any> {
-  const effectivePath = isRelativePath(filePath) ? path.resolve(getEntryPointDir(), filePath) : filePath;
-  const obj = await import(`file://${effectivePath}`);
-  return filePath.endsWith('.cjs') ? obj.default.default : obj.default;
-}
-
-/**
  * Checks if a path is relative.
  * @param {string} path - The path to check.
  * @returns {boolean} True if the path is relative, false otherwise.
@@ -251,4 +240,24 @@ export function isValueDefined<T>(value: T | undefined | null): value is T {
 
 export function isDefined(value: any): boolean {
   return value !== undefined && value !== null;
+}
+
+/**
+ * Extracts the package name and version from a string.
+ *
+ * For example, `@letrun/core@1.0.0` will return `{ name: '@letrun/core', version: '1.0.0' }`.
+ */
+export function extractPackageNameVersion(packageName: string) {
+  const match = packageName.match(/^(?:@([^/]+)\/)?([^@]+)(?:@([^@]+))?$/);
+
+  if (!match) {
+    return { name: packageName, version: undefined };
+  }
+
+  const [_, scope, name, version] = match;
+
+  return {
+    name: scope ? `@${scope}/${name}` : name,
+    version: version || undefined,
+  };
 }

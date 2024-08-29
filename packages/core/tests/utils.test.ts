@@ -2,9 +2,9 @@ import {
   childHasStatus,
   countTasks,
   delayMs,
+  extractPackageNameVersion,
   getEntryPointDir,
   getTasksByStatus,
-  importDefault,
   isRelativePath,
   isTerminatedStatus,
   isWorkflowTaskDefsArray,
@@ -12,16 +12,13 @@ import {
   loadConfigToPlugin,
   scanAllTasks,
   validateParameters,
+  wrapPromiseWithAbort,
 } from '@src/utils';
 import { Container, Plugin, TaskDef, WorkflowTasks } from '@src/model';
-import { InvalidParameterError } from '@src/error';
+import { InterruptInvokeError, InvalidParameterError } from '@src/error';
 import Joi from 'joi';
 
 describe('Utils', () => {
-  it('throws error for imports default export from a not found module', async () => {
-    await expect(importDefault('./not-found-module.js')).rejects.toThrow(/^Cannot find module*/);
-  });
-
   it('checks if a path is relative', () => {
     expect(isRelativePath('./path')).toBe(true);
     expect(isRelativePath('/absolute/path')).toBe(false);
@@ -95,9 +92,6 @@ describe('Utils', () => {
   });
 });
 
-import { wrapPromiseWithAbort } from '@src/utils';
-import { InterruptInvokeError } from '@src/error';
-
 describe('wrapPromiseWithAbort', () => {
   it('resolves the promise successfully when not aborted', async () => {
     const promise = new Promise((resolve) => setTimeout(() => resolve('success'), 100));
@@ -159,5 +153,15 @@ describe('delayMs', () => {
     await delayMs(100, abortController.signal);
     const end = Date.now();
     expect(end - start).toBeLessThan(100);
+  });
+
+  it('extracts package name and version correctly', () => {
+    expect(extractPackageNameVersion('@letrun/core@1.0.0')).toEqual({ name: '@letrun/core', version: '1.0.0' });
+    expect(extractPackageNameVersion('package@2.3.4')).toEqual({ name: 'package', version: '2.3.4' });
+    expect(extractPackageNameVersion('simple-package')).toEqual({ name: 'simple-package', version: undefined });
+    expect(extractPackageNameVersion('@scope/package@0.0.1')).toEqual({ name: '@scope/package', version: '0.0.1' });
+    expect(extractPackageNameVersion('simple-package@^1.0.0')).toEqual({ name: 'simple-package', version: '^1.0.0' });
+    expect(extractPackageNameVersion('some/wrong/module')).toEqual({ name: 'some/wrong/module', version: undefined });
+    expect(extractPackageNameVersion('')).toEqual({ name: '', version: undefined });
   });
 });
