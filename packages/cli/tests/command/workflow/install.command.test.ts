@@ -30,11 +30,10 @@ describe('InstallCommand', () => {
 
   it('logs an error if the workflow file is not found', async () => {
     const inputParameterMock = {
-      read: jest.fn().mockResolvedValue(null),
+      read: jest.fn().mockRejectedValue(new Error('File not found: invalid-path')),
     };
     jest.spyOn(installCommand['context'].getPluginManager(), 'getOne').mockResolvedValue(inputParameterMock as any);
-    await installCommand['doAction']('invalid-path', {});
-    expect(logErrorMock).toHaveBeenCalledWith('File not found: invalid-path');
+    await expect(installCommand['doAction']('invalid-path', {})).rejects.toThrow('File not found: invalid-path');
   });
 
   it('logs info if no dependencies to install', async () => {

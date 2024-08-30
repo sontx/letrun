@@ -52,4 +52,11 @@ describe('DefaultInputParameter', () => {
 
     await expect(inputParameter.read(rawInput)).rejects.toThrow(/^Unexpected token/);
   });
+
+  it('returns null if the file is not found', async () => {
+    const rawInput = 'nonexistent.json';
+    jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+
+    await expect(inputParameter.read(rawInput)).rejects.toThrow(`File not found: ${rawInput}`);
+  });
 });

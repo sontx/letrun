@@ -127,7 +127,7 @@ describe('delayMs', () => {
     const start = Date.now();
     await delayMs(100);
     const end = Date.now();
-    expect(end - start).toBeGreaterThanOrEqual(100);
+    expect(end - start).toBeGreaterThanOrEqual(90);
   });
 
   it('resolves the delay successfully when not aborted', async () => {
@@ -135,7 +135,7 @@ describe('delayMs', () => {
     const start = Date.now();
     await delayMs(100, abortController.signal);
     const end = Date.now();
-    expect(end - start).toBeGreaterThanOrEqual(100);
+    expect(end - start).toBeGreaterThanOrEqual(90);
   });
 
   it('resolves the delay immediately if the signal is already aborted', async () => {

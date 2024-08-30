@@ -30,12 +30,8 @@ export class InstallCommand extends AbstractCommand {
     const scanner = await this.getScanner();
     const inputParameter = await this.context.getPluginManager().getOne<InputParameter>(INPUT_PARAMETER_PLUGIN);
     const workflow = await inputParameter.read<WorkflowDef>(path);
-    if (!workflow) {
-      this.context.getLogger().error(`File not found: ${path}`);
-      return;
-    }
 
-    const deps = await scanner.scan(workflow);
+    const deps = await scanner.scan(workflow!);
     const installableDeps = deps
       .filter((dep) => dep.type === 'package')
       .map((dep) => ({
