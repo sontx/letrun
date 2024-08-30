@@ -10,10 +10,10 @@ export interface Dependency {
 export interface WorkflowDependency {
   name: string;
   handler?: string;
-  dependency: string;
+  dependency?: string;
   installed: boolean;
   version?: string;
   requireVersion?: string;
   incompatibleVersion?: boolean;
-  type?: 'package' | 'script';
+  type?: 'package' | 'script' | 'system';
 }

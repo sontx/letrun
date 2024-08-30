@@ -9,14 +9,16 @@ import {
   LocationResolverFn,
   ModuleResolverFn,
   resolveLocalModuleLocation,
+  TaskDef,
 } from '@letrun/core';
 import { WorkflowDependency } from '@src/model';
 import validate from 'validate-npm-package-name';
 
 export class WorkflowDepsScanner {
   constructor(
-    private locationResolver: LocationResolverFn = resolveLocalModuleLocation,
-    private moduleResolver: ModuleResolverFn = defaultModuleResolver.resolve,
+    public locationResolver: LocationResolverFn = resolveLocalModuleLocation,
+    public moduleResolver: ModuleResolverFn = defaultModuleResolver.resolve,
+    public checkSystemDependencyFn: (handler: string) => boolean = () => false,
   ) {}
 
   async scan(container: ContainerDef): Promise<WorkflowDependency[]> {
@@ -30,40 +32,16 @@ export class WorkflowDepsScanner {
         }));
 
     for (const task of tasks) {
-      const location = await this.locationResolver(task.handler);
-      let installed = false;
-      let isDirectory = false;
-
-      if (location) {
-        const stat = await fs.promises.stat(location);
-        if (stat.isDirectory()) {
-          isDirectory = true;
-          installed = fs.existsSync(path.resolve(location, 'package.json'));
-        } else {
-          installed = true;
-        }
-      }
-
-      const version = location && installed ? await this.getVersion(location, isDirectory) : null;
-      let handler = task.handler;
-      let requireVersion: string | undefined;
-      const { name, version: packageVersion } = extractPackageNameVersion(handler);
-      if (isDirectory) {
-        handler = name;
-        requireVersion = packageVersion;
-      }
-
-      dependencies.push({
-        name: task.name,
-        handler: handler,
-        dependency: location ?? task.handler,
-        installed,
-        version: version ?? undefined,
-        incompatibleVersion: version && requireVersion ? !satisfies(version, requireVersion) : false,
-        requireVersion,
-        type: installed ? (isDirectory ? 'package' : 'script') : undefined,
-      });
-
+      const dependency: WorkflowDependency = this.checkSystemDependencyFn(task.handler)
+        ? {
+            name: task.name,
+            handler: task.handler,
+            installed: true,
+            incompatibleVersion: false,
+            type: 'system',
+          }
+        : await this.createDependency(task);
+      dependencies.push(dependency);
       const deps = await this.scan(task);
       if (deps.length) {
         dependencies.push(...deps);
@@ -72,7 +50,11 @@ export class WorkflowDepsScanner {
 
     dependencies = this.removeDuplicatedPackages(dependencies);
     const candidatePackages = dependencies.filter(
-      (dep) => !dep.installed && !dep.requireVersion && !validate(dep.handler!).errors?.length,
+      (dep) =>
+        !['system', 'script'].includes(dep.type ?? '') &&
+        !dep.installed &&
+        !dep.requireVersion &&
+        !validate(dep.handler!).errors?.length,
     );
 
     if (candidatePackages.length) {
@@ -88,6 +70,42 @@ export class WorkflowDepsScanner {
     }
 
     return dependencies;
+  }
+
+  private async createDependency(task: TaskDef): Promise<WorkflowDependency> {
+    const location = await this.locationResolver(task.handler);
+    let installed = false;
+    let isDirectory = false;
+
+    if (location) {
+      const stat = await fs.promises.stat(location);
+      if (stat.isDirectory()) {
+        isDirectory = true;
+        installed = fs.existsSync(path.resolve(location, 'package.json'));
+      } else {
+        installed = true;
+      }
+    }
+
+    const version = location && installed ? await this.getVersion(location, isDirectory) : null;
+    let handler = task.handler;
+    let requireVersion: string | undefined;
+    const { name, version: packageVersion } = extractPackageNameVersion(handler);
+    if (isDirectory && name) {
+      handler = name;
+      requireVersion = packageVersion;
+    }
+
+    return {
+      name: task.name,
+      handler: handler,
+      dependency: location ?? task.handler,
+      installed,
+      version: version ?? undefined,
+      incompatibleVersion: version && requireVersion ? !satisfies(version, requireVersion) : false,
+      requireVersion,
+      type: installed ? (isDirectory ? 'package' : 'script') : undefined,
+    };
   }
 
   private removeDuplicatedPackages(dependencies: WorkflowDependency[]) {

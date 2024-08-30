@@ -8,11 +8,13 @@ describe('WorkflowDepsScanner', () => {
   let scanner: WorkflowDepsScanner;
   let mockLocationResolver: jest.Mocked<LocationResolverFn>;
   let mockModuleResolver: jest.Mocked<ModuleResolverFn>;
+  let mockCheckSystemDependencyFn: jest.MockedFunction<(handler: string) => boolean>;
 
   beforeEach(() => {
     mockLocationResolver = jest.fn();
     mockModuleResolver = jest.fn().mockResolvedValue(class {});
-    scanner = new WorkflowDepsScanner(mockLocationResolver, mockModuleResolver);
+    mockCheckSystemDependencyFn = jest.fn().mockReturnValue(false);
+    scanner = new WorkflowDepsScanner(mockLocationResolver, mockModuleResolver, mockCheckSystemDependencyFn);
   });
 
   it('returns empty array if container has no tasks', async () => {
@@ -375,5 +377,23 @@ describe('WorkflowDepsScanner', () => {
       },
     ]);
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('identifies system dependencies using checkSystemDependencyFn', async () => {
+    const container: ContainerDef = { tasks: { task1: { handler: 'system-handler' } } } as any;
+    mockCheckSystemDependencyFn.mockImplementation((handler) => handler === 'system-handler');
+
+    const result = await scanner.scan(container);
+
+    expect(result).toEqual([
+      {
+        name: 'task1',
+        handler: 'system-handler',
+        installed: true,
+        incompatibleVersion: false,
+        type: 'system',
+      },
+    ]);
+    expect(mockCheckSystemDependencyFn).toHaveBeenCalledWith('system-handler');
   });
 });
