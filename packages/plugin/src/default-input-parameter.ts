@@ -13,7 +13,10 @@ export default class DefaultInputParameter extends AbstractPlugin implements Inp
     }
 
     const ext = rawInput.split('.').pop()?.toLowerCase();
-    if (['json', 'yaml', 'yml'].includes(ext ?? '') && fs.existsSync(rawInput)) {
+    if (['json', 'yaml', 'yml'].includes(ext ?? '')) {
+      if (!fs.existsSync(rawInput)) {
+        throw new Error(`File not found: ${rawInput}`);
+      }
       const fileContent = await fs.promises.readFile(rawInput, 'utf8');
       if (ext === 'json') {
         return JSON.parse(fileContent);
