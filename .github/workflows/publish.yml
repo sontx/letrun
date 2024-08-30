@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm ci  # Use npm ci for a clean and consistent install
 
+      - name: Build all packages
+        run: npm run build:all
+
       - name: Publish changed packages
         run: npx lerna publish from-package --no-private --yes
         env:
