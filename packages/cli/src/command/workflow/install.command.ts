@@ -56,7 +56,7 @@ export class InstallCommand extends AbstractCommand {
       );
 
       if (stderr) {
-        spinner.fail("Couldn't install packages\n");
+        spinner.warn("Packages installed with warnings\n");
         this.context.getLogger().error(stderr.trim());
       } else {
         spinner.succeed('Packages installed successfully\n');
