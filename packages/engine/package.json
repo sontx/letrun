@@ -1,6 +1,6 @@
 {
   "name": "@letrun/engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "LetRun engine",
   "type": "module",
   "exports": {
@@ -53,9 +53,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/core": "^0.0.2",
-    "@letrun/plugin": "^0.0.2",
-    "@letrun/deps": "^0.0.1",
+    "@letrun/core": "^0.0.3",
+    "@letrun/deps": "^0.0.2",
+    "@letrun/plugin": "^0.0.3",
     "joi": "^17.13.3",
     "jsonpath-plus": "^9.0.0",
     "ms": "^2.1.3",

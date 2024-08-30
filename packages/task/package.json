@@ -32,7 +32,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/core": "^0.0.2",
+    "@letrun/core": "^0.0.3",
     "expect": "^29.7.0",
     "joi": "^17.13.3"
   }

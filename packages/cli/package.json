@@ -1,6 +1,6 @@
 {
   "name": "@letrun/cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple and efficient tool for running declarative workflows with ease.",
   "type": "module",
   "author": "sontx",
@@ -45,14 +45,14 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/core": "^0.0.2",
-    "@letrun/plugin": "^0.0.2",
-    "@letrun/engine": "^0.0.1",
-    "@letrun/deps": "^0.0.1",
+    "@letrun/core": "^0.0.3",
+    "@letrun/deps": "^0.0.2",
+    "@letrun/engine": "^0.0.2",
+    "@letrun/plugin": "^0.0.3",
     "commander": "^12.1.0",
-    "ora": "^8.1.0",
     "joi": "^17.13.3",
     "node-emoji": "^2.1.3",
+    "ora": "^8.1.0",
     "treeify": "^1.1.0"
   }
 }
