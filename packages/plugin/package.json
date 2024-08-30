@@ -1,7 +1,6 @@
 {
   "name": "@letrun/plugin",
   "version": "0.0.3",
-  "private": true,
   "description": "The plugins package for LetRun",
   "type": "module",
   "exports": {
