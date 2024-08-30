@@ -10,6 +10,7 @@ import {
   ModuleLocationResolver,
   WorkflowDef,
 } from '@letrun/core';
+import { SystemTaskManager } from '@letrun/engine';
 
 export class InstallCommand extends AbstractCommand {
   private npmPackage = new NpmPackage();
@@ -55,7 +56,7 @@ export class InstallCommand extends AbstractCommand {
             return `${name}@${dep.version}`;
           })
           .join(' '),
-        options.dryRun ? '--dry-run' : '',
+        options.dryRun ? '--dry-run' : undefined,
       );
 
       if (stderr) {
@@ -63,17 +64,29 @@ export class InstallCommand extends AbstractCommand {
         this.context.getLogger().error(stderr.trim());
       } else {
         spinner.succeed('Packages installed successfully\n');
-        console.log(stdout.trim());
+        console.log(stdout?.trim());
       }
+      return true;
     } catch (e: any) {
       spinner.fail(e.message);
+      return false;
     }
   }
 
   private async getScanner() {
-    const locationResolver = await this.context
-      .getPluginManager()
-      .getOne<ModuleLocationResolver>(MODULE_LOCATION_RESOLVER_PLUGIN);
-    return new WorkflowDepsScanner(locationResolver.resolveLocation);
+    const scanner = new WorkflowDepsScanner();
+    scanner.locationResolver = async (module: string, modulesDir?: string) => {
+      return this.context
+        .getPluginManager()
+        .callPluginMethod<ModuleLocationResolver>(
+          MODULE_LOCATION_RESOLVER_PLUGIN,
+          'resolveLocation',
+          module,
+          modulesDir,
+        );
+    };
+    const systemTasks = Object.keys(SystemTaskManager.getSystemTasks());
+    scanner.checkSystemDependencyFn = (handler) => systemTasks.includes(handler);
+    return scanner;
   }
 }

@@ -64,7 +64,7 @@ export class DefaultContext implements AppContext {
     await this.initPluginManager();
     await this.initLogger();
 
-    this.getLogger().info('App context loaded');
+    this.getLogger().debug('App context loaded');
     this.loaded = true;
   }
 
@@ -103,7 +103,7 @@ export class DefaultContext implements AppContext {
       return;
     }
 
-    this.getLogger().info('App context unloaded');
+    this.getLogger().debug('App context unloaded');
     await this.pluginManager?.unload();
     this.loaded = false;
   }

@@ -5,7 +5,7 @@ import { AppContext, COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
 import { BootstrapUtils, DefaultContext } from '@letrun/engine';
 
 async function setupLogLevel(context: AppContext) {
-  const logLevel = BootstrapUtils.getOptionValue('-l', '--log') ?? 'warn';
+  const logLevel = BootstrapUtils.getOptionValue('-l', '--log') ?? 'info';
   await BootstrapUtils.setGlobalLogLevel(context, logLevel);
 }
 
@@ -26,7 +26,7 @@ const bootstrap = async () => {
         console.log(`v${process.env.APP_VERSION} - from ${process.env.APP_AUTHOR} with ${EMOJIS.HEART}\n`);
       }
     })
-    .option('-l, --log <logLevel>', 'log level', 'warn')
+    .option('-l, --log <logLevel>', 'log level', 'info')
     .option('--hide-banner', 'hide banner', false);
 
   const context = new DefaultContext();
