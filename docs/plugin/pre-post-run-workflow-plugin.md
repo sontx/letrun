@@ -12,7 +12,8 @@ To create a Pre/Post Run Workflow Plugin, you need to implement the `ExecutableP
 Here is an example of a Pre-Run Workflow Plugin:
 
 ```typescript
-import { AbstractPlugin, ExecutablePlugin, PRE_RUN_WORKFLOW_PLUGIN, Workflow } from '@letrun/core';
+import { AbstractPlugin, ExecutablePlugin, PRE_RUN_WORKFLOW_PLUGIN } from '@letrun/core';
+import { Workflow } from '@letrun/common';
 
 export default class PreRunWorkflowPlugin extends AbstractPlugin implements ExecutablePlugin {
   readonly name = 'validate-workflow';
@@ -30,7 +31,8 @@ export default class PreRunWorkflowPlugin extends AbstractPlugin implements Exec
 Here is an example of a Post-Run Workflow Plugin:
 
 ```typescript
-import { AbstractPlugin, ExecutablePlugin, POST_RUN_WORKFLOW_PLUGIN, Workflow } from '@letrun/core';
+import { AbstractPlugin, ExecutablePlugin, POST_RUN_WORKFLOW_PLUGIN } from '@letrun/core';
+import { Workflow } from '@letrun/common';
 import fs from 'fs';
 
 export default class PostRunWorkflowPlugin extends AbstractPlugin implements ExecutablePlugin {

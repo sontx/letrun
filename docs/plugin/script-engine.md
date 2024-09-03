@@ -23,7 +23,8 @@ To create a Script Engine Plugin, you need to implement the `ScriptEngine` inter
 Here is an example of a Script Engine Plugin for JavaScript:
 
 ```typescript
-import { AbstractPlugin, SCRIPT_ENGINE_PLUGIN, ScriptEngine, ObjectType } from '@letrun/core';
+import { AbstractPlugin, SCRIPT_ENGINE_PLUGIN, ScriptEngine } from '@letrun/core';
+import { ObjectType } from '@letrun/common';
 import vm from 'vm';
 
 export default class JavascriptEngine extends AbstractPlugin implements ScriptEngine {

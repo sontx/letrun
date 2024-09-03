@@ -28,7 +28,7 @@ export interface PluginLifecycle {
  * Interface representing a plugin.
  * Extends the PluginLifecycle interface.
  */
-export interface Plugin extends PluginLifecycle {
+export interface Plugin extends PluginLifecycle, Record<string, any> {
   /** The name of the plugin. */
   readonly name: string;
   /** The type of the plugin. There may be multiple plugins with the same type but different names. */
@@ -36,8 +36,6 @@ export interface Plugin extends PluginLifecycle {
   /** If there are multiple names of this plugin type, the highest priority is prioritized for use. Default is 0 */
   readonly priority?: number;
   readonly description?: string;
-  /** Additional properties for the plugin. */
-  [key: string]: any;
 }
 
 /**

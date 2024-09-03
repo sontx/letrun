@@ -12,7 +12,8 @@ To create a Pre/Post Run Task Plugin, you need to implement the `ExecutablePlugi
 Here is an example of a Pre-Run Task Plugin:
 
 ```typescript
-import { AbstractPlugin, ExecutablePlugin, PRE_RUN_TASK_PLUGIN, Workflow, Task } from '@letrun/core';
+import { AbstractPlugin, ExecutablePlugin, PRE_RUN_TASK_PLUGIN } from '@letrun/core';
+import { Workflow, Task } from '@letrun/common';
 
 export default class PreRunTaskPlugin extends AbstractPlugin implements ExecutablePlugin {
   readonly name = 'validate-task';
@@ -30,7 +31,8 @@ export default class PreRunTaskPlugin extends AbstractPlugin implements Executab
 Here is an example of a Post-Run Task Plugin:
 
 ```typescript
-import { AbstractPlugin, ExecutablePlugin, POST_RUN_TASK_PLUGIN, Task, Workflow } from '@letrun/core';
+import { AbstractPlugin, ExecutablePlugin, POST_RUN_TASK_PLUGIN } from '@letrun/core';
+import { Workflow, Task } from '@letrun/common';
 import fs from 'fs';
 
 export default class PostRunTaskPlugin extends AbstractPlugin implements ExecutablePlugin {

@@ -231,6 +231,7 @@ The default configuration is:
 There are four projects:
 
 - `core`: The core library that contains the shared types, interfaces, and utilities.
+- `common`: Common types and utilities which are independent from the runtime environment.
 - `plugin`: The plugin library that contains the system plugins.
 - `task`: The task library that contains some custom tasks.
 - `deps`: Provides a way to manage dependencies for the CLI tool.
