@@ -1,6 +1,6 @@
 {
   "name": "@letrun/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "The core package for the cli and its plugins or tasks",
   "type": "module",
   "exports": {
