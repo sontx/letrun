@@ -18,19 +18,19 @@ import { AbstractPlugin, Persistence, PERSISTENCE_PLUGIN, PersistenceUnit } from
 class InMemoryPersistenceUnit implements PersistenceUnit {
   constructor(private storage: Record<string, any>) {}
 
-  save(key: string, value: any): void {
+  async save(key: string, value: any) {
     this.storage[key] = value;
   }
 
-  load(key: string): any {
+  async load(key: string) {
     return this.storage[key];
   }
 
-  remove(key: string): void {
+  async remove(key: string) {
     delete this.storage[key];
   }
 
-  list(): string[] {
+  async list() {
     return Object.keys(this.storage);
   }
 }

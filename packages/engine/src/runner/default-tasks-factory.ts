@@ -1,14 +1,5 @@
-import {
-  IdGenerator,
-  InvalidParameterError,
-  isWorkflowTaskDefsArray,
-  isWorkflowTaskDefsEmpty,
-  Task,
-  TaskDef,
-  TasksFactory,
-  WorkflowTaskDefs,
-  WorkflowTasks,
-} from '@letrun/core';
+import { IdGenerator, isWorkflowTaskDefsArray, isWorkflowTaskDefsEmpty } from '@letrun/core';
+import { InvalidParameterError, Task, TaskDef, TasksFactory, WorkflowTaskDefs, WorkflowTasks } from '@letrun/common';
 
 export type TaskCustomizer = (task: Task) => Task;
 export type TaskDefValidator = (taskDef: TaskDef) => void;

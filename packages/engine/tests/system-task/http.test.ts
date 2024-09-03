@@ -1,5 +1,5 @@
 import { HttpTaskHandler } from '@src/system-task/http';
-import { InvalidParameterError, Task, TaskHandlerInput } from '@letrun/core';
+import { InvalidParameterError, Task, TaskHandlerInput } from '@letrun/common';
 
 const jest = import.meta.jest;
 

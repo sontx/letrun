@@ -3,7 +3,7 @@ import { RunCommand } from './run.command';
 import { WorkflowCommand } from './workflow';
 import { PluginCommand } from './plugin';
 import { TaskCommand } from './task';
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 
 export class CommandLoader {
   public static async load(program: Command, context: AppContext): Promise<void> {

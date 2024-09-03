@@ -32,7 +32,7 @@ Here the full list of system tasks:
 ## Custom Tasks
 
 Custom tasks are tasks that are defined by the user and loaded by the CLI dynamically.
-They are written in JavaScript and implement from the [TaskHandler](../../packages/core/src/model/task-handler.ts) interface.
+They are written in JavaScript and implement from the [TaskHandler](../../packages/common/src/model/task-handler.ts) interface.
 
 You can write custom tasks either in a simple JS file or a node package:
 
@@ -62,7 +62,8 @@ We support grouping tasks by placing them in subdirectories, the group name will
 This is an example of a custom task:
 
 ```ts
-import { TaskHandler, validateParameters } from '@letrun/core';
+import { validateParameters } from '@letrun/core';
+import { TaskHandler } from '@letrun/common';
 import Joi from 'joi';
 
 interface TaskParameters {
@@ -89,7 +90,8 @@ export default class GreatingTaskHandler implements TaskHandler {
 Here is another example that will uppercase the input string:
 
 ```ts
-import { TaskHandler, validateParameters } from '@letrun/core';
+import { validateParameters } from '@letrun/core';
+import { TaskHandler } from '@letrun/common';
 import Joi from 'joi';
 
 interface TaskParameters {

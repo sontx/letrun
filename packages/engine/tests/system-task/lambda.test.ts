@@ -1,4 +1,4 @@
-import { AppContext, TaskHandlerInput } from '@letrun/core';
+import { AppContext, TaskHandlerInput } from '@letrun/common';
 import fs from 'fs';
 import { LambdaTaskHandler } from '@src/system-task/lambda';
 

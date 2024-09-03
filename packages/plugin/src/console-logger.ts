@@ -6,11 +6,11 @@ import { inspect, InspectOptions } from 'util';
 import { format, transports } from 'winston';
 import {
   AbstractPlugin,
-  AppContext,
   BUILTIN_PLUGIN_PRIORITY,
   LOG_TRANSPORT_PLUGIN,
   LogTransportPlugin,
 } from '@letrun/core';
+import { AppContext } from "@letrun/common";
 
 export default class ConsoleLogger extends AbstractPlugin implements LogTransportPlugin {
   private options?: ConsoleFormatOptions;

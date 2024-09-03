@@ -1,17 +1,15 @@
 import DefaultWorkflowRunner from '@src/default-workflow-runner';
+import { RETRY_PLUGIN, TASK_INVOKER_PLUGIN, WorkflowRunner, WorkflowRunnerInput } from '@letrun/core';
 import {
   AppContext,
   ExecutionSession,
   IllegalStateError,
   InterruptInvokeError,
   RerunError,
-  RETRY_PLUGIN, RetryConfig,
+  RetryConfig,
   Task,
-  TASK_INVOKER_PLUGIN,
   Workflow,
-  WorkflowRunner,
-  WorkflowRunnerInput,
-} from '@letrun/core';
+} from '@letrun/common';
 import { Subject } from 'rxjs';
 
 const jest = import.meta.jest;
@@ -173,7 +171,7 @@ describe('DefaultWorkflowRunner', () => {
       }),
     } as unknown as AppContext;
     const session = {
-      getParentTask: jest.fn(checkTask => checkTask !== catchTask ? catchTask : undefined),
+      getParentTask: jest.fn((checkTask) => (checkTask !== catchTask ? catchTask : undefined)),
     } as unknown as ExecutionSession;
     const runner = new DefaultWorkflowRunner() as WorkflowRunner;
     jest.spyOn(runner, 'getContext').mockReturnValue(context);

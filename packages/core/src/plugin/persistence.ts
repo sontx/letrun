@@ -1,4 +1,4 @@
-import { Plugin } from '@src/model';
+import { Plugin } from '@letrun/common';
 
 export const PERSISTENCE_PLUGIN = 'persistence';
 

@@ -1,7 +1,7 @@
 import FilePersistence, { FilePersistenceUnit } from '@src/file-persistence';
 import path from 'node:path';
 import fs from 'fs';
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import { Subject } from "rxjs";
 
 const jest = import.meta.jest;

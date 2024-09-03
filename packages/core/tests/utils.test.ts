@@ -15,8 +15,7 @@ import {
   validateParameters,
   wrapPromiseWithAbort,
 } from '@src/utils';
-import { Container, Plugin, TaskDef, WorkflowTasks } from '@src/model';
-import { InterruptInvokeError, InvalidParameterError } from '@src/error';
+import { Container, InterruptInvokeError, InvalidParameterError, Plugin, TaskDef, WorkflowTasks } from '@letrun/common';
 import Joi from 'joi';
 
 describe('Utils', () => {

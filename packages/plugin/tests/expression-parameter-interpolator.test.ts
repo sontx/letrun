@@ -1,5 +1,5 @@
 import ExpressionParameterInterpolator from '@src/expression-parameter-interpolator';
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import { Subject } from "rxjs";
 
 const jest = import.meta.jest;

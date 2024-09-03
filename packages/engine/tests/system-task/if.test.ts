@@ -1,5 +1,5 @@
 import { IfTaskHandler, validateIfTask } from '@src/system-task/if';
-import { InvalidParameterError, Task, TaskDef, TaskHandlerInput } from '@letrun/core';
+import { InvalidParameterError, Task, TaskDef, TaskHandlerInput } from '@letrun/common';
 
 const jest = import.meta.jest;
 

@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@letrun/core": "^0.0.3",
+    "@letrun/common": "^0.0.1",
     "expect": "^29.7.0",
     "joi": "^17.13.3"
   }

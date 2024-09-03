@@ -1,4 +1,5 @@
-import { TaskHandler, TaskHandlerInput, TaskHandlerOutput, validateParameters } from '@letrun/core';
+import { validateParameters } from '@letrun/core';
+import { TaskHandler, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
 import Joi from 'joi';
 import * as fs from 'node:fs';
 

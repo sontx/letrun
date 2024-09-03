@@ -1,7 +1,8 @@
-import { defaultModuleResolver, extractJsExtension, getEntryPointDir, Plugin, PluginLoader } from '@letrun/core';
+import { defaultModuleResolver, extractJsExtension, getEntryPointDir } from '@letrun/core';
 import fs from 'fs';
 import path from 'node:path';
 import { DEFAULT_LOGGER } from '@src/libs/log-helper';
+import { Plugin, PluginLoader } from '@letrun/common';
 
 /**
  * Class representing a file-based plugin loader.

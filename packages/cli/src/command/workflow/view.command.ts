@@ -2,9 +2,10 @@ import treeify, { TreeObject } from 'treeify';
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
 import fs from 'fs';
-import { Container, Persistence, PERSISTENCE_PLUGIN, Workflow } from '@letrun/core';
+import { Persistence, PERSISTENCE_PLUGIN } from '@letrun/core';
 import { FIELD_TRANSFORMERS } from '../libs';
 import { EMOJIS } from '@src/ui';
+import { Container, Workflow } from "@letrun/common";
 
 export class ViewCommand extends AbstractCommand {
   load(program: Command): void {

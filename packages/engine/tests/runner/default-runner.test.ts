@@ -1,19 +1,10 @@
 import { DefaultRunner } from '@src/runner/default-runner';
-import {
-  AppContext,
-  IdGenerator,
-  IllegalStateError,
-  InvalidParameterError,
-  POST_RUN_WORKFLOW_PLUGIN,
-  PRE_RUN_WORKFLOW_PLUGIN,
-  Workflow,
-  WorkflowDef,
-  WorkflowRunner,
-} from '@letrun/core';
+import { IdGenerator, POST_RUN_WORKFLOW_PLUGIN, PRE_RUN_WORKFLOW_PLUGIN, WorkflowRunner } from '@letrun/core';
+import { AppContext, IllegalStateError, InvalidParameterError, Workflow, WorkflowDef } from '@letrun/common';
 import { DefaultContext } from '@src/runner/default-context';
 import { DefaultTasksFactory } from '@src/runner/default-tasks-factory';
 import { SystemTaskManager } from '@src/system-task';
-import { BootstrapUtils } from "@src/libs/bootstrap-utils";
+import { BootstrapUtils } from '@src/libs/bootstrap-utils';
 
 const jest = import.meta.jest;
 
@@ -132,7 +123,7 @@ describe('DefaultRunner.create', () => {
         debug: jest.fn(),
       }),
       getConfigProvider: jest.fn(() => ({
-        set: jest.fn()
+        set: jest.fn(),
       })),
       getPluginManager: jest.fn(),
       unload: jest.fn(),
@@ -146,14 +137,14 @@ describe('DefaultRunner.create', () => {
 
   it('sets the context and log level correctly', async () => {
     const setGlobalLogLevelSpy = jest.spyOn(BootstrapUtils, 'setGlobalLogLevel');
-    const runner = await DefaultRunner.create(mockContext, 'debug') as any;
+    const runner = (await DefaultRunner.create(mockContext, 'debug')) as any;
     expect(runner['context']).toBe(mockContext);
     expect(setGlobalLogLevelSpy).toHaveBeenCalledWith(mockContext, 'debug');
   });
 
   it('handles the absence of a context correctly', async () => {
     const loadSpy = jest.spyOn(DefaultContext.prototype, 'load');
-    const runner = await DefaultRunner.create() as any;
+    const runner = (await DefaultRunner.create()) as any;
     expect(runner['context']).toBeInstanceOf(DefaultContext);
     expect(loadSpy).toHaveBeenCalled();
   });

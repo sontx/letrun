@@ -19,10 +19,10 @@ To create a Task Invoker Plugin, you need to implement the `TaskInvoker` interfa
 Here is an example of a Task Invoker Plugin:
 
 ```typescript
-import { AbstractPlugin, TASK_INVOKER_PLUGIN, TaskHandlerInput, TaskHandlerOutput, TaskInvoker } from '@letrun/core';
+import { AbstractPlugin, TASK_INVOKER_PLUGIN, TaskInvoker } from '@letrun/core';
+import { TaskHandlerInput, TaskHandlerOutput, InvalidParameterError } from '@letrun/common';
 import path from 'node:path';
 import fs from 'fs';
-import { InvalidParameterError } from '@letrun/core';
 
 export default class CustomTaskInvoker extends AbstractPlugin implements TaskInvoker {
   readonly name = 'custom';

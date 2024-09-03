@@ -1,4 +1,5 @@
-import { AppContext, LOGGER_PLUGIN, LoggerPlugin } from '@letrun/core';
+import { LOGGER_PLUGIN, LoggerPlugin } from '@letrun/core';
+import { AppContext } from "@letrun/common";
 
 export class LogHelper {
   /**

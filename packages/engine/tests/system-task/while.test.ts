@@ -1,5 +1,5 @@
 import { validateWhileTask, WhileTaskHandler } from '@src/system-task/while';
-import { InvalidParameterError, RerunError, Task, TaskDef, TaskHandlerInput } from '@letrun/core';
+import { InvalidParameterError, RerunError, Task, TaskDef, TaskHandlerInput } from '@letrun/common';
 
 const jest = import.meta.jest;
 

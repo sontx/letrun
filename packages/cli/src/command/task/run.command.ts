@@ -1,9 +1,10 @@
 import { AbstractCommand, AbstractOptions } from '../abstract.command';
 import { Command } from 'commander';
-import { INPUT_PARAMETER_PLUGIN, InputParameter, TaskHandler, WorkflowDef } from '@letrun/core';
+import { INPUT_PARAMETER_PLUGIN, InputParameter } from '@letrun/core';
 import fs from 'fs';
 import { LogHelper } from '@src/command/libs/log-helper';
 import { DefaultRunner, SystemTaskManager, TaskHelper } from '@letrun/engine';
+import { TaskHandler, WorkflowDef } from "@letrun/common";
 
 const SUPPORT_RUN_SYSTEM_TASKS = ['log', 'http'];
 

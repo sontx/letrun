@@ -1,5 +1,5 @@
 import type { Command } from 'commander';
-import { Plugin } from '@src/model';
+import { Plugin } from '@letrun/common';
 
 export const COMMAND_PLUGIN = 'command';
 

@@ -35,7 +35,7 @@ In some cases, there is only one plugin that can handle the task, you can set th
 Here is an example of a custom plugin:
 
 ```ts
-import { Plugin } from '@letrun/core';
+import { Plugin } from '@letrun/common';
 
 export default class MyPlugin implements Plugin {
   readonly name = 'my-plugin';

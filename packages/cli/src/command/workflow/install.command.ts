@@ -8,9 +8,9 @@ import {
   InputParameter,
   MODULE_LOCATION_RESOLVER_PLUGIN,
   ModuleLocationResolver,
-  WorkflowDef,
 } from '@letrun/core';
 import { SystemTaskManager } from '@letrun/engine';
+import { WorkflowDef } from "@letrun/common";
 
 export class InstallCommand extends AbstractCommand {
   private npmPackage = new NpmPackage();

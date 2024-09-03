@@ -2,7 +2,8 @@ import { EnvironmentConfigProvider } from './environment-config-provider';
 import { JsonConfigProvider } from './json-config-provider';
 import path from 'node:path';
 import { YamlConfigProvider } from './yaml-config-provider';
-import { ConfigNotFoundError, ConfigProvider, FunctionKeys, getEntryPointDir, ObjectType } from '@letrun/core';
+import { getEntryPointDir } from '@letrun/core';
+import { ConfigNotFoundError, ConfigProvider, FunctionKeys, ObjectType } from '@letrun/common';
 import fs from 'fs';
 import { Observable, Subject } from 'rxjs';
 

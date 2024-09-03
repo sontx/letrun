@@ -3,16 +3,13 @@ import {
   BUILTIN_PLUGIN_PRIORITY,
   defaultModuleResolver,
   getEntryPointDir,
-  InvalidParameterError,
   MODULE_LOCATION_RESOLVER_PLUGIN,
   ModuleLocationResolver,
-  Task,
   TASK_INVOKER_PLUGIN,
-  TaskHandlerInput,
-  TaskHandlerOutput,
   TaskInvoker,
 } from '@letrun/core';
 import path from 'node:path';
+import { InvalidParameterError, Task, TaskHandlerInput, TaskHandlerOutput } from "@letrun/common";
 
 export default class DefaultTaskInvoker extends AbstractPlugin implements TaskInvoker {
   readonly name = 'default';

@@ -1,13 +1,11 @@
 import {
   AbstractPlugin,
-  AppContext,
   delayMs,
-  InterruptInvokeError,
   RETRY_PLUGIN,
-  RetryConfig,
   RetryInput,
   RetryPlugin,
 } from '@letrun/core';
+import { AppContext, InterruptInvokeError, RetryConfig } from "@letrun/common";
 
 const DEFAULT_RETRY_DELAY_SECONDS = 3;
 const DEFAULT_RETRY_COUNT = 3;

@@ -1,4 +1,5 @@
-import { RerunError, TaskDef, TaskHandler, TaskHandlerInput, validateParameters } from '@letrun/core';
+import { validateParameters } from '@letrun/core';
+import { RerunError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
 

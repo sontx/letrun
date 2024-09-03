@@ -1,4 +1,4 @@
-import { TaskDef, TaskHandler } from '@letrun/core';
+import { TaskDef, TaskHandler } from '@letrun/common';
 import { IfTaskHandler, validateIfTask } from './if';
 import { SwitchTaskHandler, validateSwitchTask } from './switch';
 import { ForTaskHandler, validateForTask } from './for';

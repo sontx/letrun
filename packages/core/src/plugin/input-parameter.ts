@@ -1,4 +1,4 @@
-import { Plugin } from '@src/model';
+import { Plugin } from '@letrun/common';
 
 /**
  * Constant representing the input parameter plugin type.

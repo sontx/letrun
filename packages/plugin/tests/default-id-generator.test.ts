@@ -1,4 +1,4 @@
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import DefaultIdGenerator from '@src/default-id-generator';
 import { Subject } from "rxjs";
 

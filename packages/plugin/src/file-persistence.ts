@@ -1,6 +1,5 @@
 import {
   AbstractPlugin,
-  AppContext,
   BUILTIN_PLUGIN_PRIORITY,
   getEntryPointDir,
   Persistence,
@@ -9,6 +8,7 @@ import {
 } from '@letrun/core';
 import fs from 'fs';
 import path from 'node:path';
+import { AppContext } from "@letrun/common";
 
 export class FilePersistenceUnit implements PersistenceUnit {
   private readonly dataDir: string;

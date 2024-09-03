@@ -1,4 +1,5 @@
-import { AbstractPlugin, AppContext, BUILTIN_PLUGIN_PRIORITY, ID_GENERATOR_PLUGIN, IdGenerator } from '@letrun/core';
+import { AbstractPlugin, BUILTIN_PLUGIN_PRIORITY, ID_GENERATOR_PLUGIN, IdGenerator } from '@letrun/core';
+import { AppContext } from "@letrun/common";
 
 /**
  * Class responsible for generating unique IDs.

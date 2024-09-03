@@ -1,4 +1,4 @@
-import { Plugin } from '@src/model';
+import { Plugin } from '@letrun/common';
 
 export const ID_GENERATOR_PLUGIN = 'id-generator';
 

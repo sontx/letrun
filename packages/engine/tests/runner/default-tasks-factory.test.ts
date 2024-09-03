@@ -1,5 +1,6 @@
 import { DefaultTasksFactory } from '@src/runner/default-tasks-factory';
-import {IdGenerator, InvalidParameterError, Task, TaskDef} from '@letrun/core';
+import { IdGenerator } from '@letrun/core';
+import { InvalidParameterError, Task, TaskDef } from '@letrun/common';
 
 const jest = import.meta.jest;
 

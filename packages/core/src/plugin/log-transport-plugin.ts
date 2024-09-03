@@ -1,5 +1,5 @@
 import type * as Transport from 'winston-transport';
-import { Plugin } from '@src/model';
+import { Plugin } from '@letrun/common';
 
 export const LOG_TRANSPORT_PLUGIN = 'log-transport';
 

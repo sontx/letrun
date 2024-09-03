@@ -1,5 +1,5 @@
 import { RunWorkflowTaskHandler } from '@src/system-task/run-workflow';
-import { InvalidParameterError, Task, TaskHandlerInput } from '@letrun/core';
+import { InvalidParameterError, Task, TaskHandlerInput } from '@letrun/common';
 import fs from 'fs';
 
 const jest = import.meta.jest;
