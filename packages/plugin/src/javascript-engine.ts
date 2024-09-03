@@ -1,13 +1,12 @@
 import {
   AbstractPlugin,
-  AppContext,
   BUILTIN_PLUGIN_PRIORITY,
   extractJsExtension,
-  ObjectType,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
 } from '@letrun/core';
 import vm from 'vm';
+import { AppContext, ObjectType } from "@letrun/common";
 
 export default class JavascriptEngine extends AbstractPlugin implements ScriptEngine {
   readonly name = 'javascript';

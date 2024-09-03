@@ -1,4 +1,4 @@
-import { Plugin, PluginLoader } from '@letrun/core';
+import { Plugin, PluginLoader } from '@letrun/common';
 import ConsoleLogger from './console-logger';
 import DefaultTaskInvoker from './default-task-invoker';
 import DefaultWorkflowRunner from './default-workflow-runner';

@@ -1,4 +1,4 @@
-import { Plugin, TaskHandlerInput, TaskHandlerOutput } from '@src/model';
+import { Plugin, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
 
 export const TASK_INVOKER_PLUGIN = 'task-invoker';
 

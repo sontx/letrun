@@ -1,14 +1,13 @@
 import {
   AbstractPlugin,
-  AppContext,
   BUILTIN_PLUGIN_PRIORITY,
-  ObjectType,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
 } from '@letrun/core';
 import { PythonShell } from 'python-shell';
 import tmp from 'tmp';
 import fs from 'fs';
+import { AppContext, ObjectType } from "@letrun/common";
 
 /**
  * Evaluates Python script, there are some limitations:

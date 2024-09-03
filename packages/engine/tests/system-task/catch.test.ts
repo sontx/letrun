@@ -1,5 +1,5 @@
 import { CatchTaskHandler, validateCatchTask } from '@src/system-task/catch';
-import { InvalidParameterError, Task, TaskDef, TaskHandlerInput, WorkflowTasks } from '@letrun/core';
+import { InvalidParameterError, Task, TaskDef, TaskHandlerInput, WorkflowTasks } from '@letrun/common';
 
 const jest = import.meta.jest;
 

@@ -1,4 +1,5 @@
-import { delayMs, TaskHandler, TaskHandlerInput, TaskHandlerOutput, validateParameters } from '@letrun/core';
+import { delayMs, validateParameters } from '@letrun/core';
+import { TaskHandler, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
 import Joi from 'joi';
 import ms from 'ms';
 

@@ -1,5 +1,4 @@
-import { ObjectType } from '../types';
-import { Plugin } from '@src/model';
+import { Plugin, ObjectType } from '@letrun/common';
 
 export const SCRIPT_ENGINE_PLUGIN = 'script-engine';
 

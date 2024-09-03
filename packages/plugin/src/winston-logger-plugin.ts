@@ -1,15 +1,14 @@
 import {
   AbstractPlugin,
-  AppContext,
   BUILTIN_PLUGIN_PRIORITY,
   LOG_TRANSPORT_PLUGIN,
-  Logger,
   LOGGER_PLUGIN,
   LoggerPlugin,
   PostHookFn,
   PreHookFn,
 } from '@letrun/core';
 import winston, { createLogger, format } from 'winston';
+import { AppContext, Logger } from "@letrun/common";
 
 class DefaultLogger implements Logger, Pick<LoggerPlugin, 'hook'> {
   private readonly postHooks: PostHookFn[] = [];

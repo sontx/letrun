@@ -1,5 +1,5 @@
 import { SimplePluginManager } from '@src/plugin';
-import { AppContext, IllegalStateError, InterruptInvokeError, Plugin } from '@letrun/core';
+import { AppContext, IllegalStateError, InterruptInvokeError, Plugin } from '@letrun/common';
 
 const jest = import.meta.jest;
 

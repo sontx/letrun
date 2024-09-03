@@ -1,6 +1,6 @@
 import winston, { transports } from 'winston';
 import WinstonLoggerPlugin from '@src/winston-logger-plugin';
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import { Subject } from 'rxjs';
 
 const jest = import.meta.jest;

@@ -1,5 +1,4 @@
-import { Plugin } from '@src/model';
-import { Logger } from '@src/model/logger';
+import { Plugin, Logger } from '@letrun/common';
 
 export const LOGGER_PLUGIN = 'logger';
 

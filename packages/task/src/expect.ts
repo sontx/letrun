@@ -1,4 +1,5 @@
-import { TaskHandler, TaskHandlerInput, validateParameters } from '@letrun/core';
+import { validateParameters } from '@letrun/core';
+import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { expect } from 'expect';
 

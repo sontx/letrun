@@ -1,4 +1,4 @@
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import path from 'node:path';
 import { TaskHelper } from "@src/libs/task-helper";
 

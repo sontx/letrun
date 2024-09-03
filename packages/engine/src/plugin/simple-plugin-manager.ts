@@ -1,12 +1,12 @@
+import { DEFAULT_PLUGIN_PRIORITY } from '@letrun/core';
 import {
   AppContext,
-  DEFAULT_PLUGIN_PRIORITY,
   FunctionKeys,
   IllegalStateError,
   InterruptInvokeError,
   Plugin,
   PluginManager,
-} from '@letrun/core';
+} from '@letrun/common';
 
 /**
  * Class representing a simple plugin manager.

@@ -1,19 +1,16 @@
+import { IdGenerator, PARAMETER_INTERPOLATOR_PLUGIN, ParameterInterpolator, scanAllTasks } from '@letrun/core';
 import {
   AppContext,
   Container,
   ExecutionSession,
-  IdGenerator,
   IllegalStateError,
-  PARAMETER_INTERPOLATOR_PLUGIN,
-  ParameterInterpolator,
   Runner,
-  scanAllTasks,
   Task,
   TaskHandler,
   TasksFactory,
   Workflow,
   WorkflowTasks,
-} from '@letrun/core';
+} from '@letrun/common';
 
 const MAX_RECURSION_LEVEL = 10;
 

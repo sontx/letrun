@@ -1,12 +1,5 @@
-import {
-  countTasks,
-  ExecutionSession,
-  InvalidParameterError,
-  isWorkflowTaskDefsEmpty,
-  scanAllTasks,
-  Task,
-  TaskDef,
-} from '@letrun/core';
+import { countTasks, isWorkflowTaskDefsEmpty, scanAllTasks } from '@letrun/core';
+import { ExecutionSession, InvalidParameterError, Task, TaskDef } from '@letrun/common';
 
 /**
  * Validates the loop task definition.

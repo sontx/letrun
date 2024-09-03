@@ -1,5 +1,5 @@
 import Handler from '@src/exec';
-import { TaskHandlerInput } from '@letrun/core';
+import { TaskHandlerInput } from '@letrun/common';
 
 const jest = import.meta.jest;
 

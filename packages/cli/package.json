@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@letrun/core": "^0.0.3",
+    "@letrun/common": "^0.0.1",
     "@letrun/deps": "^0.0.2",
     "@letrun/engine": "^0.0.2",
     "@letrun/plugin": "^0.0.3",

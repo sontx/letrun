@@ -1,5 +1,5 @@
 import Handler from '@src/expect';
-import { TaskHandlerInput } from '@letrun/core';
+import { TaskHandlerInput } from '@letrun/common';
 import { expect } from 'expect';
 
 const jest = import.meta.jest;

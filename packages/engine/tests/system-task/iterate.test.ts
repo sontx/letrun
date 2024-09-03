@@ -1,5 +1,5 @@
 import { IterateTaskHandler, validateIterateTask } from '@src/system-task/iterate';
-import { InvalidParameterError, RerunError, Task, TaskDef, TaskHandlerInput } from '@letrun/core';
+import { InvalidParameterError, RerunError, Task, TaskDef, TaskHandlerInput } from '@letrun/common';
 
 const jest = import.meta.jest;
 

@@ -1,8 +1,17 @@
 import path from 'node:path';
-import { ObjectType } from './types';
-import { InterruptInvokeError, InvalidParameterError } from './error';
 import type Joi from 'joi';
-import { Container, Plugin, Task, TaskDef, TaskStatus, WorkflowTaskDefs, WorkflowTasks } from '@src/model';
+import {
+  Container,
+  InterruptInvokeError,
+  InvalidParameterError,
+  ObjectType,
+  Plugin,
+  Task,
+  TaskDef,
+  TaskStatus,
+  WorkflowTaskDefs,
+  WorkflowTasks,
+} from '@letrun/common';
 
 /**
  * Checks if a path is relative.

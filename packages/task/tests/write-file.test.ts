@@ -1,5 +1,5 @@
 import Handler from '@src/write-file';
-import { TaskHandlerInput } from '@letrun/core';
+import { TaskHandlerInput } from '@letrun/common';
 import * as fs from 'node:fs';
 
 const jest = import.meta.jest;

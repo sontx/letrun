@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 import { AbstractPlugin } from '@src/plugin/abstract-plugin';
-import { AppContext } from '@src/model';
+import { AppContext } from '@letrun/common';
 
 const jest = import.meta.jest;
 

@@ -1,12 +1,11 @@
 import {
   AbstractPlugin,
-  AppContext,
   BUILTIN_PLUGIN_PRIORITY,
-  ConfigNotFoundError,
   PARAMETER_INTERPOLATOR_PLUGIN,
   ParameterInterpolator,
 } from '@letrun/core';
 import { JSONPath } from 'jsonpath-plus';
+import { AppContext, ConfigNotFoundError } from "@letrun/common";
 
 export default class JsonPathParameterInterpolator extends AbstractPlugin implements ParameterInterpolator {
   private flatten: boolean = false;

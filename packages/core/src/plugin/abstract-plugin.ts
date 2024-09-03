@@ -1,4 +1,4 @@
-import { AppContext, Plugin } from '../model';
+import { AppContext, Plugin } from '@letrun/common';
 import { loadConfigToPlugin } from '../utils';
 import { Subject, takeUntil } from 'rxjs';
 

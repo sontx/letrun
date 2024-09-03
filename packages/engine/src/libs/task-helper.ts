@@ -1,8 +1,9 @@
-import { AppContext, defaultModuleResolver, extractJsExtension, getEntryPointDir, TaskHandler } from '@letrun/core';
+import { defaultModuleResolver, extractJsExtension, getEntryPointDir } from '@letrun/core';
 import path from 'node:path';
 import * as fs from 'fs';
 import type { PackageJson } from 'type-fest';
 import { NpmPackage } from '@letrun/deps';
+import { AppContext, TaskHandler } from '@letrun/common';
 
 type CustomTask = Partial<
   TaskHandler & {

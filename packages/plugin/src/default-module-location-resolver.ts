@@ -1,10 +1,10 @@
 import {
   AbstractPlugin,
   BUILTIN_PLUGIN_PRIORITY,
-  InvalidParameterError,
   MODULE_LOCATION_RESOLVER_PLUGIN,
   resolveLocalModuleLocation,
 } from '@letrun/core';
+import { InvalidParameterError } from "@letrun/common";
 
 export default class DefaultModuleLocationResolver extends AbstractPlugin {
   readonly name = 'default';

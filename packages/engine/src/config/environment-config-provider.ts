@@ -1,4 +1,4 @@
-import {AbstractConfigProvider} from './abstract-config-provider';
+import { AbstractConfigProvider } from './abstract-config-provider';
 import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 /**

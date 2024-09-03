@@ -1,5 +1,5 @@
 import DefaultRetryPlugin from '@src/default-retry-plugin';
-import { InterruptInvokeError } from '@letrun/core';
+import { InterruptInvokeError } from '@letrun/common';
 
 const jest = import.meta.jest;
 

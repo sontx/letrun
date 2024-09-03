@@ -1,4 +1,4 @@
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import { DEFAULT_LOGGER } from '@src/libs/log-helper';
 
 export class BootstrapUtils {

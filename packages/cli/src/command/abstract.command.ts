@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 
 export interface AbstractOptions {
   [key: string]: any;

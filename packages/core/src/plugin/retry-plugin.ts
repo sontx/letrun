@@ -1,4 +1,4 @@
-import { Plugin, Retryable, RetryConfig } from '../model';
+import { Plugin, Retryable, RetryConfig } from '@letrun/common';
 
 export const RETRY_PLUGIN = 'retry';
 

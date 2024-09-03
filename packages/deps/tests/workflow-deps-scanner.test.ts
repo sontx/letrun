@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { WorkflowDepsScanner } from '@src/workflow-deps-scanner';
-import { ContainerDef, LocationResolverFn, ModuleResolverFn } from '@letrun/core';
+import { LocationResolverFn, ModuleResolverFn } from '@letrun/core';
+import { ContainerDef } from "@letrun/common";
 
 const jest = import.meta.jest;
 

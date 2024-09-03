@@ -1,5 +1,5 @@
 import ConsoleLogger from '@src/console-logger';
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import { transports } from 'winston';
 import { Subject } from 'rxjs';
 

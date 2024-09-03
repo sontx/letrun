@@ -12,6 +12,7 @@
       <excludeFolder url="file://$MODULE_DIR$/packages/cli/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/packages/core/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/packages/deps/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/common/dist" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

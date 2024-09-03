@@ -1,4 +1,5 @@
-import { RunnerOptions, TaskHandler, TaskHandlerInput, validateParameters, wrapPromiseWithAbort } from '@letrun/core';
+import { validateParameters, wrapPromiseWithAbort } from '@letrun/core';
+import { RunnerOptions, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import fs from 'fs';
 

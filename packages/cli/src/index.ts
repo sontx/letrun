@@ -1,8 +1,9 @@
 import { Command } from 'commander';
 import { CommandLoader } from './command';
 import { BANNER, EMOJIS } from './ui';
-import { AppContext, COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
+import { COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
 import { BootstrapUtils, DefaultContext } from '@letrun/engine';
+import { AppContext } from "@letrun/common";
 
 async function setupLogLevel(context: AppContext) {
   const logLevel = BootstrapUtils.getOptionValue('-l', '--log') ?? 'info';

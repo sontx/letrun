@@ -1,4 +1,4 @@
-import { ConfigNotFoundError, ConfigProvider, ObjectType } from '@letrun/core';
+import { ConfigNotFoundError, ConfigProvider, ObjectType } from '@letrun/common';
 import { JSONPath } from 'jsonpath-plus';
 import { Observable, Subject } from 'rxjs';
 

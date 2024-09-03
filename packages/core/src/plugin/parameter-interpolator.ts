@@ -1,4 +1,4 @@
-import { Plugin } from '@src/model';
+import { Plugin } from '@letrun/common';
 
 export const PARAMETER_INTERPOLATOR_PLUGIN = 'parameter-interpolator';
 

@@ -1,4 +1,4 @@
-import { TaskHandlerInput, TaskHandlerOutput } from '@letrun/core';
+import { TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
 import ms from 'ms';
 import { DelayTaskHandler } from '@src/system-task/delay';
 

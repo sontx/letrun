@@ -1,5 +1,5 @@
 import JsonPathParameterInterpolator from '@src/json-path-parameter-interpolator';
-import { AppContext } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 import { Subject } from "rxjs";
 
 const jest = import.meta.jest;

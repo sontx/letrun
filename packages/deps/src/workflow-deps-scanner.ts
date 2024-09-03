@@ -3,16 +3,15 @@ import path from 'node:path';
 import type { PackageJson } from 'type-fest';
 import { compare, satisfies } from 'compare-versions';
 import {
-  ContainerDef,
   defaultModuleResolver,
   extractPackageNameVersion,
   LocationResolverFn,
   ModuleResolverFn,
   resolveLocalModuleLocation,
-  TaskDef,
 } from '@letrun/core';
 import { WorkflowDependency } from '@src/model';
 import validate from 'validate-npm-package-name';
+import { ContainerDef, TaskDef } from "@letrun/common";
 
 export class WorkflowDepsScanner {
   constructor(

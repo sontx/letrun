@@ -8,10 +8,11 @@
     "letrun": "dist/letrun.js"
   },
   "scripts": {
-    "test": "npm run test -ws",
-    "coverage": "npm run coverage -ws",
+    "test": "npm run test -ws --if-present",
+    "coverage": "npm run coverage -ws --if-present",
     "build": "npm run build:all && npm run copy",
-    "build:all": "npm run build:core && npm run build:deps && npm run build:plugin && npm run build:task && npm run build:engine && npm run build:cli",
+    "build:all": "npm run build:common &&npm run build:core && npm run build:deps && npm run build:plugin && npm run build:task && npm run build:engine && npm run build:cli",
+    "build:common": "npm run build -w @letrun/common",
     "build:core": "npm run build -w @letrun/core",
     "build:deps": "npm run build -w @letrun/deps",
     "build:plugin": "npm run build -w @letrun/plugin",
@@ -19,8 +20,9 @@
     "build:engine": "npm run build -w @letrun/engine",
     "build:cli": "npm run build -w @letrun/cli",
     "clean": "rm -rf ./dist/**",
-    "copy": "npm run copy:cli && npm run copy:task",
+    "copy": "npm run copy:cli && npm run copy:task && npm run copy:bin",
     "copy:cli": "copyfiles -f ./packages/cli/dist/**/*.js ./dist",
+    "copy:bin": "copyfiles -f ./bin/* ./dist",
     "copy:task": "copyfiles -f ./packages/task/dist/**/*.js ./dist/tasks"
   },
   "repository": {

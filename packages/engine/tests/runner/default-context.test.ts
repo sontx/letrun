@@ -1,5 +1,6 @@
 import { DefaultContext } from '@src/runner/default-context';
-import { ConfigProvider, Logger, LOGGER_PLUGIN, PluginLoader, PluginManager } from '@letrun/core';
+import { LOGGER_PLUGIN } from '@letrun/core';
+import { ConfigProvider, Logger, PluginLoader, PluginManager } from '@letrun/common';
 
 const jest = import.meta.jest;
 

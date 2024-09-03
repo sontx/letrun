@@ -2,7 +2,7 @@ import { ChainConfigProvider } from '@src/config/chain-config-provider';
 import { JsonConfigProvider } from '@src/config/json-config-provider';
 import { YamlConfigProvider } from '@src/config/yaml-config-provider';
 import { EnvironmentConfigProvider } from '@src/config/environment-config-provider';
-import { ConfigNotFoundError } from '@letrun/core';
+import { ConfigNotFoundError } from '@letrun/common';
 
 const jest = import.meta.jest;
 

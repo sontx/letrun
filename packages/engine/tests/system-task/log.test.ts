@@ -1,5 +1,5 @@
 import { LogTaskHandler } from '@src/system-task/log';
-import { InvalidParameterError, Task, TaskHandlerInput } from '@letrun/core';
+import { InvalidParameterError, Task, TaskHandlerInput } from '@letrun/common';
 
 const jest = import.meta.jest;
 

@@ -1,5 +1,5 @@
 import { SwitchTaskHandler, validateSwitchTask } from '@src/system-task/switch';
-import { IllegalStateError, InvalidParameterError, Task, TaskDef, TaskHandlerInput } from '@letrun/core';
+import { IllegalStateError, InvalidParameterError, Task, TaskDef, TaskHandlerInput } from '@letrun/common';
 
 const jest = import.meta.jest;
 

@@ -1,5 +1,5 @@
 import { createLogger, format, transports } from 'winston';
-import { Logger } from '@letrun/core';
+import { Logger } from '@letrun/common';
 
 class DefaultLogger implements Logger {
   private readonly winstonLogger = createLogger({

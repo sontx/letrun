@@ -1,4 +1,4 @@
-import { ConfigNotFoundError } from '@letrun/core';
+import { ConfigNotFoundError } from '@letrun/common';
 import { AbstractConfigProvider } from '@src/config/abstract-config-provider';
 
 const jest = import.meta.jest;

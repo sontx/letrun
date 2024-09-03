@@ -6,11 +6,10 @@ import {
   InputParameter,
   Persistence,
   PERSISTENCE_PLUGIN,
-  Workflow,
-  WorkflowDef,
 } from '@letrun/core';
 import { LogHelper } from '@src/command/libs/log-helper';
 import { DefaultRunner } from '@letrun/engine';
+import { Workflow, WorkflowDef } from "@letrun/common";
 
 export class RunCommand extends AbstractCommand {
   load(program: Command): void {
