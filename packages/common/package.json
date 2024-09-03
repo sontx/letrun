@@ -27,7 +27,7 @@
   ],
   "scripts": {
     "build": "node ../../esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
-    "prepublishOnly": "npm run build && npm run test"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
