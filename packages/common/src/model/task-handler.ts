@@ -1,7 +1,7 @@
 import { Task, Workflow } from './workflow';
-import { ObjectType } from '@src/types';
 import { AppContext } from './app-context';
 import { ExecutionSession } from './execution-session';
+import type Joi from 'joi';
 
 /**
  * Interface representing the input for a task handler.
@@ -29,13 +29,18 @@ export interface TaskHandler {
   /** Optional description of the task handler. */
   description?: string;
   /** Optional parameters for the task handler, presenting the accepted parameters. */
-  parameters?: ObjectType;
+  parameters?: Joi.Description;
+
   /**
    * Handles the task.
    * @param input - The input for the task handler.
    * @returns A promise that resolves to the output of the task handler.
    */
-  handle(input: TaskHandlerInput): Promise<TaskHandlerOutput>;
+  handle(input: TaskHandlerInput): Promise<TaskHandlerOutput> | TaskHandlerOutput;
+}
+
+export interface TaskHandlerConstructor {
+  new (): TaskHandler;
 }
 
 /** Type representing the output of a task handler. */

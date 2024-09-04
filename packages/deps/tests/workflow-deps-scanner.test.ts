@@ -1,21 +1,28 @@
 import fs from 'node:fs';
 import { WorkflowDepsScanner } from '@src/workflow-deps-scanner';
-import { LocationResolverFn, ModuleResolverFn } from '@letrun/core';
-import { ContainerDef } from "@letrun/common";
+import { LocationResolverFn, TaskGroupResolverFn, TaskHandlerParserFn } from '@letrun/core';
+import { ContainerDef } from '@letrun/common';
 
 const jest = import.meta.jest;
 
 describe('WorkflowDepsScanner', () => {
   let scanner: WorkflowDepsScanner;
+  let mockTaskHandlerParser: jest.Mocked<TaskHandlerParserFn>;
   let mockLocationResolver: jest.Mocked<LocationResolverFn>;
-  let mockModuleResolver: jest.Mocked<ModuleResolverFn>;
+  let mockTaskGroupResolver: jest.Mocked<TaskGroupResolverFn>;
   let mockCheckSystemDependencyFn: jest.MockedFunction<(handler: string) => boolean>;
 
   beforeEach(() => {
+    mockTaskHandlerParser = jest.fn().mockReturnValue({});
     mockLocationResolver = jest.fn();
-    mockModuleResolver = jest.fn().mockResolvedValue(class {});
+    mockTaskGroupResolver = jest.fn().mockResolvedValue({});
     mockCheckSystemDependencyFn = jest.fn().mockReturnValue(false);
-    scanner = new WorkflowDepsScanner(mockLocationResolver, mockModuleResolver, mockCheckSystemDependencyFn);
+    scanner = new WorkflowDepsScanner(
+      mockTaskHandlerParser,
+      mockLocationResolver,
+      mockTaskGroupResolver,
+      mockCheckSystemDependencyFn,
+    );
   });
 
   it('returns empty array if container has no tasks', async () => {
@@ -28,22 +35,25 @@ describe('WorkflowDepsScanner', () => {
     const container: ContainerDef = { tasks: { task1: { handler: 'handler1' } } } as any;
     (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/handler1');
     jest.spyOn(fs.promises, 'stat').mockReturnValue({ isDirectory: () => false } as any);
-    (mockModuleResolver as jest.Mock).mockResolvedValue(
-      class {
-        version = '1.0.0';
-      },
-    );
+    (mockTaskGroupResolver as jest.Mock).mockResolvedValue({ version: '1.0.0' });
+    const handler = {
+      name: 'handler1',
+      version: '1.0.0',
+      type: 'script',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
 
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
         version: '1.0.0',
+        requireVersion: '1.0.0',
         type: 'script',
       },
     ]);
@@ -53,16 +63,22 @@ describe('WorkflowDepsScanner', () => {
     const container: ContainerDef = { tasks: { task1: { handler: 'handler1' } } } as any;
     (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/handler1');
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => false } as any);
-
+    const handler = {
+      name: 'handler1',
+      version: '1.0.0',
+      type: 'script',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
+        requireVersion: '1.0.0',
         type: 'script',
       },
     ]);
@@ -74,17 +90,23 @@ describe('WorkflowDepsScanner', () => {
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
     jest.spyOn(fs, 'existsSync').mockReturnValue(true);
     jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '2.0.0' }));
-
+    const handler = {
+      name: 'handler1',
+      version: '2.0.0',
+      type: 'package',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
         version: '2.0.0',
+        requireVersion: '2.0.0',
         type: 'package',
       },
     ]);
@@ -94,14 +116,18 @@ describe('WorkflowDepsScanner', () => {
     const container: ContainerDef = { tasks: { task1: { handler: 'handler1' } } } as any;
     (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/handler1');
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => false } as any);
-    (mockModuleResolver as jest.Mock).mockRejectedValue(new Error('Invalid version'));
-
+    (mockTaskGroupResolver as jest.Mock).mockRejectedValue(new Error('Invalid version'));
+    const handler = {
+      name: 'handler1',
+      type: 'script',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
@@ -127,24 +153,24 @@ describe('WorkflowDepsScanner', () => {
       .mockResolvedValueOnce('/path/to/handler1')
       .mockResolvedValueOnce('/path/to/handler2');
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => false } as any);
-    (mockModuleResolver as jest.Mock)
-      .mockResolvedValueOnce(
-        class {
-          version = '1.0.0';
-        },
-      )
-      .mockResolvedValueOnce(
-        class {
-          version = '2.0.0';
-        },
-      );
-
+    (mockTaskGroupResolver as jest.Mock)
+      .mockResolvedValueOnce({ version: '1.0.0' })
+      .mockResolvedValueOnce({ version: '2.0.0' });
+    const handler1 = {
+      name: 'handler1',
+      type: 'script',
+    };
+    const handler2 = {
+      name: 'handler2',
+      type: 'package',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValueOnce(handler1).mockReturnValueOnce(handler2);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler1,
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
@@ -153,12 +179,12 @@ describe('WorkflowDepsScanner', () => {
       },
       {
         name: 'task2',
-        handler: 'handler2',
+        handler: handler2,
         dependency: '/path/to/handler2',
         installed: true,
         incompatibleVersion: false,
         version: '2.0.0',
-        type: 'script',
+        type: 'package',
       },
     ]);
   });
@@ -166,13 +192,16 @@ describe('WorkflowDepsScanner', () => {
   it('sets installed to false when module is not found', async () => {
     const container: ContainerDef = { tasks: { task1: { handler: 'handler1' } } } as any;
     (mockLocationResolver as jest.Mock).mockResolvedValue(null);
-
+    const handler = {
+      name: 'handler1',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: 'handler1',
         installed: false,
         incompatibleVersion: false,
@@ -185,13 +214,16 @@ describe('WorkflowDepsScanner', () => {
     (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/handler1');
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
     jest.spyOn(fs, 'existsSync').mockReturnValue(false);
-
+    const handler = {
+      name: 'handler1',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: '/path/to/handler1',
         installed: false,
         incompatibleVersion: false,
@@ -203,13 +235,17 @@ describe('WorkflowDepsScanner', () => {
     const container: ContainerDef = { tasks: { task1: { handler: 'handler1' } } } as any;
     (mockLocationResolver as jest.Mock).mockResolvedValue('/path/to/handler1');
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => false } as any);
-
+    const handler = {
+      name: 'handler1',
+      type: 'script',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: '/path/to/handler1',
         installed: true,
         incompatibleVersion: false,
@@ -224,13 +260,17 @@ describe('WorkflowDepsScanner', () => {
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
     jest.spyOn(fs, 'existsSync').mockReturnValue(true);
     jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '1.0.0' }));
-
+    const handler = {
+      name: 'handler1',
+      type: 'package',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'handler1',
+        handler: handler,
         dependency: '/path/to/handler1',
         incompatibleVersion: false,
         installed: true,
@@ -246,17 +286,20 @@ describe('WorkflowDepsScanner', () => {
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
     jest.spyOn(fs, 'existsSync').mockReturnValue(true);
     jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '0.0.1' }));
-
+    const handler = {
+      name: '@letrun/core',
+      type: 'package',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: '@letrun/core',
+        handler: handler,
         dependency: '/path/to/@letrun/core',
         installed: true,
         incompatibleVersion: false,
-        requireVersion: '0.0.1',
         version: '0.0.1',
         type: 'package',
       },
@@ -269,13 +312,18 @@ describe('WorkflowDepsScanner', () => {
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
     jest.spyOn(fs, 'existsSync').mockReturnValue(true);
     jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '2.0.0' }));
-
+    const handler = {
+      name: '@letrun/core',
+      type: 'package',
+      version: '1.0.0',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: '@letrun/core',
+        handler: handler,
         dependency: '/path/to/@letrun/core',
         installed: true,
         incompatibleVersion: true,
@@ -292,13 +340,18 @@ describe('WorkflowDepsScanner', () => {
     jest.spyOn(fs.promises, 'stat').mockResolvedValue({ isDirectory: () => true } as any);
     jest.spyOn(fs, 'existsSync').mockReturnValue(true);
     jest.spyOn(fs.promises, 'readFile').mockResolvedValue(JSON.stringify({ version: '1.2.0' }));
-
+    const handler = {
+      name: '@letrun/core',
+      type: 'package',
+      version: '^1.0.0',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: '@letrun/core',
+        handler: handler,
         dependency: '/path/to/@letrun/core',
         installed: true,
         incompatibleVersion: false,
@@ -319,7 +372,7 @@ describe('WorkflowDepsScanner', () => {
       }),
     });
 
-    const result = await scanner['tryGetNpmPackageVersion'](packageName);
+    const result = await scanner['tryGetNpmPackageVersion']({ name: packageName, version: packageVersion } as any);
 
     expect(result).toBe(packageVersion);
     expect(global.fetch).toHaveBeenCalledWith(`https://registry.npmjs.org/${packageName}`);
@@ -329,7 +382,7 @@ describe('WorkflowDepsScanner', () => {
     const packageName = 'some-package';
     global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
 
-    const result = await scanner['tryGetNpmPackageVersion'](packageName);
+    const result = await scanner['tryGetNpmPackageVersion']({ name: packageName } as any);
 
     expect(result).toBeNull();
     expect(global.fetch).toHaveBeenCalledWith(`https://registry.npmjs.org/${packageName}`);
@@ -344,13 +397,18 @@ describe('WorkflowDepsScanner', () => {
         'dist-tags': { latest: '1.0.0' },
       }),
     });
-
+    const handler = {
+      name: 'some-package',
+      type: 'package',
+      version: '^1.0.0',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'some-package',
+        handler: handler,
         dependency: 'some-package',
         installed: false,
         incompatibleVersion: false,
@@ -362,17 +420,21 @@ describe('WorkflowDepsScanner', () => {
   });
 
   it('does not resolve npm package version if handler is not a package name', async () => {
-    const handler = '/this/is/invalid/package';
-    const container: ContainerDef = { tasks: { task1: { handler } } } as any;
+    const rawHandler = '/this/is/invalid/package';
+    const container: ContainerDef = { tasks: { task1: { handler: rawHandler } } } as any;
     (mockLocationResolver as jest.Mock).mockResolvedValue(null);
     global.fetch = jest.fn();
+    const handler = {
+      name: rawHandler,
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
         handler,
-        dependency: handler,
+        dependency: rawHandler,
         installed: false,
         incompatibleVersion: false,
       },
@@ -383,13 +445,16 @@ describe('WorkflowDepsScanner', () => {
   it('identifies system dependencies using checkSystemDependencyFn', async () => {
     const container: ContainerDef = { tasks: { task1: { handler: 'system-handler' } } } as any;
     mockCheckSystemDependencyFn.mockImplementation((handler) => handler === 'system-handler');
-
+    const handler = {
+      name: 'system-handler',
+    };
+    (mockTaskHandlerParser as jest.Mock).mockReturnValue(handler);
     const result = await scanner.scan(container);
 
     expect(result).toEqual([
       {
         name: 'task1',
-        handler: 'system-handler',
+        handler: handler,
         installed: true,
         incompatibleVersion: false,
         type: 'system',

@@ -54,9 +54,13 @@ export class ViewCommand extends AbstractCommand {
     }
   }
 
-  private viewTask(task: Partial<TaskHandler> & { group?: string }, isSystem: boolean) {
-    let tree: TreeObject = this.extractFields(task, ['group', 'path', 'description', 'parameters'], true);
-    console.log(`${isSystem ? EMOJIS.NUT_AND_BOLT : EMOJIS.ROBOT} ${task.name}`);
+  private viewTask(task: Partial<TaskHandler> & { group?: string; isPackage?: boolean }, isSystem: boolean) {
+    let tree: TreeObject = this.extractFields(
+      task,
+      ['group', 'version', 'description', 'parameters', 'fullPath'],
+      true,
+    );
+    console.log(`${isSystem ? EMOJIS.NUT_AND_BOLT : task.isPackage ? EMOJIS.PACKAGE : EMOJIS.ROBOT} ${task.name}`);
     console.log(treeify.asTree(tree, true, true).trim());
   }
 }

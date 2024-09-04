@@ -38,6 +38,10 @@ export interface Plugin extends PluginLifecycle, Record<string, any> {
   readonly description?: string;
 }
 
+export interface PluginConstructor {
+  new (): Plugin;
+}
+
 /**
  * Interface representing an executable plugin.
  * Extends the Plugin interface.

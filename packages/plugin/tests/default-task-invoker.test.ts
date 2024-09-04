@@ -1,7 +1,5 @@
 import DefaultTaskInvoker from '@src/default-task-invoker';
 import { InvalidParameterError, TaskHandlerInput } from '@letrun/common';
-import path from 'node:path';
-import fs from 'fs';
 import { Subject } from 'rxjs';
 
 const jest = import.meta.jest;
@@ -23,30 +21,28 @@ describe('DefaultTaskInvoker', () => {
 
   it('invokes an external task and returns the result', async () => {
     const externalTaskHandler = jest.fn().mockResolvedValue({ result: 'external task result' });
-    const mockModuleResolver = jest.fn().mockResolvedValue(
-      jest.fn().mockImplementation(() => ({
-        handle: externalTaskHandler,
-      })),
-    );
-
-    const handlerPath = path.resolve('tasks', 'externalTaskHandler.js');
-    jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
-      return filePath === handlerPath;
+    const mockTaskGroupResolver = jest.fn().mockReturnValue({
+      name: '',
+      tasks: {
+        mockTask: {
+          handle: externalTaskHandler,
+        },
+      },
     });
 
     const input = {
-      task: { taskDef: { handler: handlerPath } },
+      task: { taskDef: { handler: 'script:/path/to/script.js:mockTask' } },
       session: { systemTasks: {} },
       context: {
         getLogger: jest.fn().mockReturnValue({ verbose: jest.fn() }),
         getConfigProvider: jest.fn().mockReturnValue({ get: jest.fn().mockResolvedValue('tasks') }),
         getPluginManager: jest.fn().mockImplementation(() => ({
-          callPluginMethod: jest.fn().mockResolvedValue(handlerPath),
+          callPluginMethod: jest.fn().mockResolvedValue('/path/to/script.js'),
         })),
       },
     } as unknown as TaskHandlerInput;
 
-    const invoker = new DefaultTaskInvoker(mockModuleResolver);
+    const invoker = new DefaultTaskInvoker(mockTaskGroupResolver);
     const result = await invoker.invoke(input);
     expect(result).toEqual({ result: 'external task result' });
     expect(externalTaskHandler).toHaveBeenCalledWith(input);

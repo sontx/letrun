@@ -3,20 +3,22 @@ import path from 'node:path';
 import type { PackageJson } from 'type-fest';
 import { compare, satisfies } from 'compare-versions';
 import {
-  defaultModuleResolver,
-  extractPackageNameVersion,
+  defaultTaskGroupResolver,
+  defaultTaskHandlerParser,
   LocationResolverFn,
-  ModuleResolverFn,
-  resolveLocalModuleLocation,
+  resolveTaskHandlerLocation,
+  TaskGroupResolverFn,
+  TaskHandlerParserFn,
 } from '@letrun/core';
 import { WorkflowDependency } from '@src/model';
 import validate from 'validate-npm-package-name';
-import { ContainerDef, TaskDef } from "@letrun/common";
+import { ContainerDef, ParsedHandler, TaskDef } from '@letrun/common';
 
 export class WorkflowDepsScanner {
   constructor(
-    public locationResolver: LocationResolverFn = resolveLocalModuleLocation,
-    public moduleResolver: ModuleResolverFn = defaultModuleResolver.resolve,
+    public taskHandlerParse: TaskHandlerParserFn = defaultTaskHandlerParser.parse,
+    public locationResolver: LocationResolverFn = resolveTaskHandlerLocation,
+    public taskGroupResolver: TaskGroupResolverFn = defaultTaskGroupResolver.resolve,
     public checkSystemDependencyFn: (handler: string) => boolean = () => false,
   ) {}
 
@@ -34,7 +36,7 @@ export class WorkflowDepsScanner {
       const dependency: WorkflowDependency = this.checkSystemDependencyFn(task.handler)
         ? {
             name: task.name,
-            handler: task.handler,
+            handler: this.taskHandlerParse(task.handler),
             installed: true,
             incompatibleVersion: false,
             type: 'system',
@@ -49,11 +51,7 @@ export class WorkflowDepsScanner {
 
     dependencies = this.removeDuplicatedPackages(dependencies);
     const candidatePackages = dependencies.filter(
-      (dep) =>
-        !['system', 'script'].includes(dep.type ?? '') &&
-        !dep.installed &&
-        !dep.requireVersion &&
-        !validate(dep.handler!).errors?.length,
+      (dep) => dep.type === 'package' && !dep.installed && !validate(dep.handler?.name!).errors?.length,
     );
 
     if (candidatePackages.length) {
@@ -62,7 +60,6 @@ export class WorkflowDepsScanner {
           const foundVersion = await this.tryGetNpmPackageVersion(dep.handler!);
           if (foundVersion) {
             dep.requireVersion = foundVersion;
-            dep.type = 'package';
           }
         }),
       );
@@ -72,7 +69,8 @@ export class WorkflowDepsScanner {
   }
 
   private async createDependency(task: TaskDef): Promise<WorkflowDependency> {
-    const location = await this.locationResolver(task.handler);
+    const parsedHandler = this.taskHandlerParse(task.handler);
+    const location = await this.locationResolver(parsedHandler);
     let installed = false;
     let isDirectory = false;
 
@@ -87,23 +85,16 @@ export class WorkflowDepsScanner {
     }
 
     const version = location && installed ? await this.getVersion(location, isDirectory) : null;
-    let handler = task.handler;
-    let requireVersion: string | undefined;
-    const { name, version: packageVersion } = extractPackageNameVersion(handler);
-    if (isDirectory && name) {
-      handler = name;
-      requireVersion = packageVersion;
-    }
 
     return {
       name: task.name,
-      handler: handler,
+      handler: parsedHandler,
       dependency: location ?? task.handler,
       installed,
       version: version ?? undefined,
-      incompatibleVersion: version && requireVersion ? !satisfies(version, requireVersion) : false,
-      requireVersion,
-      type: installed ? (isDirectory ? 'package' : 'script') : undefined,
+      incompatibleVersion: version && parsedHandler.version ? !satisfies(version, parsedHandler.version) : false,
+      requireVersion: parsedHandler.version,
+      type: parsedHandler.type,
     };
   }
 
@@ -111,17 +102,17 @@ export class WorkflowDepsScanner {
     const map = new Map<string, WorkflowDependency>();
 
     for (const dep of dependencies) {
-      const packageName = dep.handler!;
-      if (!map.has(packageName)) {
-        map.set(packageName, dep);
+      const identify = `${dep.handler?.name}@${dep.handler?.taskName}`;
+      if (!map.has(identify)) {
+        map.set(identify, dep);
       } else {
-        const existing = map.get(packageName)!;
+        const existing = map.get(identify)!;
         if (dep.requireVersion && existing.requireVersion) {
           if (compare(existing.requireVersion, dep.requireVersion, '<')) {
             map.set(dep.name, dep);
           }
         } else if (dep.requireVersion) {
-          map.set(packageName, dep);
+          map.set(identify, dep);
         }
       }
     }
@@ -129,9 +120,8 @@ export class WorkflowDepsScanner {
     return Array.from(map.values());
   }
 
-  private async tryGetNpmPackageVersion(packageName: string) {
+  private async tryGetNpmPackageVersion({ name, version }: ParsedHandler) {
     try {
-      const { name, version } = extractPackageNameVersion(packageName);
       const response = await fetch(`https://registry.npmjs.org/${name}`);
       const data = (await response.json()) as any;
       return data['name'] === name ? (version ? version : `^${data['dist-tags'].latest}`) : null;
@@ -144,9 +134,8 @@ export class WorkflowDepsScanner {
     let taskVersion;
     let errorMessage;
     try {
-      const handlerClass = await this.moduleResolver(location);
-      const handler = new handlerClass();
-      taskVersion = handler.version;
+      const taskGroup = await this.taskGroupResolver(location);
+      taskVersion = taskGroup.version;
     } catch (e: any) {
       errorMessage = e.message;
     }

@@ -1,3 +1,5 @@
+import { HandlerType, ParsedHandler } from '@letrun/common';
+
 /**
  * Represents a dependency with its name, version, and optional location.
  */
@@ -9,11 +11,11 @@ export interface Dependency {
 
 export interface WorkflowDependency {
   name: string;
-  handler?: string;
+  handler?: ParsedHandler;
   dependency?: string;
   installed: boolean;
   version?: string;
   requireVersion?: string;
   incompatibleVersion?: boolean;
-  type?: 'package' | 'script' | 'system';
+  type?: HandlerType | 'system';
 }

@@ -28,7 +28,7 @@ describe('FilePluginLoader', () => {
     fs.writeFileSync(path.join(pluginDir, 'plugin1.js'), 'export default class Plugin1 {};');
     fs.writeFileSync(path.join(pluginDir, 'plugin2.cjs'), 'export default class Plugin2 {};');
     const mockPluginClass = jest.fn();
-    mockModuleResolver.mockResolvedValue(mockPluginClass);
+    mockModuleResolver.mockResolvedValue({ default: mockPluginClass });
 
     const plugins = await loader.load();
 
@@ -83,7 +83,7 @@ describe('FilePluginLoader', () => {
     }
     fs.writeFileSync(path.join(pluginDir, 'plugin1.js'), 'export default class Plugin1 {};');
     const mockPluginClass = jest.fn();
-    mockModuleResolver.mockResolvedValue(mockPluginClass);
+    mockModuleResolver.mockResolvedValue({ default: mockPluginClass });
 
     await loader.load();
     const plugins = await loader.load();

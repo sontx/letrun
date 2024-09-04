@@ -55,10 +55,10 @@ describe('InstallCommand', () => {
     };
     jest.spyOn(installCommand['context'].getPluginManager(), 'getOne').mockResolvedValue(inputParameterMock as any);
     installCommand['getScanner'] = jest.fn().mockResolvedValue({
-      scan: jest.fn().mockResolvedValue([{ type: 'package', handler: 'some-package' }]),
+      scan: jest.fn().mockResolvedValue([{ type: 'package', handler: { name: 'some-package' } }]),
     });
     const succeed = await installCommand['doAction']('valid-path', {});
-    expect(npmPackageMock.install).toHaveBeenCalledWith('some-package@undefined', undefined);
+    expect(npmPackageMock.install).toHaveBeenCalledWith('some-package', undefined);
     expect(succeed).toBeTruthy();
   });
 
@@ -102,10 +102,10 @@ describe('InstallCommand', () => {
     };
     jest.spyOn(installCommand['context'].getPluginManager(), 'getOne').mockResolvedValue(inputParameterMock as any);
     installCommand['getScanner'] = jest.fn().mockResolvedValue({
-      scan: jest.fn().mockResolvedValue([{ type: 'package', handler: 'some-package' }]),
+      scan: jest.fn().mockResolvedValue([{ type: 'package', handler: { name: 'some-package' } }]),
     });
     const succeed = await installCommand['doAction']('valid-path', { dryRun: true });
-    expect(npmPackageMock.install).toHaveBeenCalledWith('some-package@undefined', '--dry-run');
+    expect(npmPackageMock.install).toHaveBeenCalledWith('some-package', '--dry-run');
     expect(succeed).toBeTruthy();
   });
 });

@@ -11,12 +11,17 @@ import {
   isWorkflowTaskDefsArray,
   isWorkflowTaskDefsEmpty,
   loadConfigToPlugin,
+  readPackageJson,
   scanAllTasks,
   validateParameters,
   wrapPromiseWithAbort,
 } from '@src/utils';
 import { Container, InterruptInvokeError, InvalidParameterError, Plugin, TaskDef, WorkflowTasks } from '@letrun/common';
 import Joi from 'joi';
+import fs from 'node:fs';
+import { PackageJson } from 'type-fest';
+
+const jest = import.meta.jest;
 
 describe('Utils', () => {
   it('checks if a path is relative', () => {
@@ -174,5 +179,32 @@ describe('delayMs', () => {
     expect(extractJsExtension('file.js.txt')).toBeNull();
     expect(extractJsExtension('file.mjs.txt')).toBeNull();
     expect(extractJsExtension('file.cjs.txt')).toBeNull();
+  });
+});
+
+describe('readPackageJson', () => {
+  it('reads and parses package.json file correctly', async () => {
+    const modulePath = '/absolute/path/module';
+    const packageJsonContent = JSON.stringify({ name: 'test-package', version: '1.0.0' });
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+    jest.spyOn(fs.promises, 'readFile').mockResolvedValue(packageJsonContent);
+
+    const result = await readPackageJson(modulePath);
+    expect(result).toEqual({ name: 'test-package', version: '1.0.0' } as PackageJson);
+  });
+
+  it('throws an error when package.json file is not found', async () => {
+    const modulePath = '/absolute/path/module';
+    jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+
+    await expect(readPackageJson(modulePath)).rejects.toThrow(`package.json not found in ${modulePath}`);
+  });
+
+  it('returns null when package.json file is not found and throwsIfNotFound is false', async () => {
+    const modulePath = '/absolute/path/module';
+    jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+
+    const result = await readPackageJson(modulePath, false);
+    expect(result).toBeNull();
   });
 });

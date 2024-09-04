@@ -11,4 +11,4 @@ export * from './id-generator';
 export * from './abstract-plugin';
 export * from './common';
 export * from './retry-plugin';
-export * from './module-location-resolver';
+export * from './task-handler-location-resolver';
