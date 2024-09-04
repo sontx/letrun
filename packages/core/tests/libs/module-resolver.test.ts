@@ -22,7 +22,7 @@ describe('ModuleResolver', () => {
       });
 
       const result = await moduleResolver.resolve(relativeModulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('resolves a module from an absolute file path', async () => {
@@ -33,7 +33,7 @@ describe('ModuleResolver', () => {
       });
 
       const result = await moduleResolver.resolve(absoluteModulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('throws an error if the module file does not exist', async () => {
@@ -55,7 +55,7 @@ describe('ModuleResolver', () => {
       });
 
       const result = await moduleResolver.resolve(commonjsModulePath);
-      expect(result).toBe('resolvedCommonJSModule');
+      expect(result).toEqual({ default: 'resolvedCommonJSModule' });
     });
   });
 
@@ -73,7 +73,7 @@ describe('ModuleResolver', () => {
       });
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('throws an error when package.json main field points to a non-existent file', async () => {
@@ -95,7 +95,7 @@ describe('ModuleResolver', () => {
       jest.spyOn(moduleResolver as any, 'readPackageJson').mockResolvedValue({ main: 'index.js' });
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('throws an error when package.json type field is invalid', async () => {
@@ -116,7 +116,7 @@ describe('ModuleResolver', () => {
       jest.spyOn(moduleResolver as any, 'dynamicImport').mockResolvedValue({ default: { default: 'resolvedModule' } });
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('resolves a module when package.json has type set to module', async () => {
@@ -126,7 +126,7 @@ describe('ModuleResolver', () => {
       jest.spyOn(moduleResolver as any, 'dynamicImport').mockResolvedValue({ default: 'resolvedModule' });
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('resolves a module when package.json has type set to module, prioritizing type over file extension', async () => {
@@ -136,7 +136,7 @@ describe('ModuleResolver', () => {
       jest.spyOn(moduleResolver as any, 'dynamicImport').mockResolvedValue({ default: 'resolvedModule' });
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('resolves a module when package.json has type set to commonjs, prioritizing type over file extension', async () => {
@@ -146,7 +146,7 @@ describe('ModuleResolver', () => {
       jest.spyOn(moduleResolver as any, 'dynamicImport').mockResolvedValue({ default: { default: 'resolvedModule' } });
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('throws an error when package.json is missing', async () => {
@@ -170,7 +170,7 @@ describe('ModuleResolver', () => {
       jest.spyOn(moduleResolver as any, 'getModuleType').mockResolvedValue('module');
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('resolves a module from node_modules with commonjs type', async () => {
@@ -182,7 +182,7 @@ describe('ModuleResolver', () => {
       jest.spyOn(moduleResolver as any, 'getModuleType').mockResolvedValue('commonjs');
 
       const result = await moduleResolver.resolve(modulePath);
-      expect(result).toBe('resolvedModule');
+      expect(result).toEqual({ default: 'resolvedModule' });
     });
 
     it('throws an error when module type is invalid', async () => {

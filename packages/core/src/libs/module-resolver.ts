@@ -6,7 +6,7 @@ import type { PackageJson } from 'type-fest';
 export type ModuleResolverFn = <T = any>(modulePath: string) => Promise<T>;
 
 /**
- * Class responsible for resolving exported default entry point of node module from module directory or file path.
+ * Class responsible for resolving exported entry point of node module from module directory or file path.
  */
 export class ModuleResolver {
   constructor(private readonly rootDir = getEntryPointDir()) {}
@@ -36,7 +36,7 @@ export class ModuleResolver {
     if (!['commonjs', 'module'].includes(type)) {
       throw new Error(`Unsupported module type: ${type}`);
     }
-    return type === 'commonjs' ? obj.default?.default : obj.default;
+    return type === 'commonjs' ? obj.default : obj;
   }
 
   private async dynamicImport(filePath: string) {
