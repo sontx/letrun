@@ -1,6 +1,6 @@
 {
   "name": "@letrun/core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The core package for the cli and its plugins or tasks",
   "type": "module",
   "exports": {
@@ -54,7 +54,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/common": "^0.0.1",
+    "@letrun/common": "^0.0.2",
     "commander": "^12.1.0",
     "compare-versions": "^6.1.1",
     "joi": "^17.13.3",
