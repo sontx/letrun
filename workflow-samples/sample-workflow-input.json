@@ -3,7 +3,7 @@
   "tasks": [
     {
       "name": "task1",
-      "handler": "http",
+      "handler": "package:test-module",
       "parameters": {
         "url": "https://jsonplaceholder.typicode.com/${input.name}/1",
         "method": "GET"

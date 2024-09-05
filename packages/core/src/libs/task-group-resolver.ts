@@ -31,10 +31,11 @@ export class TaskGroupResolver {
       return {
         ...UNCATEGORIZED_TASK_GROUP,
         version: handler.version,
+        type: packageJson ? 'package' : 'script',
         tasks: {
           [name]: handler,
         },
-      };
+      } as TaskGroup;
     };
 
     if (!isGroup) {
@@ -58,6 +59,7 @@ export class TaskGroupResolver {
       version,
       author: typeof author === 'string' ? author : author?.name,
       tasks: this.getTaskHandlers(module),
+      type: 'package',
     };
   };
 

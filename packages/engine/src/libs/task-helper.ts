@@ -2,7 +2,7 @@ import { defaultTaskGroupResolver, extractJsExtension, getEntryPointDir } from '
 import path from 'node:path';
 import * as fs from 'fs';
 import { NpmPackage } from '@letrun/deps';
-import { AppContext, TaskHandler } from '@letrun/common';
+import { AppContext, TaskHandler, UNCATEGORIZED_TASK_GROUP } from '@letrun/common';
 
 type CustomTask = Partial<
   TaskHandler & {
@@ -69,11 +69,17 @@ export class TaskHelper {
     const fullPath = path.resolve(rootDir, file);
 
     try {
-      const isPackage = !this.isJsFile(file);
       const taskGroup = await this.taskGroupResolver(file);
+      const isNodeModule = file.includes('node_modules');
+      const rootHandler =
+        taskGroup.type === 'package' ? `${isNodeModule ? 'package' : 'external'}:${taskGroup.name}` : relativePath;
+
       return Object.entries(taskGroup.tasks ?? {}).map(([name, handler]) => {
-        const declarativeHandler = isPackage ? relativePath : relativePath.replace(/\.[^/.]+$/, '');
-        const group = taskGroup.name;
+        const isUncategorizedGroup = taskGroup.name === UNCATEGORIZED_TASK_GROUP.name;
+        const declarativeHandler =
+          taskGroup.type === 'package' ? `${rootHandler}${isUncategorizedGroup ? '' : `:${name}`}` : rootHandler;
+        const parentDirs = this.extractParentDirs(relativePath);
+        const group = taskGroup.type === 'script' && parentDirs.length ? parentDirs[0] : taskGroup.name;
 
         return {
           ...handler,
@@ -83,7 +89,7 @@ export class TaskHelper {
           group,
           path: relativePath,
           fullPath,
-          isPackage,
+          isPackage: taskGroup.type === 'package',
           handler: declarativeHandler,
         };
       });

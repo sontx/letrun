@@ -51,8 +51,9 @@ export class ListCommand extends AbstractCommand {
     const withFields = this.parseArrayOption(options.with);
 
     for (const task of customTasks) {
-      if (!rootTree[task.group!]) {
-        rootTree[task.group!] =
+      const group = `${EMOJIS.FOLDER} ${task.group}`;
+      if (!rootTree[group]) {
+        rootTree[group] =
           withFields.includes('description') && task.groupDescription
             ? {
                 description: task.groupDescription as any,
@@ -60,8 +61,11 @@ export class ListCommand extends AbstractCommand {
             : {};
       }
 
-      (rootTree[task.group!] as any)[`${task.isPackage ? EMOJIS.PACKAGE : EMOJIS.ROBOT} ${task.name}`] =
-        this.extractFields(task, withFields, true);
+      (rootTree[group] as any)[`${task.isPackage ? EMOJIS.PACKAGE : EMOJIS.ROBOT} ${task.name}`] = this.extractFields(
+        task,
+        withFields,
+        true,
+      );
     }
 
     console.log(`\nTotal custom tasks: ${customTasks.length}`);

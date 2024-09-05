@@ -27,6 +27,7 @@ describe('TaskGroupResolver', () => {
       tasks: {
         mockTask: expect.any(mockHandler),
       },
+      type: 'script',
     });
   });
 
@@ -53,6 +54,7 @@ describe('TaskGroupResolver', () => {
       tasks: {
         mockTask: expect.any(mockHandler),
       },
+      type: 'package',
     });
   });
 
@@ -119,6 +121,7 @@ describe('TaskGroupResolver', () => {
         mockTask1: expect.any(mockHandler1),
         mockTask2: expect.any(mockHandler2),
       },
+      type: 'package',
     });
   });
 
@@ -140,6 +143,7 @@ describe('TaskGroupResolver', () => {
       tasks: {
         validTask: expect.any(validHandler),
       },
+      type: 'package',
     });
   });
 
@@ -173,6 +177,7 @@ describe('TaskGroupResolver', () => {
         defaultTask: expect.any(defaultHandler),
         otherTask: expect.any(otherHandler),
       },
+      type: 'package',
     });
   });
 
@@ -196,6 +201,7 @@ describe('TaskGroupResolver', () => {
       tasks: {
         validTask: expect.any(validHandler),
       },
+      type: 'package',
     });
   });
 });

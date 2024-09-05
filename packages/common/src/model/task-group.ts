@@ -40,4 +40,11 @@ export interface TaskGroup {
    * The tasks that belong to this group. This map contains the name of the task as the key and the task handler as the value.
    */
   tasks?: Record<string, TaskHandler>;
+
+  /**
+   * The type of the task group.
+   * - `package`: A task group that is defined in a node package.
+   * - `script`: A task group that is defined in a standalone script file.
+   */
+  type?: 'package' | 'script';
 }
