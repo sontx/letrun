@@ -45,7 +45,7 @@ You can write custom tasks either in a simple JS file or a node package:
    - A node package that exports a default class that implements the `TaskHandler` interface.
    - The entry point should be defined in the `main` field in `package.json`.
    - The package should be published to npm or a private registry.
-   - We recommend you name the package with `letrun-task-` prefix.
+   - We recommend you use scoped package and name the package with `@letrun-task-` prefix.
    - You can install the package using `letrun task install <package-name>` command.
    - We also support you place the package in the `tasks` directory manually.
 
@@ -56,8 +56,6 @@ A task handler should have the following structure:
 - `version`: The version of the task, this is optional. We'll use the package version if not defined.
 - `parameters`: An object that describes the input parameters of the task for showing help.
 - `handle`: The function that executes the task.
-
-We support grouping tasks by placing them in subdirectories, the group name will be the directory name.
 
 This is an example of a custom task:
 
@@ -142,3 +140,77 @@ The output of the workflow will be: `HELLO, WORLD!`.
 > If you write custom task in TypeScript, you need to compile and bundle it to JavaScript before using.
 
 To show all available custom tasks, you can use the `letrun task list -c` command.
+
+## Task Group
+
+A task group is a collection of tasks that are grouped together.
+It is useful when you have a set of tasks that are related to each other.
+
+Currently, we support grouping tasks by placing them in subdirectories or multiple exported classes in a node package.
+
+### Subdirectory
+
+You can group tasks by placing them in subdirectories. The group name will be the directory name.
+The only one level of nesting is supported, so you can't nest a group inside another group.
+
+Here is an example of a task group:
+
+```
+tasks/
+└── my-group
+    ├── task1.js
+    └── task2.js
+```
+
+The task's handler will follow this format `script:group-name/script-file`.
+For example, the handler for `task1.js` will be `script:my-group/task1.js`.
+
+> This approach is limited to simple tasks.
+> If you need to use external libraries, we recommend you create a node package.
+
+### Node Package
+
+You can group tasks by exporting multiple classes in a node package.
+The group name will be the package name.
+
+Here is an example of a task group:
+
+**package.json**
+
+```json
+{
+  "name": "my-group",
+  "version": "1.0.0",
+  "main": "index.js"
+}
+```
+
+**index.js**
+
+```js
+export class Task1Handler {
+  name = 'task1';
+  handle() {
+    console.log('Task 1');
+  }
+}
+
+export class Task2Handler {
+  name = 'task2';
+  handle() {
+    console.log('Task 2');
+  }
+}
+```
+
+The task's handler will follow this format `package:package-name:task-name`.
+For example, the handler for `Task1Handler` will be `package:my-group:task1`.
+
+The group information will be obtained from the package.json:
+
+- `name`: The name of the task group.
+- `description`: A brief description of the task group.
+- `version`: The version of the task group.
+- `author`: The author of the task group.
+
+> We recommend you use scoped package and name the package with `@letrun-task-` prefix.
