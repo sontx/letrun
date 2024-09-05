@@ -3,7 +3,7 @@ import { CommandLoader } from './command';
 import { BANNER, EMOJIS } from './ui';
 import { COMMAND_PLUGIN, CommandPlugin } from '@letrun/core';
 import { BootstrapUtils, DefaultContext } from '@letrun/engine';
-import { AppContext } from "@letrun/common";
+import { AppContext } from '@letrun/common';
 
 async function setupLogLevel(context: AppContext) {
   const logLevel = BootstrapUtils.getOptionValue('-l', '--log') ?? 'info';
@@ -24,7 +24,7 @@ const bootstrap = async () => {
       const skipBanner = allOpts.hideBanner || allOpts.pipe;
       if (!skipBanner) {
         console.log(BANNER);
-        console.log(`v${process.env.APP_VERSION} - from ${process.env.APP_AUTHOR} with ${EMOJIS.HEART}\n`);
+        console.log(`letrun@${process.env.APP_VERSION} - from ${process.env.APP_AUTHOR} with ${EMOJIS.HEART}\n`);
       }
     })
     .option('-l, --log <logLevel>', 'log level', 'info')

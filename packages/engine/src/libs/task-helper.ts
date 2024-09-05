@@ -1,15 +1,15 @@
-import { defaultModuleResolver, extractJsExtension, getEntryPointDir } from '@letrun/core';
+import { defaultTaskGroupResolver, extractJsExtension, getEntryPointDir } from '@letrun/core';
 import path from 'node:path';
 import * as fs from 'fs';
-import type { PackageJson } from 'type-fest';
 import { NpmPackage } from '@letrun/deps';
-import { AppContext, TaskHandler } from '@letrun/common';
+import { AppContext, TaskHandler, UNCATEGORIZED_TASK_GROUP } from '@letrun/common';
 
 type CustomTask = Partial<
   TaskHandler & {
     path: string;
     fullPath: string;
     group?: string;
+    groupDescription?: string;
     isPackage?: boolean;
     handler?: string;
     version?: string;
@@ -17,7 +17,7 @@ type CustomTask = Partial<
 >;
 
 export class TaskHelper {
-  static moduleResolver = defaultModuleResolver.resolve;
+  static taskGroupResolver = defaultTaskGroupResolver.resolve;
   static getEntryPointDir = getEntryPointDir;
 
   static extractParentDirs(filePath: string) {
@@ -46,22 +46,22 @@ export class TaskHelper {
   }
 
   private static async loadCustomTasks(tasksDir: string, context: AppContext) {
-    const tasks: CustomTask[] = [];
+    const resultTasks: CustomTask[] = [];
 
     const taskFilesFromDir = await this.getTaskFilesFromDir(tasksDir, context);
     for (const file of taskFilesFromDir) {
-      const task = await this.createBundledTask(file, tasksDir);
-      tasks.push(task);
+      const tasks = await this.createBundledTask(file, tasksDir);
+      resultTasks.push(...tasks);
     }
 
     const depsTaskFiles = await this.getDepsTaskFiles();
     const workingDir = path.join(getEntryPointDir(), 'node_modules');
     for (const file of depsTaskFiles) {
-      const task = await this.createBundledTask(file, workingDir);
-      tasks.push(task);
+      const tasks = await this.createBundledTask(file, workingDir);
+      resultTasks.push(...tasks);
     }
 
-    return tasks;
+    return resultTasks;
   }
 
   private static async createBundledTask(file: string, rootDir: string) {
@@ -69,55 +69,38 @@ export class TaskHelper {
     const fullPath = path.resolve(rootDir, file);
 
     try {
-      const handlerClass = await this.moduleResolver(file);
-      const handler = handlerClass ? new handlerClass() : null;
-      const isValidTask = !!handler?.handle;
-      const isPackage = !this.isJsFile(file);
-      const declarativeHandler = isPackage ? relativePath : relativePath.replace(/\.[^/.]+$/, '');
-      const group = this.extractParentDirs(relativePath).join('/');
+      const taskGroup = await this.taskGroupResolver(file);
+      const isNodeModule = file.includes('node_modules');
+      const rootHandler =
+        taskGroup.type === 'package' ? `${isNodeModule ? 'package' : 'external'}:${taskGroup.name}` : relativePath;
 
-      const getTaskInfo = async () => {
-        let name = handler?.name;
-        let version = handler?.version;
+      return Object.entries(taskGroup.tasks ?? {}).map(([name, handler]) => {
+        const isUncategorizedGroup = taskGroup.name === UNCATEGORIZED_TASK_GROUP.name;
+        const declarativeHandler =
+          taskGroup.type === 'package' ? `${rootHandler}${isUncategorizedGroup ? '' : `:${name}`}` : rootHandler;
+        const parentDirs = this.extractParentDirs(relativePath);
+        const group = taskGroup.type === 'script' && parentDirs.length ? parentDirs[0] : taskGroup.name;
 
-        if (isPackage) {
-          const packageJsonPath = path.join(fullPath, 'package.json');
-          const packageJson: PackageJson = await fs.promises.readFile(packageJsonPath, 'utf8').then(JSON.parse);
-          name = name || packageJson.name;
-          version = version || packageJson.version || '0.0.0';
-        } else {
-          name = name || path.basename(relativePath, path.extname(relativePath));
-          version = version || '0.0.0';
-        }
-
-        return { name, version };
-      };
-
-      const { name, version } = await getTaskInfo();
-
-      return isValidTask
-        ? {
-            ...handler,
-            name,
-            version,
-            group,
-            path: relativePath,
-            fullPath,
-            isPackage,
-            handler: declarativeHandler,
-          }
-        : {
-            name: `${relativePath} (invalid task)`,
-            path: relativePath,
-            fullPath,
-            group,
-          };
+        return {
+          ...handler,
+          name,
+          version: handler.version || taskGroup.version,
+          groupDescription: taskGroup.description,
+          group,
+          path: relativePath,
+          fullPath,
+          isPackage: taskGroup.type === 'package',
+          handler: declarativeHandler,
+        };
+      });
     } catch (e: any) {
-      return {
-        name: `${relativePath} (${e.message})`,
-        path: relativePath,
-        fullPath,
-      };
+      return [
+        {
+          name: `${relativePath} (${e.message})`,
+          path: relativePath,
+          fullPath,
+        },
+      ];
     }
   }
 

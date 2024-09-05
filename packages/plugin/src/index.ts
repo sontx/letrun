@@ -10,7 +10,7 @@ import WinstonLoggerPlugin from './winston-logger-plugin';
 import JavascriptEngine from './javascript-engine';
 import PythonEngine from './python-engine';
 import DefaultRetryPlugin from './default-retry-plugin';
-import DefaultModuleLocationResolver from './default-module-location-resolver';
+import DefaultTaskHandlerLocationResolver from './default-task-handler-location-resolver';
 
 const DEFAULT_PLUGINS: Plugin[] = [
   new ConsoleLogger(),
@@ -24,7 +24,7 @@ const DEFAULT_PLUGINS: Plugin[] = [
   new JavascriptEngine(),
   new PythonEngine(),
   new DefaultRetryPlugin(),
-  new DefaultModuleLocationResolver(),
+  new DefaultTaskHandlerLocationResolver(),
 ];
 
 export class DefaultPluginLoader implements PluginLoader {

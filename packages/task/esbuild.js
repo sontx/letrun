@@ -16,7 +16,7 @@ function buildHandler(entryPoint, outputFile) {
         js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
       },
       outfile: outputFile,
-      external: ['joi'],
+      external: ['joi', '@letrun/core', '@letrun/common'],
     })
     .catch((e) => {
       console.error(e);

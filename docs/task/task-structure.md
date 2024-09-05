@@ -35,6 +35,36 @@ This is an example of a task definition:
 }
 ```
 
+## Task Handler Format
+
+A task handler is a string that represents the task type.
+It can be a built-in task or a custom task.
+The task handler should be defined in the `handler` field.
+
+The handler should follow the format: `type:identify[:task-name]`.
+
+- `type`: The type of the task, it can be:
+  - `package`: A task handler from a node package which is published to npm.
+  - `external`: A task handler from an external node package which is not published.
+  - `script`: A task handler from a standalone script file.
+- `identify`: The identifier of the task handler, it can be:
+  - The package name if the type is `package`. The version can be specified by using the `@` symbol, e.g. `@my-scope/my-task@1.0.0`.
+  - The path to the node module if the type is `external`.
+  - The path to the script file if the type is `script`.
+- `task-name`: The name of the task handler, this is optional if the identify isn't a group task package.
+
+> If the handler is a path, it will treat as a script task handler.
+
+This is some valid task handler examples:
+
+```text
+package:@letrun-task/file@0.0.1:read
+package:example-task
+
+external:./tasks/example-task
+script:./tasks/example-task.js
+```
+
 ## Nested Tasks
 
 You can nest tasks inside other tasks by defining the nested tasks in the `tasks` field. This is useful when you want to group tasks together.

@@ -12,6 +12,8 @@ import {
   WorkflowTaskDefs,
   WorkflowTasks,
 } from '@letrun/common';
+import type { PackageJson } from 'type-fest';
+import fs from 'node:fs';
 
 /**
  * Checks if a path is relative.
@@ -275,4 +277,20 @@ export function extractJsExtension(filename: string) {
   const regex = /\.([mc])?js$/i;
   const match = filename.match(regex);
   return match ? match[0] : null;
+}
+
+export async function readPackageJson(modulePath: string, throwsIfNotFound = true): Promise<PackageJson | null> {
+  const packageJsonPath = path.join(modulePath, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    if (!throwsIfNotFound) {
+      return null;
+    }
+    throw new Error(`package.json not found in ${modulePath}`);
+  }
+  const packageJson = await fs.promises.readFile(packageJsonPath, 'utf8');
+  return JSON.parse(packageJson) as PackageJson;
+}
+
+export async function withAwait<T = any>(maybePromise: any): Promise<T> {
+  return maybePromise instanceof Promise ? await maybePromise : maybePromise;
 }

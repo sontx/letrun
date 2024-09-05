@@ -54,7 +54,7 @@ describe('LogTaskHandler', () => {
   it('throws error for missing message parameter', async () => {
     mockTask.parameters = { level: 'info' };
     const input: TaskHandlerInput = { task: mockTask, context: mockContext, session: {}, workflow: {} } as any;
-    await expect(handler.handle(input)).rejects.toThrow(InvalidParameterError);
+    expect(() => handler.handle(input)).toThrow(InvalidParameterError);
   });
 
   it('uses default log level when level is not provided', async () => {

@@ -8,6 +8,7 @@ export * from './plugin-loader';
 export * from './plugin-manager';
 export * from './runner';
 export * from './task-handler';
+export * from './task-group';
 export * from './tasks-factory';
 export * from './retryable';
 export * from './retry-config';

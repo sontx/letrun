@@ -85,4 +85,4 @@ Here are supported plugin types:
 10. [Workflow Runner](workflow-runner.md)
 11. [Pre/Post Run Workflow Plugin](pre-post-run-workflow-plugin.md)
 12. [Pre/Post Run Task Plugin](pre-post-run-task-plugin.md)
-13. [Module Location Resolver](module-location-resolver.md)
+13. [Task Handler Location Resolver](task-handler-location-resolver)

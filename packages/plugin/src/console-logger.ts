@@ -4,13 +4,8 @@ import type { TransformableInfo } from 'logform';
 import { LEVEL, MESSAGE, SPLAT } from 'triple-beam';
 import { inspect, InspectOptions } from 'util';
 import { format, transports } from 'winston';
-import {
-  AbstractPlugin,
-  BUILTIN_PLUGIN_PRIORITY,
-  LOG_TRANSPORT_PLUGIN,
-  LogTransportPlugin,
-} from '@letrun/core';
-import { AppContext } from "@letrun/common";
+import { AbstractPlugin, BUILTIN_PLUGIN_PRIORITY, LOG_TRANSPORT_PLUGIN, LogTransportPlugin } from '@letrun/core';
+import { AppContext } from '@letrun/common';
 
 export default class ConsoleLogger extends AbstractPlugin implements LogTransportPlugin {
   private options?: ConsoleFormatOptions;
@@ -23,7 +18,7 @@ export default class ConsoleLogger extends AbstractPlugin implements LogTranspor
     const consoleFormat = new ConsoleFormat(this.options ?? {}) as any;
     const formats = [
       format.ms(),
-      format.errors({ stack: true }),
+      format.errors({ stack: false }),
       format.splat(),
       format.json(),
       format.colorize({ all: true }),
@@ -81,7 +76,7 @@ class ConsoleFormat {
   private static readonly reSpaces = /^\s+/;
   private static readonly reSpacesOrEmpty = /^(\s*)/;
   private static readonly reColor = /\x1B\[\d+m/;
-  private static readonly defaultStrip = [LEVEL, MESSAGE, SPLAT, 'level', 'message', 'ms', 'stack'];
+  private static readonly defaultStrip = [LEVEL, MESSAGE, SPLAT, 'level', 'message', 'name', 'ms', 'stack'];
   private static readonly chars = {
     singleLine: '▪',
     startLine: '┏',
@@ -132,18 +127,6 @@ class ConsoleFormat {
     return ms;
   }
 
-  private stack(info: TransformableInfo): string[] {
-    const messages: string[] = [];
-
-    if (info.stack) {
-      const error = new Error();
-      error.stack = info.stack;
-      this.inspector(error, messages);
-    }
-
-    return messages;
-  }
-
   private meta(info: TransformableInfo): string[] {
     const messages: string[] = [];
     const stripped = { ...info };
@@ -187,7 +170,6 @@ class ConsoleFormat {
     const messages: string[] = [];
 
     if (this.opts.showMeta) {
-      messages.push(...this.stack(info));
       messages.push(...this.meta(info));
     }
 

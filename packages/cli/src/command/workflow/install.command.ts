@@ -3,14 +3,13 @@ import { Command } from 'commander';
 import { NpmPackage, WorkflowDepsScanner } from '@letrun/deps';
 import ora from 'ora';
 import {
-  extractPackageNameVersion,
   INPUT_PARAMETER_PLUGIN,
   InputParameter,
-  MODULE_LOCATION_RESOLVER_PLUGIN,
-  ModuleLocationResolver,
+  TASK_HANDLER_LOCATION_RESOLVER_PLUGIN,
+  TaskHandlerLocationResolver,
 } from '@letrun/core';
 import { SystemTaskManager } from '@letrun/engine';
-import { WorkflowDef } from "@letrun/common";
+import { ParsedHandler, WorkflowDef } from '@letrun/common';
 
 export class InstallCommand extends AbstractCommand {
   private npmPackage = new NpmPackage();
@@ -48,15 +47,15 @@ export class InstallCommand extends AbstractCommand {
       const { stdout, stderr } = await this.npmPackage.install(
         installableDeps
           .map((dep) => {
-            const { name } = extractPackageNameVersion(dep.handler!);
-            return `${name}@${dep.version}`;
+            const { name, version } = dep.handler!;
+            return version ? `${name}@${version}` : name;
           })
           .join(' '),
         options.dryRun ? '--dry-run' : undefined,
       );
 
       if (stderr) {
-        spinner.warn("Packages installed with warnings\n");
+        spinner.warn('Packages installed with warnings\n');
         this.context.getLogger().error(stderr.trim());
       } else {
         spinner.succeed('Packages installed successfully\n');
@@ -71,16 +70,15 @@ export class InstallCommand extends AbstractCommand {
 
   private async getScanner() {
     const scanner = new WorkflowDepsScanner();
-    scanner.locationResolver = async (module: string, modulesDir?: string) => {
-      return this.context
+    scanner.locationResolver = (handler: ParsedHandler, tasksDir?: string) =>
+      this.context
         .getPluginManager()
-        .callPluginMethod<ModuleLocationResolver>(
-          MODULE_LOCATION_RESOLVER_PLUGIN,
+        .callPluginMethod<TaskHandlerLocationResolver>(
+          TASK_HANDLER_LOCATION_RESOLVER_PLUGIN,
           'resolveLocation',
-          module,
-          modulesDir,
+          handler,
+          tasksDir,
         );
-    };
     const systemTasks = Object.keys(SystemTaskManager.getSystemTasks());
     scanner.checkSystemDependencyFn = (handler) => systemTasks.includes(handler);
     return scanner;

@@ -36,7 +36,7 @@ export class FilePluginLoader implements PluginLoader {
       for (const file of files.filter((file) => extractJsExtension(file))) {
         const pluginFile = path.resolve(this.pluginDir, file);
         try {
-          const pluginClass = await this.moduleResolver(pluginFile);
+          const { default: pluginClass } = (await this.moduleResolver(pluginFile)) ?? {};
           if (!pluginClass) {
             DEFAULT_LOGGER.warn(`No default export found in ${pluginFile}`);
           } else {

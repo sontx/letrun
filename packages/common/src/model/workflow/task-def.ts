@@ -11,7 +11,13 @@ export interface TaskDef extends ContainerDef {
   title?: string;
   /** Optional flag to ignore errors and let other tasks continue running. */
   ignoreError?: boolean;
-  /** The handler of the task. This may be the system task type or the path to the task's handler, which will handle the whole logic of this task. */
+  /**
+   *  The handler of the task. This may be the system task type or the path to the task's handler, which will handle the whole logic of this task.
+   *  This should be formatted as:
+   *  - `package:package-name[@version][:task-name]` for a package task in node_modules.
+   *  - `external:package-name-or-path[:task-name]` for an external package task outside node_modules.
+   *  - `script:path/to/script` for a standalone script task.
+   */
   handler: string;
   /** Optional parameters for the task, supporting interpolating values. */
   parameters?: ObjectType;
@@ -30,3 +36,20 @@ export interface TaskDef extends ContainerDef {
   /** Optional tasks to execute if the {@link TaskDef.handler} is 'catch' right after the {@link TaskDef.catch} block. */
   finally?: WorkflowTaskDefs;
 }
+
+/**
+ * The parsed {@link TaskDef.handler} string to an object.
+ */
+export interface ParsedHandler {
+  name: string;
+  version?: string;
+  taskName?: string;
+  type: HandlerType;
+}
+
+/**
+ * - package: node package inside node_modules.
+ * - external: node package outside node_modules.
+ * - script: standalone script file.
+ */
+export type HandlerType = 'package' | 'external' | 'script';

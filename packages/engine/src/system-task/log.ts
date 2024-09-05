@@ -1,5 +1,5 @@
 import { validateParameters } from '@letrun/core';
-import { TaskHandler, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
+import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
 /**
@@ -53,9 +53,8 @@ export class LogTaskHandler implements TaskHandler {
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<TaskHandlerOutput>} The output of the task.
    */
-  async handle({ task, context }: TaskHandlerInput): Promise<TaskHandlerOutput> {
+  handle({ task, context }: TaskHandlerInput) {
     const { level, message } = validateParameters(task.parameters, Schema);
     context.getLogger()[level](message);
   }
