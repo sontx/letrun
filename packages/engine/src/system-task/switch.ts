@@ -1,6 +1,9 @@
 import {
   countTasks,
+  Description,
   isWorkflowTaskDefsEmpty,
+  Name,
+  Parameters,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
   validateParameters,
@@ -40,25 +43,10 @@ const Schema = Joi.object<TaskParameters>({
  * Class representing the handler for the switch task.
  * Implements the TaskHandler interface.
  */
+@Name('switch')
+@Description('Chooses tasks based on input values')
+@Parameters(Schema)
 export class SwitchTaskHandler implements TaskHandler {
-  /**
-   * The name of the task handler.
-   * @type {string}
-   */
-  name: string = 'switch';
-
-  /**
-   * The description of the task handler.
-   * @type {string}
-   */
-  description: string = 'Chooses tasks based on input values';
-
-  /**
-   * The parameters schema for the task handler.
-   * @type {Joi.Description}
-   */
-  parameters: Joi.Description = Schema.describe();
-
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.

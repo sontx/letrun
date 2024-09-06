@@ -294,3 +294,23 @@ export async function readPackageJson(modulePath: string, throwsIfNotFound = tru
 export async function withAwait<T = any>(maybePromise: any): Promise<T> {
   return maybePromise instanceof Promise ? await maybePromise : maybePromise;
 }
+
+/**
+ * A decorator that injects a field with specified value into a class instance.
+ * @param fieldName - The name of the field to inject.
+ * @param value - The value to inject.
+ */
+export function injectFieldDecorator(fieldName: string, value: any) {
+  return function (target: any) {
+    const originalConstructor = target;
+
+    function NewConstructor(...args: any[]) {
+      const instance = new originalConstructor(...args);
+      (instance as any)[fieldName] = value;
+      return instance;
+    }
+
+    NewConstructor.prototype = originalConstructor.prototype;
+    return NewConstructor as any;
+  };
+}

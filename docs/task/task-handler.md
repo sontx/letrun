@@ -54,13 +54,22 @@ A task handler should have the following structure:
 - `name`: The name of the task, this is optional. We'll use the file name or package name as the task name if not defined.
 - `description`: A brief description of the task, this is optional.
 - `version`: The version of the task, this is optional. We'll use the package version if not defined.
-- `parameters`: An object that describes the input parameters of the task for showing help.
-- `handle`: The function that executes the task.
+- `parameters`: An object that describes the input parameters of the task for showing help. (calls `Schema.describe()` from Joi)
+- `handle`: The function that executes the task. This is required.
+
+There are alternative ways to define those fields by using these corresponding decorators:
+
+- `@Name`: The name of the task.
+- `@Description`: A brief description of the task.
+- `@Version`: The version of the task.
+- `@Parameters`: An object that describes the input parameters of the task for showing help.
+
+> _Vanilla JS_ does not support decorators yet, so you need to use Babel or TypeScript to work with them.
 
 This is an example of a custom task:
 
 ```ts
-import { validateParameters } from '@letrun/core';
+import { validateParameters, Name, Parameters } from '@letrun/core';
 import { TaskHandler } from '@letrun/common';
 import Joi from 'joi';
 
@@ -72,10 +81,9 @@ const Schema = Joi.object<TaskParameters>({
   message: Joi.string().description('The message to say greeting').required(),
 });
 
-export default class GreatingTaskHandler implements TaskHandler {
-  name = 'greeting';
-  parameters = Schema.describe();
-
+@Name('greeting')
+@Parameters(Schema)
+export default class GreetingTaskHandler implements TaskHandler {
   async handle({ task }: TaskHandlerInput) {
     const { message } = validateParameters(task.parameters, Schema);
     const effectiveMessage = `Hello, ${message}!`;
@@ -88,7 +96,7 @@ export default class GreatingTaskHandler implements TaskHandler {
 Here is another example that will uppercase the input string:
 
 ```ts
-import { validateParameters } from '@letrun/core';
+import { validateParameters, Name, Parameters } from '@letrun/core';
 import { TaskHandler } from '@letrun/common';
 import Joi from 'joi';
 
@@ -100,10 +108,9 @@ const Schema = Joi.object<TaskParameters>({
   value: Joi.string().description('The string to uppercase').required(),
 });
 
+@Name('uppercase')
+@Parameters(Schema)
 export default class UppercaseTaskHandler implements TaskHandler {
-  name = 'uppercase';
-  parameters = Schema.describe();
-
   async handle({ task }: TaskHandlerInput) {
     const { value } = validateParameters(task.parameters, Schema);
     return value.toUpperCase();

@@ -9,7 +9,7 @@ const options = {
   bundle: true,
   tsconfig: 'tsconfig.json',
   platform: 'node',
-  target: 'esnext',
+  target: 'es2022',
   plugins: [nodeExternalsPlugin()],
 };
 

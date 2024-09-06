@@ -1,4 +1,4 @@
-import { validateParameters } from '@letrun/core';
+import { Description, Name, Parameters, validateParameters } from '@letrun/core';
 import { RerunError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
@@ -42,25 +42,10 @@ const Schema = Joi.object<TaskParameters>({
  * Class representing the handler for the 'for' task.
  * Implements the TaskHandler interface.
  */
+@Name('for')
+@Description('Loops through a specified range and performs tasks')
+@Parameters(Schema)
 export class ForTaskHandler implements TaskHandler {
-  /**
-   * The name of the task handler.
-   * @type {string}
-   */
-  name: string = 'for';
-
-  /**
-   * The description of the task handler.
-   * @type {string}
-   */
-  description: string = 'Loops through a specified range and performs tasks';
-
-  /**
-   * The parameters schema for the task handler.
-   * @type {Joi.Description}
-   */
-  parameters: Joi.Description = Schema.describe();
-
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.

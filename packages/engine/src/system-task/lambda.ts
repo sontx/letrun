@@ -1,5 +1,13 @@
 import Joi from 'joi';
-import { SCRIPT_ENGINE_PLUGIN, ScriptEngine, validateParameters, wrapPromiseWithAbort } from '@letrun/core';
+import {
+  Description,
+  Name,
+  Parameters,
+  SCRIPT_ENGINE_PLUGIN,
+  ScriptEngine,
+  validateParameters,
+  wrapPromiseWithAbort,
+} from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import fs from 'fs';
 import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
@@ -20,11 +28,10 @@ const Schema = Joi.object<TaskParameters>({
   .xor('expression', 'file')
   .required();
 
+@Name('lambda')
+@Description('Evaluates a lambda expression.')
+@Parameters(Schema)
 export class LambdaTaskHandler implements TaskHandler {
-  name = 'lambda';
-  description = 'Evaluates a lambda expression.';
-  parameters = Schema.describe();
-
   async handle(taskInput: TaskHandlerInput) {
     const { task, context, session } = taskInput;
     const { expression, file, input, language } = validateParameters(task.parameters, Schema);

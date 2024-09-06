@@ -6,6 +6,7 @@ import {
   extractPackageNameVersion,
   getEntryPointDir,
   getTasksByStatus,
+  injectFieldDecorator,
   isRelativePath,
   isTerminatedStatus,
   isWorkflowTaskDefsArray,
@@ -206,5 +207,37 @@ describe('readPackageJson', () => {
 
     const result = await readPackageJson(modulePath, false);
     expect(result).toBeNull();
+  });
+});
+
+describe('injectFieldDecorator', () => {
+  it('should inject the specified field into the class instance', () => {
+    const fieldName = 'injectedField';
+    const fieldValue = 'testValue';
+
+    @injectFieldDecorator(fieldName, fieldValue)
+    class TestClass {}
+
+    const instance = new TestClass();
+    expect((instance as any)[fieldName]).toBe(fieldValue);
+  });
+
+  it('should keep the prototype after creating a new class', () => {
+    class BaseClass {
+      baseMethod() {
+        return 'baseMethod';
+      }
+    }
+
+    const fieldName = 'injectedField';
+    const fieldValue = 'testValue';
+
+    @injectFieldDecorator(fieldName, fieldValue)
+    class DerivedClass extends BaseClass {}
+
+    const instance = new DerivedClass();
+    expect(instance.baseMethod()).toBe('baseMethod');
+    expect((instance as any)[fieldName]).toBe(fieldValue);
+    expect(instance).toBeInstanceOf(DerivedClass);
   });
 });

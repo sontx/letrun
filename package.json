@@ -5,7 +5,7 @@
   "author": "sontx",
   "type": "module",
   "bin": {
-    "letrun": "dist/letrun.js"
+    "letrun": "dist/letrun.mjs"
   },
   "scripts": {
     "test": "npm run test -ws --if-present",
@@ -21,7 +21,7 @@
     "build:cli": "npm run build -w @letrun/cli",
     "clean": "rm -rf ./dist/**",
     "copy": "npm run copy:cli && npm run copy:task && npm run copy:bin",
-    "copy:cli": "copyfiles -f ./packages/cli/dist/**/*.js ./dist",
+    "copy:cli": "copyfiles -f ./packages/cli/dist/**/*.mjs ./dist",
     "copy:bin": "copyfiles -f ./bin/* ./dist",
     "copy:task": "copyfiles -f ./packages/task/dist/**/*.js ./dist/tasks"
   },
@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
-    "esbuild": "^0.19.11",
+    "esbuild": "^0.23.1",
     "esbuild-node-externals": "^1.14.0",
     "lerna": "^8.1.8",
     "prettier": "^3.3.3",

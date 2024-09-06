@@ -1,4 +1,4 @@
-import { SCRIPT_ENGINE_PLUGIN, ScriptEngine, validateParameters } from '@letrun/core';
+import { Description, Name, Parameters, SCRIPT_ENGINE_PLUGIN, ScriptEngine, validateParameters } from '@letrun/core';
 import { RerunError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
@@ -43,25 +43,10 @@ const Schema = Joi.object<TaskParameters>({
  * Class representing the handler for the 'while' task.
  * Implements the TaskHandler interface.
  */
+@Name('while')
+@Description('Loops through tasks until a condition is met')
+@Parameters(Schema)
 export class WhileTaskHandler implements TaskHandler {
-  /**
-   * The name of the task handler.
-   * @type {string}
-   */
-  name: string = 'while';
-
-  /**
-   * The description of the task handler.
-   * @type {string}
-   */
-  description: string = 'Loops through tasks until a condition is met';
-
-  /**
-   * The parameters schema for the task handler.
-   * @type {Joi.Description}
-   */
-  parameters: Joi.Description = Schema.describe();
-
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.

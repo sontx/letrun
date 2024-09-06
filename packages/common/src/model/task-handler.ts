@@ -28,7 +28,9 @@ export interface TaskHandler {
   version?: string;
   /** Optional description of the task handler. */
   description?: string;
-  /** Optional parameters for the task handler, presenting the accepted parameters. */
+  /**
+   *  An object that describes the input parameters of the task for showing help.
+   */
   parameters?: Joi.Description;
 
   /**

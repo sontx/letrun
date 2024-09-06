@@ -1,4 +1,4 @@
-import { countTasks, isWorkflowTaskDefsEmpty, validateParameters } from '@letrun/core';
+import { countTasks, Description, isWorkflowTaskDefsEmpty, Name, Parameters, validateParameters } from '@letrun/core';
 import { InvalidParameterError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
@@ -79,25 +79,10 @@ const Schema = Joi.object<TaskParameters>({
  * Class representing the handler for the 'if' task.
  * Implements the TaskHandler interface.
  */
+@Name('if')
+@Description('Executes tasks based on conditions')
+@Parameters(Schema)
 export class IfTaskHandler implements TaskHandler {
-  /**
-   * The name of the task handler.
-   * @type {string}
-   */
-  name: string = 'if';
-
-  /**
-   * The description of the task handler.
-   * @type {string}
-   */
-  description: string = 'Executes tasks based on conditions';
-
-  /**
-   * The parameters schema for the task handler.
-   * @type {Joi.Description}
-   */
-  parameters: Joi.Description = Schema.describe();
-
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.
