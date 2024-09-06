@@ -174,7 +174,7 @@ See more details in the [Plugin](docs/plugin/plugin.md) document.
 The CLI tool can be configured using a configuration file or environment variables.
 The configuration provider will look up in this order:
 
-1. `letrun.json` in the runner directory.
+1. `letrun.mjson` in the runner directory.
 2. `letrun.yaml` in the runner directory.
 3. `letrun.yml` in the runner directory.
 4. Lookup from environment variables.
@@ -261,7 +261,7 @@ npm run build
 ```sh
 cd dist
 
-node letrun.js <workflow-file>
+node letrun.mjs <workflow-file>
 ```
 
 ### License

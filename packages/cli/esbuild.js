@@ -28,6 +28,6 @@ import { createRequire } from 'module'; const require = createRequire(import.met
       'process.env.APP_DESCRIPTION': JSON.stringify(description),
       'process.env.APP_AUTHOR': JSON.stringify(author),
     },
-    outfile: 'dist/letrun.js',
+    outfile: 'dist/letrun.mjs',
   })
   .catch(() => process.exit(1));

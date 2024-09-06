@@ -5,7 +5,7 @@
   "type": "module",
   "author": "sontx",
   "bin": {
-    "letrun": "dist/letrun.js"
+    "letrun": "dist/letrun.mjs"
   },
   "keywords": [
     "workflow",
@@ -15,7 +15,7 @@
   "scripts": {
     "build": "npm run clean && node esbuild.js",
     "build:prod": "npm run clean && node esbuild.js --prod",
-    "start": "node dist/letrun.js",
+    "start": "node dist/letrun.mjs",
     "clean": "rm -rf ./dist/**",
     "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest -- --coverage",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npm run jest",

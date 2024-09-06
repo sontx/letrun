@@ -9,9 +9,9 @@ if ($PSVersionTable.PSVersion -lt "6.0" -or $IsWindows) {
 $ret=0
 # Support pipeline input
 if ($MyInvocation.ExpectingInput) {
-  $input | & "node$exe"  "letrun.js" $args
+  $input | & "node$exe"  "letrun.mjs" $args
 } else {
-  & "node$exe"  "letrun.js" $args
+  & "node$exe"  "letrun.mjs" $args
 }
 $ret=$LASTEXITCODE
 exit $ret
