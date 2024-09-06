@@ -39,10 +39,12 @@ export class DefaultRunner implements Runner {
   static async create(context?: AppContext, logLevel?: string): Promise<Runner> {
     if (!context) {
       context = new DefaultContext();
-      await context.load();
     }
     if (logLevel) {
       await BootstrapUtils.setGlobalLogLevel(context, logLevel);
+    }
+    if (context) {
+      await context.load();
     }
     const runner = new DefaultRunner();
     await runner.load(context);
