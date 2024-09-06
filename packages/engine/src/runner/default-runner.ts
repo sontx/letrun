@@ -37,17 +37,21 @@ export class DefaultRunner implements Runner {
   private abortController?: AbortController;
 
   static async create(context?: AppContext, logLevel?: string): Promise<Runner> {
+    const isExternalContext = !!context;
     if (!context) {
       context = new DefaultContext();
-      await context.load();
     }
     if (logLevel) {
       await BootstrapUtils.setGlobalLogLevel(context, logLevel);
     }
+    // make sure the logger is configured before the context loaded
+    if (context && !isExternalContext) {
+      await context.load();
+    }
     const runner = new DefaultRunner();
     await runner.load(context);
     // make sure the context is unloaded when the runner is destroyed
-    runner.isExternalContext = false;
+    runner.isExternalContext = isExternalContext;
     return runner;
   }
 
