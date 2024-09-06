@@ -116,6 +116,7 @@ describe('DefaultRunner.create', () => {
   let mockContext: jest.Mocked<AppContext>;
 
   beforeEach(() => {
+    jest.resetAllMocks();
     mockContext = {
       getLogger: jest.fn().mockReturnValue({
         info: jest.fn(),
@@ -127,6 +128,7 @@ describe('DefaultRunner.create', () => {
       })),
       getPluginManager: jest.fn(),
       unload: jest.fn(),
+      load: jest.fn(),
     } as unknown as jest.Mocked<AppContext>;
   });
 
@@ -147,6 +149,21 @@ describe('DefaultRunner.create', () => {
     const runner = (await DefaultRunner.create()) as any;
     expect(runner['context']).toBeInstanceOf(DefaultContext);
     expect(loadSpy).toHaveBeenCalled();
+  });
+
+  it('should not call context.load if context is provided', async () => {
+    const loadSpy = jest.spyOn(mockContext, 'load');
+    const runner = await DefaultRunner.create(mockContext);
+    expect(loadSpy).not.toHaveBeenCalled();
+    expect((runner as any)['isExternalContext']).toBeTruthy();
+  });
+
+  it('should initialize a new context if no context is provided', async () => {
+    const loadSpy = jest.spyOn(DefaultContext.prototype, 'load');
+    const runner = (await DefaultRunner.create()) as any;
+    expect(runner['context']).toBeInstanceOf(DefaultContext);
+    expect(loadSpy).toHaveBeenCalled();
+    expect((runner as any)['isExternalContext']).toBeFalsy();
   });
 });
 
