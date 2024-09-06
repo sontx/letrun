@@ -1,7 +1,7 @@
 {
   "extends": "@tsconfig/node20",
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "ES2022",
     "moduleResolution": "Bundler",
     "isolatedModules": true,
     "noUncheckedIndexedAccess": true,

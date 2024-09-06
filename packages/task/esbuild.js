@@ -11,7 +11,7 @@ function buildHandler(entryPoint, outputFile) {
       sourcesContent: false,
       platform: 'node',
       format: "esm",
-      target: "esnext",
+      target: "es2022",
       banner: {
         js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
       },

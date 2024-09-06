@@ -18,7 +18,7 @@ esbuild
     sourcesContent: false,
     platform: 'node',
     format: 'esm',
-    target: 'esnext',
+    target: 'es2022',
     banner: {
       js: `#!/usr/bin/env node
 import { createRequire } from 'module'; const require = createRequire(import.meta.url);`,
