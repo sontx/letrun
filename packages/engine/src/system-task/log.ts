@@ -1,4 +1,4 @@
-import { validateParameters } from '@letrun/core';
+import { Description, Name, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
@@ -31,25 +31,10 @@ const Schema = Joi.object<TaskParameters>({
  * Class representing the handler for the log task.
  * Implements the TaskHandler interface.
  */
+@Name('log')
+@Description('Outputs messages or errors for debugging')
+@Parameters(Schema)
 export class LogTaskHandler implements TaskHandler {
-  /**
-   * The name of the task handler.
-   * @type {string}
-   */
-  name: string = 'log';
-
-  /**
-   * The description of the task handler.
-   * @type {string}
-   */
-  description: string = 'Outputs messages or errors for debugging';
-
-  /**
-   * The parameters schema for the task handler.
-   * @type {Joi.Description}
-   */
-  parameters: Joi.Description = Schema.describe();
-
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.

@@ -1,7 +1,10 @@
 import {
   countTasks,
+  Description,
   getTasksByStatus,
   isWorkflowTaskDefsEmpty,
+  Name,
+  Parameters,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
   validateParameters,
@@ -48,25 +51,10 @@ const Schema = Joi.object<TaskParameters>({
  * Class representing the handler for the catch task.
  * Implements the TaskHandler interface.
  */
+@Name('catch')
+@Description('Handles errors during task execution')
+@Parameters(Schema)
 export class CatchTaskHandler implements TaskHandler {
-  /**
-   * The name of the task handler.
-   * @type {string}
-   */
-  name: string = 'catch';
-
-  /**
-   * The description of the task handler.
-   * @type {string}
-   */
-  description: string = 'Handles errors during task execution';
-
-  /**
-   * The parameters schema for the task handler.
-   * @type {Joi.Description}
-   */
-  parameters: Joi.Description = Schema.describe();
-
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.

@@ -1,4 +1,4 @@
-import { delayMs, validateParameters } from '@letrun/core';
+import { delayMs, Description, Name, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
 import Joi from 'joi';
 import ms from 'ms';
@@ -15,11 +15,10 @@ const Schema = Joi.object<TaskParameters>({
   data: Joi.any().description('The data to pass to the output on time out'),
 });
 
+@Name('delay')
+@Description('Delays the execution of the workflow for a specified amount of time')
+@Parameters(Schema)
 export class DelayTaskHandler implements TaskHandler {
-  name: string = 'delay';
-  description: string = 'Delays the execution of the workflow for a specified amount of time';
-  parameters: Joi.Description = Schema.describe();
-
   async handle({ task, context, session }: TaskHandlerInput): Promise<TaskHandlerOutput> {
     const { time, data } = validateParameters(task.parameters, Schema);
     const delayMillis = typeof time === 'string' ? ms(time) : time;
