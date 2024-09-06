@@ -3,7 +3,7 @@ import { TaskHandler } from '@letrun/common';
 import type Joi from 'joi';
 
 /**
- * A decorator that injects the name field to a {@link TaskHandler}.
+ * A decorator that injects the name field to a {@link TaskHandler}. See {@link TaskHandler.name}.
  * @param value - task handler name.
  * @constructor
  *
@@ -19,7 +19,7 @@ export function Name(value: string) {
 }
 
 /**
- * A decorator that injects the version field to a {@link TaskHandler}.
+ * A decorator that injects the version field to a {@link TaskHandler}. See {@link TaskHandler.version}.
  * @param value - task handler version.
  * @constructor
  *
@@ -35,7 +35,7 @@ export function Version(value: string) {
 }
 
 /**
- * A decorator that injects the description field to a {@link TaskHandler}.
+ * A decorator that injects the description field to a {@link TaskHandler}. See {@link TaskHandler.description}.
  * @param value - task handler description.
  * @constructor
  *
@@ -51,7 +51,7 @@ export function Description(value: string) {
 }
 
 /**
- * A decorator that injects the parameters field to a {@link TaskHandler}.
+ * A decorator that injects the parameters field to a {@link TaskHandler}. See {@link TaskHandler.parameters}.
  * @param value - task handler parameters.
  * @constructor
  *

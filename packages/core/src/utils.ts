@@ -304,13 +304,13 @@ export function injectFieldDecorator(fieldName: string, value: any) {
   return function (target: any) {
     const originalConstructor = target;
 
-    function newConstructor(...args: any[]) {
+    function NewConstructor(...args: any[]) {
       const instance = new originalConstructor(...args);
       (instance as any)[fieldName] = value;
       return instance;
     }
 
-    newConstructor.prototype = originalConstructor.prototype;
-    return newConstructor as any;
+    NewConstructor.prototype = originalConstructor.prototype;
+    return NewConstructor as any;
   };
 }
