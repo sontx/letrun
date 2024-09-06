@@ -44,7 +44,7 @@ describe('NpmPackage', () => {
 
     expect(writeFileMock).toHaveBeenCalledWith(
       'package.json',
-      JSON.stringify({ name: 'letrun', type: 'module', main: 'letrun.mjs' }, null, 2),
+      JSON.stringify({ name: 'letrun', type: 'module', main: 'letrun.js' }, null, 2),
     );
     expect(installDeps).toHaveBeenCalledTimes(1);
   });
