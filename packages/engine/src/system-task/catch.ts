@@ -4,6 +4,7 @@ import {
   getTasksByStatus,
   isWorkflowTaskDefsEmpty,
   Name,
+  Output,
   Parameters,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
@@ -13,9 +14,6 @@ import { InvalidParameterError, RerunError, Task, TaskDef, TaskHandler, TaskHand
 import Joi from 'joi';
 import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
-/**
- * Interface representing the parameters for the CatchTaskHandler.
- */
 interface TaskParameters {
   /**
    * The error name to match against the caught error if the catch is executed.
@@ -36,9 +34,6 @@ interface TaskParameters {
   language?: string;
 }
 
-/**
- * Schema for validating the task parameters.
- */
 const Schema = Joi.object<TaskParameters>({
   errorName: Joi.string().description('The error name to match against the caught error if the catch is executed'),
   expression: Joi.string().description(
@@ -47,19 +42,16 @@ const Schema = Joi.object<TaskParameters>({
   language: Joi.string().description('The language of the expression').default('javascript'),
 }).oxor('errorName', 'expression');
 
-/**
- * Class representing the handler for the catch task.
- * Implements the TaskHandler interface.
- */
+const OutputSchema = Joi.object({
+  handledBlocks: Joi.array().items(Joi.string().allow('catch', 'finally')).description('The handled blocks'),
+  error: Joi.object().description('The error that was caught'),
+});
+
 @Name('catch')
 @Description('Handles errors during task execution')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class CatchTaskHandler implements TaskHandler {
-  /**
-   * Handles the task execution.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<any>} The output of the task.
-   */
   async handle(input: TaskHandlerInput): Promise<any> {
     const { task } = input;
 
@@ -126,13 +118,6 @@ export class CatchTaskHandler implements TaskHandler {
     }
   }
 
-  /**
-   * Handles the catch block execution.
-   * @private
-   * @param {Task[]} errorTaskArray - The array of error tasks.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<void | never>} A promise that resolves when the catch block is handled.
-   */
   private async handleCatchBlock(errorTaskArray: Task[], input: TaskHandlerInput): Promise<void | never> {
     const { task, context, session } = input;
     const { errorName, expression, language } = validateParameters(task.parameters, Schema);
@@ -175,12 +160,6 @@ export class CatchTaskHandler implements TaskHandler {
     }
   }
 
-  /**
-   * Handles the finally block execution.
-   * @private
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {void | never} The output of the finally block.
-   */
   private handleFinallyBlock({ task, context, session }: TaskHandlerInput): void | never {
     if (countTasks(task.finally) > 0) {
       if (!task.output) {

@@ -52,7 +52,7 @@ export function Description(value: string) {
 
 /**
  * A decorator that injects the parameters field to a {@link TaskHandler}. See {@link TaskHandler.parameters}.
- * @param value - task handler parameters.
+ * @param value - task handler parameters. If value is not provided, the parameters field will be set to null (no parameters are required).
  * @constructor
  *
  * @example
@@ -64,8 +64,28 @@ export function Description(value: string) {
  * }
  * ```
  */
-export function Parameters(value: Joi.Description | Joi.Schema) {
-  return injectFieldDecorator('parameters', isJoiSchema(value) ? value.describe() : value);
+export function Parameters(value?: Joi.Description | Joi.Schema | null) {
+  const effectiveValue = !value ? null : isJoiSchema(value) ? value.describe() : value;
+  return injectFieldDecorator('parameters', effectiveValue);
+}
+
+/**
+ * A decorator that injects the output field to a {@link TaskHandler}. See {@link TaskHandler.output}.
+ * @param value - task handler output. If value is not provided, the output field will be set to null (no output).
+ * @constructor
+ *
+ * @example
+ * ```ts
+ * @Output(Joi.object({
+ *   value: Joi.string().required(),
+ * }))
+ * class MyTaskHandler implements TaskHandler {
+ * }
+ * ```
+ */
+export function Output(value?: Joi.Description | Joi.Schema | null) {
+  const effectiveValue = !value ? null : isJoiSchema(value) ? value.describe() : value;
+  return injectFieldDecorator('output', effectiveValue);
 }
 
 function isJoiSchema(value: Joi.Description | Joi.Schema): value is Joi.Schema {

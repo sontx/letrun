@@ -21,7 +21,7 @@ export interface TaskHandlerInput {
  * Interface representing a task handler.
  * Keeps the logic stateless because it will be recalled multiple times with different task data.
  */
-export interface TaskHandler {
+export interface TaskHandler<T = any> {
   /** The name of the task handler. */
   name?: string;
   /** The version of the task handler. */
@@ -30,20 +30,23 @@ export interface TaskHandler {
   description?: string;
   /**
    *  An object that describes the input parameters of the task for showing help.
+   *  If the task does not require any input, set this to null.
    */
-  parameters?: Joi.Description;
+  parameters?: Joi.Description | null;
+  /**
+   * An object that describes the output of the task for showing help.
+   * If the task does not return anything, set this to null.
+   */
+  output?: Joi.Description | null;
 
   /**
    * Handles the task.
    * @param input - The input for the task handler.
    * @returns A promise that resolves to the output of the task handler.
    */
-  handle(input: TaskHandlerInput): Promise<TaskHandlerOutput> | TaskHandlerOutput;
+  handle(input: TaskHandlerInput): Promise<T> | T;
 }
 
 export interface TaskHandlerConstructor {
   new (): TaskHandler;
 }
-
-/** Type representing the output of a task handler. */
-export type TaskHandlerOutput = any;

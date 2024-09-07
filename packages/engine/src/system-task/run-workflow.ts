@@ -1,12 +1,8 @@
-import { Description, Name, Parameters, validateParameters, wrapPromiseWithAbort } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters, wrapPromiseWithAbort } from '@letrun/core';
 import { RunnerOptions, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import fs from 'fs';
 
-/**
- * Interface representing the parameters for the RunWorkflowTaskHandler.
- * Extends RunnerOptions.
- */
 interface TaskParameters extends RunnerOptions {
   /**
    * The input to pass to the workflow.
@@ -15,9 +11,6 @@ interface TaskParameters extends RunnerOptions {
   input?: any;
 }
 
-/**
- * Schema for validating the task parameters.
- */
 const Schema = Joi.object<TaskParameters>({
   file: Joi.string().description('The file path to the workflow to run'),
   workflow: Joi.any().description(
@@ -26,20 +19,13 @@ const Schema = Joi.object<TaskParameters>({
   input: Joi.any().description('The input to pass to the workflow'),
 }).xor('file', 'workflow');
 
-/**
- * Class representing the handler for the 'run-workflow' task.
- * Implements the TaskHandler interface.
- */
+const OutputSchema = Joi.any().description('The output of the sub-workflow');
+
 @Name('run-workflow')
 @Description('Runs another workflow within the current workflow')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class RunWorkflowTaskHandler implements TaskHandler {
-  /**
-   * Handles the task execution.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<any>} The output of the task.
-   * @throws {Error} If the workflow fails to run or completes with an error.
-   */
   async handle({ task, session, context }: TaskHandlerInput): Promise<any> {
     const { workflow, input, file } = validateParameters(task.parameters, Schema);
     let workflowToRun = workflow ? (typeof workflow === 'string' ? JSON.parse(workflow) : workflow) : undefined;

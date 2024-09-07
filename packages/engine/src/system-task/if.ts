@@ -1,10 +1,15 @@
-import { countTasks, Description, isWorkflowTaskDefsEmpty, Name, Parameters, validateParameters } from '@letrun/core';
+import {
+  countTasks,
+  Description,
+  isWorkflowTaskDefsEmpty,
+  Name,
+  Output,
+  Parameters,
+  validateParameters,
+} from '@letrun/core';
 import { InvalidParameterError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
-/**
- * Interface representing the parameters for the IfTaskHandler.
- */
 interface TaskParameters {
   /**
    * The left operand of the expression.
@@ -42,9 +47,6 @@ interface TaskParameters {
   right: any;
 }
 
-/**
- * Schema for validating the task parameters.
- */
 const Schema = Joi.object<TaskParameters>({
   left: Joi.any().required(),
   operator: Joi.string()
@@ -75,19 +77,13 @@ const Schema = Joi.object<TaskParameters>({
   right: Joi.any(),
 });
 
-/**
- * Class representing the handler for the 'if' task.
- * Implements the TaskHandler interface.
- */
+const OutputSchema = Joi.boolean().description('The result of the expression');
+
 @Name('if')
 @Description('Executes tasks based on conditions')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class IfTaskHandler implements TaskHandler {
-  /**
-   * Handles the task execution.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<boolean>} The output of the task.
-   */
   async handle({ task, context, session }: TaskHandlerInput): Promise<boolean> {
     const value = validateParameters(task.parameters, Schema);
     const matched = this.isMatched(value);

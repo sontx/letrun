@@ -20,7 +20,7 @@ Here is an example of a Task Invoker Plugin:
 
 ```typescript
 import { AbstractPlugin, TASK_INVOKER_PLUGIN, TaskInvoker } from '@letrun/core';
-import { TaskHandlerInput, TaskHandlerOutput, InvalidParameterError } from '@letrun/common';
+import { TaskHandlerInput, InvalidParameterError } from '@letrun/common';
 import path from 'node:path';
 import fs from 'fs';
 
@@ -28,7 +28,7 @@ export default class CustomTaskInvoker extends AbstractPlugin implements TaskInv
   readonly name = 'custom';
   readonly type = TASK_INVOKER_PLUGIN;
 
-  async invoke(input: TaskHandlerInput): Promise<TaskHandlerOutput> {
+  async invoke(input: TaskHandlerInput) {
     const {
       task,
       session: { systemTasks },

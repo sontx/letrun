@@ -1,11 +1,8 @@
-import { Description, Name, Parameters, validateParameters } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { RerunError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
 
-/**
- * Interface representing the parameters for the ForTaskHandler.
- */
 interface TaskParameters {
   /**
    * The starting value of the iterator.
@@ -27,9 +24,6 @@ interface TaskParameters {
   step?: number;
 }
 
-/**
- * Schema for validating the task parameters.
- */
 const Schema = Joi.object<TaskParameters>({
   from: Joi.number().description('The iterator will loop from this value').required(),
   to: Joi.number().description('The iterator will loop until reach this value').required(),
@@ -38,20 +32,19 @@ const Schema = Joi.object<TaskParameters>({
     .default(1),
 });
 
-/**
- * Class representing the handler for the 'for' task.
- * Implements the TaskHandler interface.
- */
+const OutputSchema = Joi.object({
+  index: Joi.number().description('The current index of the loop, starting from the "from" value'),
+  iteration: Joi.number().description('The current iteration of the loop, starting from 0'),
+  from: Joi.number().description('The starting value of the loop'),
+  to: Joi.number().description('The ending value of the loop'),
+  step: Joi.number().description('The step value of the loop'),
+});
+
 @Name('for')
 @Description('Loops through a specified range and performs tasks')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class ForTaskHandler implements TaskHandler {
-  /**
-   * Handles the task execution.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<any>} The output of the task.
-   * @throws {RerunError} To notify the engine to rerun the task for another iteration.
-   */
   async handle({ task, context, session }: TaskHandlerInput): Promise<any> {
     const { from, to, step } = validateParameters(task.parameters, Schema);
 
