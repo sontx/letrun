@@ -3,6 +3,7 @@ import {
   Description,
   isWorkflowTaskDefsEmpty,
   Name,
+  Output,
   Parameters,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
@@ -12,9 +13,6 @@ import { IllegalStateError, InvalidParameterError, TaskDef, TaskHandler, TaskHan
 import Joi from 'joi';
 import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
-/**
- * Interface representing the parameters for the SwitchTaskHandler.
- */
 interface TaskParameters {
   /**
    * The expression to evaluate.
@@ -29,9 +27,6 @@ interface TaskParameters {
   language?: string;
 }
 
-/**
- * Schema for validating the task parameters.
- */
 const Schema = Joi.object<TaskParameters>({
   expression: Joi.string().description('The result of this expression will be matched with the target case').required(),
   language: Joi.string().description(
@@ -39,20 +34,13 @@ const Schema = Joi.object<TaskParameters>({
   ),
 });
 
-/**
- * Class representing the handler for the switch task.
- * Implements the TaskHandler interface.
- */
+const OutputSchema = Joi.string().description('The target case to switch to');
+
 @Name('switch')
 @Description('Chooses tasks based on input values')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class SwitchTaskHandler implements TaskHandler {
-  /**
-   * Handles the task execution.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<string>} The target case.
-   * @throws {IllegalStateError} If no matching case or default case is found.
-   */
   async handle(input: TaskHandlerInput): Promise<string> {
     const { task, context, session } = input;
     const targetCase = await this.evaluateDecisionCase(input);
@@ -74,13 +62,6 @@ export class SwitchTaskHandler implements TaskHandler {
     return targetCase;
   }
 
-  /**
-   * Evaluates the decision case based on the task parameters.
-   * @private
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<string>} The evaluated decision case.
-   * @throws {InvalidParameterError} If the evaluator type is invalid.
-   */
   private async evaluateDecisionCase({ task, context, workflow }: TaskHandlerInput): Promise<string> {
     const { expression, language } = validateParameters(task.parameters, Schema);
     if (!language) {

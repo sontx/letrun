@@ -1,4 +1,4 @@
-import { Description, Name, Parameters, validateParameters } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { RerunError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
@@ -19,9 +19,15 @@ const Schema = Joi.object<TaskParameters>({
     }),
 });
 
+const OutputSchema = Joi.object({
+  iteration: Joi.number().description('The current iteration of the loop, starting from 0'),
+  item: Joi.any().description('The current item in the iteration'),
+});
+
 @Name('iterate')
 @Description('Loops through a list of items and performs tasks')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class IterateTaskHandler implements TaskHandler {
   async handle({ task, context, session }: TaskHandlerInput): Promise<any> {
     const { items } = validateParameters(task.parameters, Schema);

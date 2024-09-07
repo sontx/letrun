@@ -1,4 +1,4 @@
-import { Description, Name, Parameters, validateParameters } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { expect } from 'expect';
@@ -58,9 +58,12 @@ const Schema = Joi.object<TaskParameters>({
   message: Joi.string().description('The message to throw when the test fails'),
 });
 
+const OutputSchema = Joi.boolean().description('The result of the test');
+
 @Name('expect')
 @Description('Tests the object against the expected value')
 @Parameters(Schema)
+@Output(OutputSchema)
 export default class Handler implements TaskHandler {
   async handle({ task, context }: TaskHandlerInput) {
     const value = validateParameters(task.parameters, Schema);

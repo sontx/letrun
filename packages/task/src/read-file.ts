@@ -1,4 +1,4 @@
-import { Description, Name, Parameters, validateParameters } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import * as fs from 'node:fs';
@@ -16,9 +16,12 @@ const Schema = Joi.object<TaskParameters>({
     .valid('json', 'text', 'line'),
 });
 
+const OutputSchema = Joi.any().description('The content of the file depending on the contentType');
+
 @Name('read-file')
 @Description('Reads the content of a file')
 @Parameters(Schema)
+@Output(OutputSchema)
 export default class Handler implements TaskHandler {
   async handle({ task, context }: TaskHandlerInput) {
     const { contentType, path } = validateParameters(task.parameters, Schema);

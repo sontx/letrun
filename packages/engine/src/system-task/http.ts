@@ -1,10 +1,7 @@
-import { Description, Name, Parameters, validateParameters } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
-/**
- * Interface representing the parameters for the HttpTaskHandler.
- */
 interface TaskParameters {
   /**
    * The URL endpoint to send the request.
@@ -50,9 +47,6 @@ interface TaskParameters {
   responseType?: 'json' | 'text' | 'blob';
 }
 
-/**
- * Schema for validating the task parameters.
- */
 const Schema = Joi.object<TaskParameters>({
   url: Joi.string().description('The URL endpoint to send request').uri().required(),
   method: Joi.string()
@@ -74,19 +68,13 @@ const Schema = Joi.object<TaskParameters>({
     .default('json'),
 });
 
-/**
- * Class representing the handler for the HTTP task.
- * Implements the TaskHandler interface.
- */
+const OutputSchema = Joi.any().description('The response data from the HTTP request which depends on the responseType');
+
 @Name('http')
 @Description('Sends HTTP requests and processes responses')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class HttpTaskHandler implements TaskHandler {
-  /**
-   * Handles the task execution.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @throws {Error} If the HTTP request fails.
-   */
   async handle({ task, session }: TaskHandlerInput) {
     const value = validateParameters(task.parameters, Schema);
     const url = new URL(value.url);

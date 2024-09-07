@@ -30,8 +30,14 @@ export interface TaskHandler<T = any> {
   description?: string;
   /**
    *  An object that describes the input parameters of the task for showing help.
+   *  If the task does not require any input, set this to null.
    */
-  parameters?: Joi.Description;
+  parameters?: Joi.Description | null;
+  /**
+   * An object that describes the output of the task for showing help.
+   * If the task does not return anything, set this to null.
+   */
+  output?: Joi.Description | null;
 
   /**
    * Handles the task.

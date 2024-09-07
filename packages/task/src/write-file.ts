@@ -1,4 +1,4 @@
-import { validateParameters } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import * as fs from 'node:fs';
@@ -15,6 +15,10 @@ const Schema = Joi.object<TaskParameters>({
   append: Joi.boolean().description('Append to the file instead of overwriting').default(false),
 });
 
+@Name('write-file')
+@Description('Writes content to a file')
+@Parameters(Schema)
+@Output()
 export default class Handler implements TaskHandler {
   name = 'write-file';
   parameters = Schema.describe();

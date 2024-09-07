@@ -1,12 +1,17 @@
-import { Description, Name, Parameters, SCRIPT_ENGINE_PLUGIN, ScriptEngine, validateParameters } from '@letrun/core';
+import {
+  Description,
+  Name,
+  Output,
+  Parameters,
+  SCRIPT_ENGINE_PLUGIN,
+  ScriptEngine,
+  validateParameters,
+} from '@letrun/core';
 import { RerunError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
 import { ScriptEngineWrapper } from '@src/libs/script-engine-wrapper';
 
-/**
- * Interface representing the parameters for the WhileTaskHandler.
- */
 interface TaskParameters {
   /**
    * The JavaScript expression to evaluate.
@@ -27,9 +32,6 @@ interface TaskParameters {
   language?: string;
 }
 
-/**
- * Schema for validating the task parameters.
- */
 const Schema = Joi.object<TaskParameters>({
   expression: Joi.string().description('The javascript expression to evaluate').required(),
   mode: Joi.string()
@@ -39,20 +41,15 @@ const Schema = Joi.object<TaskParameters>({
   language: Joi.string().description('The language of the expression').default('javascript'),
 });
 
-/**
- * Class representing the handler for the 'while' task.
- * Implements the TaskHandler interface.
- */
+const OutputSchema = Joi.object({
+  iteration: Joi.number().description('The current iteration of the loop, starting from 0'),
+});
+
 @Name('while')
 @Description('Loops through tasks until a condition is met')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class WhileTaskHandler implements TaskHandler {
-  /**
-   * Handles the task execution.
-   * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<any>} The output of the task.
-   * @throws {RerunError} To notify the engine to rerun the task for another iteration.
-   */
   async handle({ task, workflow, context, session }: TaskHandlerInput): Promise<any> {
     const { expression, mode, language } = validateParameters(task.parameters, Schema);
 

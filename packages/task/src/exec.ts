@@ -1,4 +1,4 @@
-import { Description, Name, Parameters, validateParameters } from '@letrun/core';
+import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { spawn } from 'child_process';
@@ -18,9 +18,12 @@ const Schema = Joi.object<TaskParameters>({
     .min(0),
 });
 
+const OutputSchema = Joi.any().description('The output of the command');
+
 @Name('exec')
 @Description('Executes a command in a new process')
 @Parameters(Schema)
+@Output(OutputSchema)
 export default class Handler implements TaskHandler {
   async handle({ task, context }: TaskHandlerInput) {
     const value = validateParameters(task.parameters, Schema);

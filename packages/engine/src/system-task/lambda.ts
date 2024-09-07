@@ -2,6 +2,7 @@ import Joi from 'joi';
 import {
   Description,
   Name,
+  Output,
   Parameters,
   SCRIPT_ENGINE_PLUGIN,
   ScriptEngine,
@@ -28,9 +29,12 @@ const Schema = Joi.object<TaskParameters>({
   .xor('expression', 'file')
   .required();
 
+const OutputSchema = Joi.any().description('The result of the lambda expression.');
+
 @Name('lambda')
 @Description('Evaluates a lambda expression.')
 @Parameters(Schema)
+@Output(OutputSchema)
 export class LambdaTaskHandler implements TaskHandler {
   async handle(taskInput: TaskHandlerInput) {
     const { task, context, session } = taskInput;

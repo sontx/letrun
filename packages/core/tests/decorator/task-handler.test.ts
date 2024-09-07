@@ -1,4 +1,4 @@
-import { Description, Name, Parameters, Version } from '@src/decorator/task-handler';
+import { Description, Name, Output, Parameters, Version } from '@src/decorator/task-handler';
 import Joi from 'joi';
 
 describe('TaskHandler Decorators', () => {
@@ -38,6 +38,14 @@ describe('TaskHandler Decorators', () => {
     expect((instance as any).parameters).toEqual(schema.describe());
   });
 
+  it('should inject null parameters field into TaskHandler', () => {
+    @Parameters(null)
+    class MyTaskHandler {}
+
+    const instance = new MyTaskHandler();
+    expect((instance as any).parameters).toBeNull();
+  });
+
   it('should inject parameters field with Joi description into TaskHandler', () => {
     const schema = Joi.object({
       name: Joi.string().required(),
@@ -48,6 +56,38 @@ describe('TaskHandler Decorators', () => {
 
     const instance = new MyTaskHandler();
     expect((instance as any).parameters).toEqual(schema.describe());
+  });
+
+  it('should inject output field into TaskHandler', () => {
+    const schema = Joi.object({
+      result: Joi.string().required(),
+    });
+
+    @Output(schema)
+    class MyTaskHandler {}
+
+    const instance = new MyTaskHandler();
+    expect((instance as any).output).toEqual(schema.describe());
+  });
+
+  it('should inject null output field into TaskHandler', () => {
+    @Output(null)
+    class MyTaskHandler {}
+
+    const instance = new MyTaskHandler();
+    expect((instance as any).output).toBeNull();
+  });
+
+  it('should inject output field with Joi description into TaskHandler', () => {
+    const schema = Joi.object({
+      name: Joi.string().required(),
+    });
+
+    @Output(schema.describe())
+    class MyTaskHandler {}
+
+    const instance = new MyTaskHandler();
+    expect((instance as any).output).toEqual(schema.describe());
   });
 
   it('should keep prototype methods after applying decorators', () => {
@@ -61,6 +101,7 @@ describe('TaskHandler Decorators', () => {
     @Version('1.0.0')
     @Description('This is a task handler')
     @Parameters(Joi.object({ name: Joi.string().required() }))
+    @Output(Joi.object({ value: Joi.string().required() }))
     class MyTaskHandler extends BaseClass {}
 
     const instance = new MyTaskHandler();
@@ -71,11 +112,15 @@ describe('TaskHandler Decorators', () => {
     const schema = Joi.object({
       name: Joi.string().required(),
     });
+    const outputSchema = Joi.object({
+      value: Joi.string().required(),
+    });
 
     @Name('my-task-handler')
     @Version('1.0.0')
     @Description('This is a task handler')
     @Parameters(schema)
+    @Output(outputSchema)
     class MyTaskHandler {}
 
     const instance = new MyTaskHandler();
@@ -83,5 +128,6 @@ describe('TaskHandler Decorators', () => {
     expect((instance as any).version).toBe('1.0.0');
     expect((instance as any).description).toBe('This is a task handler');
     expect((instance as any).parameters).toEqual(schema.describe());
+    expect((instance as any).output).toEqual(outputSchema.describe());
   });
 });
