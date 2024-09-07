@@ -1,9 +1,9 @@
-import { Plugin, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
+import { Plugin, TaskHandlerInput } from '@letrun/common';
 
 export const TASK_INVOKER_PLUGIN = 'task-invoker';
 
 export interface TaskInvoker extends Plugin {
   readonly type: typeof TASK_INVOKER_PLUGIN;
 
-  invoke(input: TaskHandlerInput): Promise<TaskHandlerOutput>;
+  invoke<T = any>(input: TaskHandlerInput): Promise<T>;
 }

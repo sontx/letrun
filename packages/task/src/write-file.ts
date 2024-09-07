@@ -1,5 +1,5 @@
 import { validateParameters } from '@letrun/core';
-import { TaskHandler, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
+import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import * as fs from 'node:fs';
 
@@ -19,7 +19,7 @@ export default class Handler implements TaskHandler {
   name = 'write-file';
   parameters = Schema.describe();
 
-  async handle({ task, context }: TaskHandlerInput): Promise<TaskHandlerOutput> {
+  async handle({ task, context }: TaskHandlerInput) {
     const { append, path, content } = validateParameters(task.parameters, Schema);
     const textContent = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
     context.getLogger().debug(`Writing to file: ${path}`);

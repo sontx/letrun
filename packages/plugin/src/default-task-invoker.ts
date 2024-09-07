@@ -17,7 +17,6 @@ import {
   TaskGroup,
   TaskHandler,
   TaskHandlerInput,
-  TaskHandlerOutput,
   UNCATEGORIZED_TASK_GROUP,
 } from '@letrun/common';
 
@@ -35,7 +34,7 @@ export default class DefaultTaskInvoker extends AbstractPlugin implements TaskIn
     super();
   }
 
-  async invoke(input: TaskHandlerInput): Promise<TaskHandlerOutput> {
+  async invoke<T = any>(input: TaskHandlerInput): Promise<T> {
     const {
       task,
       session: { systemTasks },

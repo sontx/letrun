@@ -1,4 +1,4 @@
-import { TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
+import { TaskHandlerInput } from '@letrun/common';
 import ms from 'ms';
 import { DelayTaskHandler } from '@src/system-task/delay';
 
@@ -43,7 +43,7 @@ describe('DelayTaskHandler', () => {
       session: mockSession,
     } as any;
 
-    const result: TaskHandlerOutput = await delayTaskHandler.handle(taskInput);
+    const result = await delayTaskHandler.handle(taskInput);
     expect(result).toBe('testData');
   });
 

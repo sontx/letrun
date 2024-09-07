@@ -1,5 +1,5 @@
 import { Description, Name, Parameters, validateParameters } from '@letrun/core';
-import { TaskHandler, TaskHandlerInput, TaskHandlerOutput } from '@letrun/common';
+import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
 /**
@@ -85,10 +85,9 @@ export class HttpTaskHandler implements TaskHandler {
   /**
    * Handles the task execution.
    * @param {TaskHandlerInput} input - The input for the task handler.
-   * @returns {Promise<TaskHandlerOutput>} The output of the task.
    * @throws {Error} If the HTTP request fails.
    */
-  async handle({ task, session }: TaskHandlerInput): Promise<TaskHandlerOutput> {
+  async handle({ task, session }: TaskHandlerInput) {
     const value = validateParameters(task.parameters, Schema);
     const url = new URL(value.url);
     if (value.params) {
