@@ -51,10 +51,11 @@ You can write custom tasks either in a simple JS file or a node package:
 
 A task handler should have the following structure:
 
-- `name`: The name of the task, this is optional. We'll use the file name or package name as the task name if not defined.
+- `name`: The name of the task, we'll use the file name or package name as the task name if not defined. This is optional.
 - `description`: A brief description of the task, this is optional.
-- `version`: The version of the task, this is optional. We'll use the package version if not defined.
-- `parameters`: An object that describes the input parameters of the task for showing help. (calls `Schema.describe()` from Joi)
+- `version`: The version of the task, we'll use the package version if not defined. This is optional.
+- `parameters`: An object that describes the input parameters of the task for showing help, set null if the task doesn't have parameters. This is optional.
+- `output`: An object that describes the output of the task for showing help, set null if the task doesn't have output. This is optional.
 - `handle`: The function that executes the task. This is required.
 
 There are alternative ways to define those fields by using these corresponding decorators:
@@ -62,7 +63,8 @@ There are alternative ways to define those fields by using these corresponding d
 - `@Name`: The name of the task.
 - `@Description`: A brief description of the task.
 - `@Version`: The version of the task.
-- `@Parameters`: An object that describes the input parameters of the task for showing help.
+- `@Parameters`: An object that describes the input parameters of the task for showing help. No value or null means the task doesn't have parameters.
+- `@Output`: An object that describes the output of the task for showing help. No value or null means the task doesn't have output.
 
 > _Vanilla JS_ does not support decorators yet, so you need to use Babel or TypeScript to work with them.
 
@@ -83,6 +85,7 @@ const Schema = Joi.object<TaskParameters>({
 
 @Name('greeting')
 @Parameters(Schema)
+@Output(Joi.string().description('The greeting message'))
 export default class GreetingTaskHandler implements TaskHandler {
   async handle({ task }: TaskHandlerInput) {
     const { message } = validateParameters(task.parameters, Schema);
@@ -110,6 +113,7 @@ const Schema = Joi.object<TaskParameters>({
 
 @Name('uppercase')
 @Parameters(Schema)
+@Output(Joi.string().description('The uppercase string'))
 export default class UppercaseTaskHandler implements TaskHandler {
   async handle({ task }: TaskHandlerInput) {
     const { value } = validateParameters(task.parameters, Schema);
