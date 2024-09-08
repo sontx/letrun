@@ -1,6 +1,6 @@
 {
   "name": "@letrun/task",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "private": true,
   "description": "The tasks package for LetRun",
   "type": "module",
@@ -32,8 +32,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/common": "^0.0.2",
-    "@letrun/core": "^0.0.5",
+    "@letrun/common": "^0.0.6",
+    "@letrun/core": "^0.0.6",
     "expect": "^29.7.0",
     "joi": "^17.13.3"
   }

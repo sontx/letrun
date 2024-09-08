@@ -1,6 +1,6 @@
 {
   "name": "@letrun/common",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "description": "Common types and utilities for Letrun which are independent from the runtime environment.",
   "type": "module",
   "exports": {

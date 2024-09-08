@@ -1,6 +1,6 @@
 {
   "name": "@letrun/deps",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Dependencies management",
   "type": "module",
   "exports": {
@@ -50,7 +50,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@letrun/core": "^0.0.5",
+    "@letrun/core": "^0.0.6",
     "validate-npm-package-name": "^5.0.1"
   }
 }
