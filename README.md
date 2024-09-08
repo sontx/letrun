@@ -159,6 +159,7 @@ letrun [command] [options]
   - [run](docs/command/task-run): Run a task directly without a workflow.
   - [install](docs/command/task-install): Install a custom task package.
   - [versions](docs/command/task-versions): List all installed custom task packages.
+  - [meta](docs/command/task-meta): Extract the metadata of a task.
 
 ## Plugin
 
