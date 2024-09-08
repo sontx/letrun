@@ -50,3 +50,14 @@ export interface TaskHandler<T = any> {
 export interface TaskHandlerConstructor {
   new (): TaskHandler;
 }
+
+/**
+ * Metadata for describing a task.
+ */
+export interface TaskMetadata {
+  name: string;
+  version?: string;
+  description?: string;
+  parameters?: Joi.Description | null;
+  output?: Joi.Description | null;
+}

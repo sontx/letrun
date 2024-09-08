@@ -1,4 +1,4 @@
-import { TaskHandler } from './task-handler';
+import { TaskHandler, TaskMetadata } from './task-handler';
 
 /**
  * The default task group that contains tasks that have not been assigned to a group.
@@ -47,4 +47,16 @@ export interface TaskGroup {
    * - `script`: A task group that is defined in a standalone script file.
    */
   type?: 'package' | 'script';
+}
+
+/**
+ * Metadata for describing a task group.
+ */
+export interface TaskGroupMetadata {
+  name: string;
+  description?: string;
+  version?: string;
+  author?: string;
+  type?: 'package' | 'script';
+  tasks: TaskMetadata[];
 }
