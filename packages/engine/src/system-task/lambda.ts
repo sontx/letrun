@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import {
-  Description,
+  Description, Icon,
   Name,
   Output,
   Parameters,
@@ -33,6 +33,7 @@ const OutputSchema = Joi.any().description('The result of the lambda expression.
 
 @Name('lambda')
 @Description('Evaluates a lambda expression.')
+@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/lambda.svg')
 @Parameters(Schema)
 @Output(OutputSchema)
 export class LambdaTaskHandler implements TaskHandler {

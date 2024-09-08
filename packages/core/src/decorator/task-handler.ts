@@ -51,6 +51,22 @@ export function Description(value: string) {
 }
 
 /**
+ * A decorator that injects the icon field to a {@link TaskHandler}. See {@link TaskHandler.icon}.
+ * @param value
+ * @constructor
+ *
+ * @example
+ * ```ts
+ * @Icon('https://example.com/icon.png')
+ * class MyTaskHandler implements TaskHandler {
+ * }
+ * ```
+ */
+export function Icon(value: string) {
+  return injectFieldDecorator('icon', value);
+}
+
+/**
  * A decorator that injects the parameters field to a {@link TaskHandler}. See {@link TaskHandler.parameters}.
  * @param value - task handler parameters. If value is not provided, the parameters field will be set to null (no parameters are required).
  * @constructor

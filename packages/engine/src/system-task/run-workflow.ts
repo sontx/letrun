@@ -1,4 +1,4 @@
-import { Description, Name, Output, Parameters, validateParameters, wrapPromiseWithAbort } from '@letrun/core';
+import { Description, Icon, Name, Output, Parameters, validateParameters, wrapPromiseWithAbort } from '@letrun/core';
 import { RunnerOptions, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import fs from 'fs';
@@ -23,6 +23,7 @@ const OutputSchema = Joi.any().description('The output of the sub-workflow');
 
 @Name('run-workflow')
 @Description('Runs another workflow within the current workflow')
+@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/workflow.svg')
 @Parameters(Schema)
 @Output(OutputSchema)
 export class RunWorkflowTaskHandler implements TaskHandler {

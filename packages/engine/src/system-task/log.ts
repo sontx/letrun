@@ -1,4 +1,4 @@
-import { Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
+import { Description, Icon, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
@@ -23,6 +23,7 @@ const Schema = Joi.object<TaskParameters>({
 
 @Name('log')
 @Description('Outputs messages or errors for debugging')
+@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/log.svg')
 @Parameters(Schema)
 @Output()
 export class LogTaskHandler implements TaskHandler {

@@ -1,6 +1,7 @@
 import {
   countTasks,
   Description,
+  Icon,
   isWorkflowTaskDefsEmpty,
   Name,
   Output,
@@ -81,6 +82,7 @@ const OutputSchema = Joi.boolean().description('The result of the expression');
 
 @Name('if')
 @Description('Executes tasks based on conditions')
+@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/if.svg')
 @Parameters(Schema)
 @Output(OutputSchema)
 export class IfTaskHandler implements TaskHandler {
