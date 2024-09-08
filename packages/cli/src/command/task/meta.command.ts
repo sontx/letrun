@@ -43,6 +43,7 @@ export class MetaCommand extends AbstractCommand {
       if (!name) {
         return await extractor.extract({
           ...SYSTEM_TASK_GROUP,
+          version: process.env.APP_VERSION,
           tasks: systemTasks,
         });
       }
@@ -65,6 +66,7 @@ export class MetaCommand extends AbstractCommand {
   private async extractSystemTask(taskHandler: TaskHandler, extractor: MetadataExtractor) {
     return await extractor.extract({
       ...SYSTEM_TASK_GROUP,
+      version: process.env.APP_VERSION,
       tasks: {
         [taskHandler.name!]: taskHandler,
       },

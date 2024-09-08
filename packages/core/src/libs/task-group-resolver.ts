@@ -31,6 +31,7 @@ export class TaskGroupResolver {
       return {
         ...UNCATEGORIZED_TASK_GROUP,
         version: handler.version,
+        keywords: handler.keywords,
         type: packageJson ? 'package' : 'script',
         tasks: {
           [name]: handler,
