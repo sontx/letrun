@@ -12,3 +12,4 @@ export * from './abstract-plugin';
 export * from './common';
 export * from './retry-plugin';
 export * from './task-handler-location-resolver';
+export * from './metadata-extractor';

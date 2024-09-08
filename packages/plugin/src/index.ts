@@ -11,6 +11,7 @@ import JavascriptEngine from './javascript-engine';
 import PythonEngine from './python-engine';
 import DefaultRetryPlugin from './default-retry-plugin';
 import DefaultTaskHandlerLocationResolver from './default-task-handler-location-resolver';
+import DefaultMetadataExtractor from './default-metadata-extractor';
 
 export class DefaultPluginLoader implements PluginLoader {
   async load() {
@@ -27,6 +28,7 @@ export class DefaultPluginLoader implements PluginLoader {
       new PythonEngine(),
       new DefaultRetryPlugin(),
       new DefaultTaskHandlerLocationResolver(),
+      new DefaultMetadataExtractor(),
     ];
   }
 }

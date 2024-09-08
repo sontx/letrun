@@ -51,7 +51,7 @@ export class WorkflowDepsScanner {
 
     dependencies = this.removeDuplicatedPackages(dependencies);
     const candidatePackages = dependencies.filter(
-      (dep) => dep.type === 'package' && !dep.installed && !validate(dep.handler?.name!).errors?.length,
+      (dep) => dep.type === 'package' && !dep.installed && validate(dep.handler?.name!).validForNewPackages,
     );
 
     if (candidatePackages.length) {
