@@ -2,6 +2,7 @@ import {
   countTasks,
   Description,
   getTasksByStatus,
+  Icon,
   isWorkflowTaskDefsEmpty,
   Name,
   Output,
@@ -49,6 +50,7 @@ const OutputSchema = Joi.object({
 
 @Name('catch')
 @Description('Handles errors during task execution')
+@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/catch.svg')
 @Parameters(Schema)
 @Output(OutputSchema)
 export class CatchTaskHandler implements TaskHandler {

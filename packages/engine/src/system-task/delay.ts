@@ -1,4 +1,4 @@
-import { delayMs, Description, Name, Output, Parameters, validateParameters } from '@letrun/core';
+import { delayMs, Description, Icon, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import ms from 'ms';
@@ -19,6 +19,7 @@ const OutputSchema = Joi.any().description('The "data" field from the input para
 
 @Name('delay')
 @Description('Delays the execution of the workflow for a specified amount of time')
+@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/delay.svg')
 @Parameters(Schema)
 @Output(OutputSchema)
 export class DelayTaskHandler implements TaskHandler {
