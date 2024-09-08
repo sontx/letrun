@@ -1,4 +1,6 @@
-import { ParsedHandler } from '@letrun/common';
+import { HandlerType, ParsedHandler } from '@letrun/common';
+import validate from 'validate-npm-package-name';
+import { extractJsExtension } from '../utils';
 
 export type TaskHandlerParserFn = (rawHandler: string) => ParsedHandler;
 
@@ -14,7 +16,7 @@ export class TaskHandlerParser {
 
     if (!match) {
       return {
-        type: 'script',
+        type: this.guessType(input),
         name: input,
       };
     }
@@ -28,6 +30,11 @@ export class TaskHandlerParser {
       ...(taskName && { taskName }),
     };
   };
+
+  private guessType(input: string): HandlerType {
+    const isValidNpmPackage = validate(input).validForNewPackages;
+    return isValidNpmPackage ? 'package' : extractJsExtension(input) ? 'script' : 'external';
+  }
 }
 
 export const defaultTaskHandlerParser = new TaskHandlerParser();
