@@ -1,4 +1,13 @@
-import { Description, Icon, Name, Output, Parameters, Version } from '@src/decorator/task-handler';
+import {
+  Description,
+  DisplayName,
+  Icon,
+  Keywords,
+  Name,
+  Output,
+  Parameters,
+  Version,
+} from '@src/decorator/task-handler';
 import Joi from 'joi';
 
 describe('TaskHandler Decorators', () => {
@@ -118,8 +127,10 @@ describe('TaskHandler Decorators', () => {
     });
 
     @Name('my-task-handler')
+    @DisplayName('My Task Handler')
     @Version('1.0.0')
     @Description('This is a task handler')
+    @Keywords('task', 'handler')
     @Parameters(schema)
     @Output(outputSchema)
     @Icon('https://example.com/icon.png')
@@ -127,8 +138,10 @@ describe('TaskHandler Decorators', () => {
 
     const instance = new MyTaskHandler();
     expect((instance as any).name).toBe('my-task-handler');
+    expect((instance as any).displayName).toBe('My Task Handler');
     expect((instance as any).version).toBe('1.0.0');
     expect((instance as any).description).toBe('This is a task handler');
+    expect((instance as any).keywords).toEqual(['task', 'handler']);
     expect((instance as any).icon).toBe('https://example.com/icon.png');
     expect((instance as any).parameters).toEqual(schema.describe());
     expect((instance as any).output).toEqual(outputSchema.describe());
@@ -140,5 +153,21 @@ describe('TaskHandler Decorators', () => {
 
     const instance = new MyTaskHandler();
     expect((instance as any).icon).toBe('https://example.com/icon.png');
+  });
+
+  it('should inject displayName field into TaskHandler', () => {
+    @DisplayName('My Task Handler')
+    class MyTaskHandler {}
+
+    const instance = new MyTaskHandler();
+    expect((instance as any).displayName).toBe('My Task Handler');
+  });
+
+  it('should inject keywords field into TaskHandler', () => {
+    @Keywords('task', 'handler')
+    class MyTaskHandler {}
+
+    const instance = new MyTaskHandler();
+    expect((instance as any).keywords).toEqual(['task', 'handler']);
   });
 });

@@ -1,6 +1,9 @@
 import Joi from 'joi';
 import {
-  Description, Icon,
+  Description,
+  DisplayName,
+  Icon,
+  Keywords,
   Name,
   Output,
   Parameters,
@@ -32,6 +35,8 @@ const Schema = Joi.object<TaskParameters>({
 const OutputSchema = Joi.any().description('The result of the lambda expression.');
 
 @Name('lambda')
+@DisplayName('Lambda')
+@Keywords('lambda', 'expression', 'eval', 'evaluate', 'script')
 @Description('Evaluates a lambda expression.')
 @Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/lambda.svg')
 @Parameters(Schema)

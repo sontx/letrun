@@ -35,6 +35,23 @@ export interface TaskGroup {
    */
   name: string;
   /**
+   * The display name of the task group.
+   * If not provided, the name will be used as the display name.
+   * This name is used for displaying the task group in the UI such as the Studio.
+   * You can define group's display name in the letrun.displayName field of package.json.
+   *
+   * @example
+   * ```json
+   * {
+   *   "letrun": {
+   *     "displayName": "My Task Group"
+   *   }
+   *   ...
+   * }
+   * ```
+   */
+  displayName?: string;
+  /**
    * A brief description of the task group.
    * This description will be shown in the help output.
    * You can define group's description in the description field of package.json.
@@ -90,6 +107,19 @@ export interface TaskGroup {
    */
   icon?: string;
   /**
+   * Optional keywords to match against when filtering.
+   * You can define group's keywords in the keywords field of package.json.
+   *
+   * @example
+   * ```json
+   * {
+   *   "keywords": ["awesome", "cool"]
+   *   ...
+   * }
+   * ```
+   */
+  keywords?: string[];
+  /**
    * The tasks that belong to this group. This map contains the name of the task as the key and the task handler as the value.
    */
   tasks?: Record<string, TaskHandler>;
@@ -107,10 +137,12 @@ export interface TaskGroup {
  */
 export interface TaskGroupMetadata {
   name: string;
+  displayName?: string;
   description?: string;
   version?: string;
   author?: string;
   icon?: string;
+  keywords?: string[];
   type?: 'package' | 'script';
   tasks: TaskMetadata[];
 }

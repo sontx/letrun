@@ -1,4 +1,4 @@
-import { Description, Icon, Name, Output, Parameters, validateParameters } from '@letrun/core';
+import { Description, DisplayName, Icon, Keywords, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { RerunError, TaskDef, TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 import { initNewIteration, validateLoopTask } from './loop-task';
@@ -25,6 +25,8 @@ const OutputSchema = Joi.object({
 });
 
 @Name('iterate')
+@DisplayName('Iterate')
+@Keywords('loop', 'for', 'each')
 @Description('Loops through a list of items and performs tasks')
 @Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/iterate.svg')
 @Parameters(Schema)

@@ -27,6 +27,12 @@ export interface TaskHandler<T = any> {
    * This name should be unique across all task handlers of the same {@link TaskGroup}.
    */
   name?: string;
+  /**
+   * The display name of the task handler.
+   * If not provided, the name will be used as the display name.
+   * This name is used for displaying the task handler in the UI such as the Studio.
+   */
+  displayName?: string;
   /** The version of the task handler. */
   version?: string;
   /** Optional description of the task handler. */
@@ -35,6 +41,10 @@ export interface TaskHandler<T = any> {
    * The icon url of the task handler.
    */
   icon?: string;
+  /**
+   * Optional keywords to match against when filtering.
+   */
+  keywords?: string[];
   /**
    *  An object that describes the input parameters of the task for showing help.
    *  If the task does not require any input, set this to null.
@@ -63,8 +73,10 @@ export interface TaskHandlerConstructor {
  */
 export interface TaskMetadata {
   name: string;
+  displayName?: string;
   version?: string;
   description?: string;
+  keywords?: string[];
   icon?: string;
   parameters?: Joi.Description | null;
   output?: Joi.Description | null;

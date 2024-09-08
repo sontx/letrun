@@ -67,6 +67,38 @@ export function Icon(value: string) {
 }
 
 /**
+ * A decorator that injects the displayName field to a {@link TaskHandler}. See {@link TaskHandler.displayName}.
+ * @param value - task handler display name.
+ * @constructor
+ *
+ * @example
+ * ```ts
+ * @DisplayName('My Task Handler')
+ * class MyTaskHandler implements TaskHandler {
+ * }
+ * ```
+ */
+export function DisplayName(value: string) {
+  return injectFieldDecorator('displayName', value);
+}
+
+/**
+ * A decorator that injects the keywords field to a {@link TaskHandler}. See {@link TaskHandler.keywords}.
+ * @param value - task handler keywords.
+ * @constructor
+ *
+ * @example
+ * ```ts
+ * @Keywords('task', 'handler')
+ * class MyTaskHandler implements TaskHandler {
+ * }
+ * ```
+ */
+export function Keywords(...value: string[]) {
+  return injectFieldDecorator('keywords', value);
+}
+
+/**
  * A decorator that injects the parameters field to a {@link TaskHandler}. See {@link TaskHandler.parameters}.
  * @param value - task handler parameters. If value is not provided, the parameters field will be set to null (no parameters are required).
  * @constructor

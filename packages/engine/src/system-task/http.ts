@@ -1,4 +1,4 @@
-import { Description, Icon, Name, Output, Parameters, validateParameters } from '@letrun/core';
+import { Description, DisplayName, Icon, Keywords, Name, Output, Parameters, validateParameters } from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
@@ -71,6 +71,8 @@ const Schema = Joi.object<TaskParameters>({
 const OutputSchema = Joi.any().description('The response data from the HTTP request which depends on the responseType');
 
 @Name('http')
+@DisplayName('HTTP Request')
+@Keywords('http', 'request', 'fetch')
 @Description('Sends HTTP requests and processes responses')
 @Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/http.svg')
 @Parameters(Schema)
