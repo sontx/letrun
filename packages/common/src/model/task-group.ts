@@ -4,7 +4,8 @@ import { TaskHandler, TaskMetadata } from './task-handler';
  * The default task group that contains tasks that have not been assigned to a group.
  */
 export const UNCATEGORIZED_TASK_GROUP: TaskGroup = {
-  name: 'Uncategorized',
+  name: 'uncategorized',
+  displayName: 'Uncategorized',
   description: 'Tasks that have not been assigned to a group.',
 };
 
@@ -12,8 +13,10 @@ export const UNCATEGORIZED_TASK_GROUP: TaskGroup = {
  * The system task group that contains built-in tasks.
  */
 export const SYSTEM_TASK_GROUP: TaskGroup = {
-  name: 'System',
-  description: 'Built-in tasks',
+  name: 'system',
+  displayName: 'System',
+  description: 'Built-in tasks that are provided by the system.',
+  keywords: ['built-in'],
 };
 
 /**

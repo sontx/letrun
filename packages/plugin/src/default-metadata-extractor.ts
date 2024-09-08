@@ -43,6 +43,7 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
         ...UNCATEGORIZED_TASK_GROUP,
         version: input.version,
         description: input.description,
+        keywords: input.keywords,
         icon: input.icon,
         type: 'script',
         tasks: {
