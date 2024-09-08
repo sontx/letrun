@@ -4,7 +4,8 @@ import { TaskHandler, TaskMetadata } from './task-handler';
  * The default task group that contains tasks that have not been assigned to a group.
  */
 export const UNCATEGORIZED_TASK_GROUP: TaskGroup = {
-  name: 'Uncategorized',
+  name: 'uncategorized',
+  displayName: 'Uncategorized',
   description: 'Tasks that have not been assigned to a group.',
 };
 
@@ -12,8 +13,10 @@ export const UNCATEGORIZED_TASK_GROUP: TaskGroup = {
  * The system task group that contains built-in tasks.
  */
 export const SYSTEM_TASK_GROUP: TaskGroup = {
-  name: 'System',
-  description: 'Built-in tasks',
+  name: 'system',
+  displayName: 'System',
+  description: 'Built-in tasks that are provided by the system.',
+  keywords: ['built-in'],
 };
 
 /**
@@ -34,6 +37,23 @@ export interface TaskGroup {
    * ```
    */
   name: string;
+  /**
+   * The display name of the task group.
+   * If not provided, the name will be used as the display name.
+   * This name is used for displaying the task group in the UI such as the Studio.
+   * You can define group's display name in the letrun.displayName field of package.json.
+   *
+   * @example
+   * ```json
+   * {
+   *   "letrun": {
+   *     "displayName": "My Task Group"
+   *   }
+   *   ...
+   * }
+   * ```
+   */
+  displayName?: string;
   /**
    * A brief description of the task group.
    * This description will be shown in the help output.
@@ -90,6 +110,19 @@ export interface TaskGroup {
    */
   icon?: string;
   /**
+   * Optional keywords to match against when filtering.
+   * You can define group's keywords in the keywords field of package.json.
+   *
+   * @example
+   * ```json
+   * {
+   *   "keywords": ["awesome", "cool"]
+   *   ...
+   * }
+   * ```
+   */
+  keywords?: string[];
+  /**
    * The tasks that belong to this group. This map contains the name of the task as the key and the task handler as the value.
    */
   tasks?: Record<string, TaskHandler>;
@@ -107,10 +140,12 @@ export interface TaskGroup {
  */
 export interface TaskGroupMetadata {
   name: string;
+  displayName?: string;
   description?: string;
   version?: string;
   author?: string;
   icon?: string;
+  keywords?: string[];
   type?: 'package' | 'script';
   tasks: TaskMetadata[];
 }

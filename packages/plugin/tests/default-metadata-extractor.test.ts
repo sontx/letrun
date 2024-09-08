@@ -44,7 +44,10 @@ describe('DefaultMetadataExtractor', () => {
 
     const result = await extractor.extract(parsedHandler as any);
 
-    expect(result).toEqual(taskGroupMetadata);
+    expect(result).toEqual({
+      ...taskGroupMetadata,
+      displayName: 'testGroup',
+    });
   });
 
   it('throws InvalidParameterError when location is not found', async () => {
@@ -116,6 +119,7 @@ describe('DefaultMetadataExtractor', () => {
     expect(result.tasks).toEqual([
       {
         name: 'task1',
+        displayName: 'task1',
         version: '1.0.0',
         description: 'First task',
         parameters: {},
@@ -123,6 +127,7 @@ describe('DefaultMetadataExtractor', () => {
       },
       {
         name: 'task2',
+        displayName: 'task2',
         version: '1.0.0',
         description: 'Second task',
         parameters: {},
@@ -165,6 +170,7 @@ describe('DefaultMetadataExtractor', () => {
     expect(result.tasks).toEqual([
       {
         name: 'task1',
+        displayName: 'task1',
         version: '1.0.0',
         description: 'First task',
         parameters: undefined,
@@ -196,6 +202,7 @@ describe('DefaultMetadataExtractor', () => {
 
     expect(result).toEqual({
       name: 'testGroup',
+      displayName: 'testGroup',
       version: '1.0.0',
       description: 'A test task group',
       author: 'Author',
@@ -203,6 +210,7 @@ describe('DefaultMetadataExtractor', () => {
       tasks: [
         {
           name: 'task1',
+          displayName: 'task1',
           version: '1.0.0',
           description: 'First task',
           parameters: {},
@@ -227,11 +235,13 @@ describe('DefaultMetadataExtractor', () => {
     expect(result).toEqual({
       ...UNCATEGORIZED_TASK_GROUP,
       version: '1.0.0',
+      displayName: 'Uncategorized',
       description: 'A test task handler',
       type: 'script',
       tasks: [
         {
           name: 'taskHandler',
+          displayName: 'taskHandler',
           version: '1.0.0',
           description: 'A test task handler',
           parameters: {},

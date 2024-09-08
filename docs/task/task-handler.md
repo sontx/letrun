@@ -52,9 +52,11 @@ You can write custom tasks either in a simple JS file or a node package:
 A task handler should have the following structure:
 
 - `name`: The name of the task, we'll use the file name or package name as the task name if not defined. This is optional.
+- `displayName`: The display name of the task, if not defined, we'll use the task name. This is optional.
 - `description`: A brief description of the task, this is optional.
 - `version`: The version of the task, we'll use the package version if not defined. This is optional.
 - `icon`: The icon url of the task, this is optional.
+- `keywords`: An array of keywords for filtering tasks, this is optional.
 - `parameters`: An object that describes the input parameters of the task for showing help, set null if the task doesn't have parameters. This is optional.
 - `output`: An object that describes the output of the task for showing help, set null if the task doesn't have output. This is optional.
 - `handle`: The function that executes the task. This is required.
@@ -62,9 +64,11 @@ A task handler should have the following structure:
 There are alternative ways to define those fields by using these corresponding decorators:
 
 - `@Name`: The name of the task.
+- `@DisplayName`: The display name of the task.
 - `@Description`: A brief description of the task.
 - `@Version`: The version of the task.
 - `@Icon`: The icon url of the task.
+- `@Keywords`: An array of keywords for filtering tasks.
 - `@Parameters`: An object that describes the input parameters of the task for showing help. No value or null means the task doesn't have parameters.
 - `@Output`: An object that describes the output of the task for showing help. No value or null means the task doesn't have output.
 
@@ -222,9 +226,11 @@ For example, the handler for `Task1Handler` will be `package:my-group:task1`.
 The group information will be obtained from the package.json:
 
 - `name`: The name of the task group. Corresponds to the package name.
+- `displayName`: The display name of the task group. Corresponds to the package.json `letrun.displayName` field.
 - `description`: A brief description of the task group. Corresponds to the package description.
 - `version`: The version of the task group. Corresponds to the package version.
 - `icon`: The icon url of the task group. Corresponds to the package.json `letrun.icon` field.
+- `keywords`: An array of keywords for filtering task groups. Corresponds to the package keywords.
 - `author`: The author of the task group. Corresponds to the package author.
 
 > We recommend you use scoped package and name the package with `@letrun-task-` prefix.

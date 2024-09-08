@@ -43,6 +43,7 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
         ...UNCATEGORIZED_TASK_GROUP,
         version: input.version,
         description: input.description,
+        keywords: input.keywords,
         icon: input.icon,
         type: 'script',
         tasks: {
@@ -63,6 +64,8 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
   private extractFromTaskGroup(taskGroup: TaskGroup): TaskGroupMetadata {
     return {
       name: taskGroup.name,
+      displayName: taskGroup.displayName ?? taskGroup.name,
+      keywords: taskGroup.keywords,
       version: taskGroup.version,
       description: taskGroup.description,
       author: taskGroup.author,
@@ -70,6 +73,8 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
       icon: taskGroup.icon,
       tasks: Object.entries(taskGroup.tasks ?? {}).map(([name, handler]) => ({
         name: handler.name ?? name,
+        displayName: handler.displayName ?? name,
+        keywords: handler.keywords,
         version: handler.version,
         description: handler.description,
         icon: handler.icon,

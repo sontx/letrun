@@ -1,8 +1,10 @@
 import {
   countTasks,
   Description,
+  DisplayName,
   Icon,
   isWorkflowTaskDefsEmpty,
+  Keywords,
   Name,
   Output,
   Parameters,
@@ -38,6 +40,8 @@ const Schema = Joi.object<TaskParameters>({
 const OutputSchema = Joi.string().description('The target case to switch to');
 
 @Name('switch')
+@DisplayName('Switch')
+@Keywords('case', 'decision', 'branch', 'condition', 'conditional')
 @Description('Chooses tasks based on input values')
 @Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/switch.svg')
 @Parameters(Schema)

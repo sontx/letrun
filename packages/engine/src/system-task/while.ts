@@ -1,6 +1,8 @@
 import {
   Description,
+  DisplayName,
   Icon,
+  Keywords,
   Name,
   Output,
   Parameters,
@@ -47,6 +49,8 @@ const OutputSchema = Joi.object({
 });
 
 @Name('while')
+@DisplayName('While')
+@Keywords('loop', 'iterate', 'each')
 @Description('Loops through tasks until a condition is met')
 @Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/while.svg')
 @Parameters(Schema)
