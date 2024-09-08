@@ -22,9 +22,7 @@ export class ModuleResolver {
       const moduleType = effectivePath.endsWith('.cjs') ? 'commonjs' : 'module';
       return await this.resolveFile(effectivePath, moduleType);
     }
-    return this.isInsideNodeModules(effectivePath)
-      ? await this.resolveInsideNodeModules(effectivePath)
-      : await this.resolveOutsideNodeModules(effectivePath);
+    return await this.resolveNodeModule(effectivePath);
   };
 
   private async resolveFile<T = any>(filePath: string, type: 'commonjs' | 'module'): Promise<T> {
@@ -43,7 +41,7 @@ export class ModuleResolver {
     return await import(filePath);
   }
 
-  private async resolveOutsideNodeModules<T = any>(modulePath: string): Promise<T> {
+  private async resolveNodeModule<T = any>(modulePath: string): Promise<T> {
     const packageJson = await this.readPackageJson(modulePath);
     const main = packageJson.main ?? 'index.js';
     let mainPath = path.join(modulePath, main);
@@ -60,21 +58,6 @@ export class ModuleResolver {
       return packageJson.type || 'commonjs';
     }
     return modulePathOrPackageJson.type || 'commonjs';
-  }
-
-  private isInsideNodeModules(modulePath: string) {
-    return modulePath.includes('node_modules');
-  }
-
-  private async resolveInsideNodeModules(modulePath: string) {
-    const moduleName = this.getModuleNameFromNodeModulesPath(modulePath);
-    const obj = await this.dynamicImport(moduleName);
-    const moduleType = await this.getModuleType(modulePath);
-    return this.resolveDefaultExport(obj, moduleType);
-  }
-
-  private getModuleNameFromNodeModulesPath(modulePath: string) {
-    return path.relative(path.resolve(this.rootDir, 'node_modules'), modulePath);
   }
 
   private async readPackageJson(modulePath: string): Promise<PackageJson> {

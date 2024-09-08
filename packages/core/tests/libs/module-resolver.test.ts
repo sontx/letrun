@@ -159,41 +159,4 @@ describe('ModuleResolver', () => {
       await expect(moduleResolver.resolve(modulePath)).rejects.toThrow('package.json not found in /absolute/path/module');
     });
   });
-
-  describe('resolve from node_modules', () => {
-    it('resolves a module from node_modules', async () => {
-      const modulePath = '/absolute/path/node_modules/module';
-      jest.spyOn(moduleResolver as any, 'isFile').mockReturnValue(false);
-      jest.spyOn(moduleResolver as any, 'isInsideNodeModules').mockReturnValue(true);
-      jest.spyOn(moduleResolver as any, 'getModuleNameFromNodeModulesPath').mockReturnValue('module');
-      jest.spyOn(moduleResolver as any, 'dynamicImport').mockResolvedValue({ default: 'resolvedModule' });
-      jest.spyOn(moduleResolver as any, 'getModuleType').mockResolvedValue('module');
-
-      const result = await moduleResolver.resolve(modulePath);
-      expect(result).toEqual({ default: 'resolvedModule' });
-    });
-
-    it('resolves a module from node_modules with commonjs type', async () => {
-      const modulePath = '/absolute/path/node_modules/module';
-      jest.spyOn(moduleResolver as any, 'isFile').mockReturnValue(false);
-      jest.spyOn(moduleResolver as any, 'isInsideNodeModules').mockReturnValue(true);
-      jest.spyOn(moduleResolver as any, 'getModuleNameFromNodeModulesPath').mockReturnValue('module');
-      jest.spyOn(moduleResolver as any, 'dynamicImport').mockResolvedValue({ default: { default: 'resolvedModule' } });
-      jest.spyOn(moduleResolver as any, 'getModuleType').mockResolvedValue('commonjs');
-
-      const result = await moduleResolver.resolve(modulePath);
-      expect(result).toEqual({ default: 'resolvedModule' });
-    });
-
-    it('throws an error when module type is invalid', async () => {
-      const modulePath = '/absolute/path/node_modules/module';
-      jest.spyOn(moduleResolver as any, 'isFile').mockReturnValue(false);
-      jest.spyOn(moduleResolver as any, 'isInsideNodeModules').mockReturnValue(true);
-      jest.spyOn(moduleResolver as any, 'getModuleNameFromNodeModulesPath').mockReturnValue('module');
-      jest.spyOn(moduleResolver as any, 'dynamicImport').mockResolvedValue({ default: 'resolvedModule' });
-      jest.spyOn(moduleResolver as any, 'getModuleType').mockResolvedValue('invalid');
-
-      await expect(moduleResolver.resolve(modulePath)).rejects.toThrow();
-    });
-  });
 });
