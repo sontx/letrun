@@ -1,4 +1,4 @@
-import { Description, Name, Output, Parameters, Version } from '@src/decorator/task-handler';
+import { Description, Icon, Name, Output, Parameters, Version } from '@src/decorator/task-handler';
 import Joi from 'joi';
 
 describe('TaskHandler Decorators', () => {
@@ -100,6 +100,7 @@ describe('TaskHandler Decorators', () => {
     @Name('my-task-handler')
     @Version('1.0.0')
     @Description('This is a task handler')
+    @Icon('https://example.com/icon.png')
     @Parameters(Joi.object({ name: Joi.string().required() }))
     @Output(Joi.object({ value: Joi.string().required() }))
     class MyTaskHandler extends BaseClass {}
@@ -121,13 +122,23 @@ describe('TaskHandler Decorators', () => {
     @Description('This is a task handler')
     @Parameters(schema)
     @Output(outputSchema)
+    @Icon('https://example.com/icon.png')
     class MyTaskHandler {}
 
     const instance = new MyTaskHandler();
     expect((instance as any).name).toBe('my-task-handler');
     expect((instance as any).version).toBe('1.0.0');
     expect((instance as any).description).toBe('This is a task handler');
+    expect((instance as any).icon).toBe('https://example.com/icon.png');
     expect((instance as any).parameters).toEqual(schema.describe());
     expect((instance as any).output).toEqual(outputSchema.describe());
+  });
+
+  it('should inject icon field into TaskHandler', () => {
+    @Icon('https://example.com/icon.png')
+    class MyTaskHandler {}
+
+    const instance = new MyTaskHandler();
+    expect((instance as any).icon).toBe('https://example.com/icon.png');
   });
 });

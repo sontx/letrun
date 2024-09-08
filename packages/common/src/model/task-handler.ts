@@ -22,12 +22,19 @@ export interface TaskHandlerInput {
  * Keeps the logic stateless because it will be recalled multiple times with different task data.
  */
 export interface TaskHandler<T = any> {
-  /** The name of the task handler. */
+  /**
+   * The name of the task handler.
+   * This name should be unique across all task handlers of the same {@link TaskGroup}.
+   */
   name?: string;
   /** The version of the task handler. */
   version?: string;
   /** Optional description of the task handler. */
   description?: string;
+  /**
+   * The icon url of the task handler.
+   */
+  icon?: string;
   /**
    *  An object that describes the input parameters of the task for showing help.
    *  If the task does not require any input, set this to null.
@@ -58,6 +65,7 @@ export interface TaskMetadata {
   name: string;
   version?: string;
   description?: string;
+  icon?: string;
   parameters?: Joi.Description | null;
   output?: Joi.Description | null;
 }

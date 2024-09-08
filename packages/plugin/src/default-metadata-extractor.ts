@@ -43,6 +43,7 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
         ...UNCATEGORIZED_TASK_GROUP,
         version: input.version,
         description: input.description,
+        icon: input.icon,
         type: 'script',
         tasks: {
           [input.name]: input,
@@ -66,10 +67,12 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
       description: taskGroup.description,
       author: taskGroup.author,
       type: taskGroup.type,
+      icon: taskGroup.icon,
       tasks: Object.entries(taskGroup.tasks ?? {}).map(([name, handler]) => ({
         name: handler.name ?? name,
         version: handler.version,
         description: handler.description,
+        icon: handler.icon,
         parameters: handler.parameters,
         output: handler.output,
       })),
