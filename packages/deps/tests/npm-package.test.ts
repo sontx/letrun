@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import { NpmPackage } from '@src/npm-package';
 import { expect } from '@jest/globals';
 
@@ -43,8 +44,8 @@ describe('NpmPackage', () => {
     await npmPackage.install();
 
     expect(writeFileMock).toHaveBeenCalledWith(
-      'package.json',
-      JSON.stringify({ name: 'letrun', type: 'module', main: 'letrun.js' }, null, 2),
+      path.join(workingDir, 'package.json'),
+      JSON.stringify({ name: 'letrun', type: 'module', main: 'letrun.mjs' }, null, 2),
     );
     expect(installDeps).toHaveBeenCalledTimes(1);
   });

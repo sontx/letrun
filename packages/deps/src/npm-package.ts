@@ -35,7 +35,9 @@ export class NpmPackage {
   }
 
   private async addDep(packageName: string, args?: string) {
-    return await execAsync(`npm install ${packageName} --package-lock=false ${args ?? ''}`.trim(), { cwd: this.workingDir });
+    return await execAsync(`npm install ${packageName} --package-lock=false ${args ?? ''}`.trim(), {
+      cwd: this.workingDir,
+    });
   }
 
   private async installDeps(args?: string) {
@@ -86,8 +88,8 @@ export class NpmPackage {
     const packageJson: PackageJson = {
       name: this.name,
       type: 'module',
-      main: `${this.name}.js`,
+      main: `${this.name}.mjs`,
     };
-    await fs.promises.writeFile('package.json', JSON.stringify(packageJson, null, 2));
+    await fs.promises.writeFile(path.join(this.workingDir, 'package.json'), JSON.stringify(packageJson, null, 2));
   }
 }
