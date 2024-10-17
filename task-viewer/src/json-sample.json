@@ -1,0 +1,395 @@
+{
+  "type": "object",
+  "keys": {
+    "nickName": {
+      "type": "string",
+      "flags": {
+        "presence": "required",
+        "description": "Nickname of the hero, must be between 3 and 20 characters, and not contain only lowercase letters"
+      },
+      "rules": [
+        {
+          "name": "min",
+          "args": {
+            "limit": 3
+          }
+        },
+        {
+          "name": "max",
+          "args": {
+            "limit": 20
+          }
+        },
+        {
+          "name": "pattern",
+          "args": {
+            "regex": "/^[a-z]+$/",
+            "options": {
+              "name": "alpha",
+              "invert": true
+            }
+          }
+        }
+      ],
+      "examples": [
+        "鹄思乱想"
+      ]
+    },
+    "avatar": {
+      "type": "string",
+      "flags": {
+        "presence": "required",
+        "description": "URI of the avatar image"
+      },
+      "rules": [
+        {
+          "name": "uri"
+        }
+      ]
+    },
+    "email": {
+      "type": "string",
+      "flags": {
+        "default": "some email",
+        "description": "Email address of the hero"
+      },
+      "rules": [
+        {
+          "name": "email"
+        }
+      ]
+    },
+    "ip": {
+      "type": "string",
+      "flags": {
+        "description": "IP address of the hero, can be either IPv4 or IPv6"
+      },
+      "rules": [
+        {
+          "name": "ip",
+          "args": {
+            "options": {
+              "cidr": "optional",
+              "version": [
+                "ipv4",
+                "ipv6"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "hostname": {
+      "type": "string",
+      "flags": {
+        "insensitive": true,
+        "description": "Hostname of the hero, case insensitive"
+      },
+      "rules": [
+        {
+          "name": "hostname"
+        }
+      ]
+    },
+    "gender": {
+      "type": "string",
+      "flags": {
+        "only": true,
+        "default": "Male",
+        "description": "Gender of the hero, can be Male, Female, or empty"
+      },
+      "allow": [
+        "Male",
+        "Female",
+        ""
+      ]
+    },
+    "height": {
+      "type": "number",
+      "flags": {
+        "description": "Height of the hero in centimeters, must be a positive number less than 200"
+      },
+      "rules": [
+        {
+          "name": "precision",
+          "args": {
+            "limit": 2
+          }
+        },
+        {
+          "name": "sign",
+          "args": {
+            "sign": "positive"
+          }
+        },
+        {
+          "name": "greater",
+          "args": {
+            "limit": 0
+          }
+        },
+        {
+          "name": "less",
+          "args": {
+            "limit": 200
+          }
+        }
+      ]
+    },
+    "birthday": {
+      "type": "date",
+      "flags": {
+        "format": "iso",
+        "description": "Birthday of the hero in ISO format"
+      }
+    },
+    "birthTime": {
+      "type": "date",
+      "flags": {
+        "format": "unix",
+        "description": "Birth time of the hero as a Unix timestamp"
+      }
+    },
+    "birthPlace": {
+      "type": "array",
+      "flags": {
+        "description": "Birthplace of the hero, must be an array of two strings"
+      },
+      "rules": [
+        {
+          "name": "length",
+          "args": {
+            "limit": 2
+          }
+        }
+      ],
+      "allow": [
+        "tran",
+        "xuan",
+        "son"
+      ],
+      "items": [
+        {
+          "type": "string",
+          "flags": {
+            "presence": "required"
+          }
+        }
+      ]
+    },
+    "birthStar": {
+      "type": "any",
+      "flags": {
+        "default": null,
+        "description": "Birth star of the hero, can be any type"
+      }
+    },
+    "birthStone": {
+      "type": "object",
+      "flags": {
+        "unknown": true,
+        "description": "Birthstone of the hero, can be any object"
+      }
+    },
+    "birthFlower": {
+      "type": "object",
+      "flags": {
+        "description": "Birth flower of the hero, must include name and color"
+      },
+      "keys": {
+        "name": {
+          "type": "string",
+          "flags": {
+            "presence": "required",
+            "description": "Name of the birth flower"
+          }
+        },
+        "color": {
+          "type": "string",
+          "flags": {
+            "presence": "required",
+            "description": "Color of the birth flower"
+          }
+        }
+      }
+    },
+    "birthAnimal": {
+      "type": "alternatives",
+      "flags": {
+        "description": "Birth animal of the hero, can be a string or a number"
+      },
+      "matches": [
+        {
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "schema": {
+            "type": "number"
+          }
+        }
+      ]
+    },
+    "skills": {
+      "type": "array",
+      "flags": {
+        "description": "Skills of the hero, must be an array of 1 to 3 unique items"
+      },
+      "rules": [
+        {
+          "name": "min",
+          "args": {
+            "limit": 1
+          }
+        },
+        {
+          "name": "max",
+          "args": {
+            "limit": 3
+          }
+        },
+        {
+          "name": "unique"
+        }
+      ],
+      "items": [
+        {
+          "type": "alternatives",
+          "flags": {
+            "presence": "required"
+          },
+          "matches": [
+            {
+              "schema": {
+                "type": "string",
+                "flags": {
+                  "description": "Skill Name"
+                }
+              }
+            },
+            {
+              "schema": {
+                "type": "object",
+                "keys": {
+                  "name": {
+                    "type": "string",
+                    "flags": {
+                      "presence": "required",
+                      "description": "Skill Name"
+                    },
+                    "rules": [
+                      {
+                        "name": "alphanum"
+                      },
+                      {
+                        "name": "case",
+                        "args": {
+                          "direction": "lower"
+                        }
+                      }
+                    ],
+                    "examples": [
+                      "teleport"
+                    ]
+                  },
+                  "level": {
+                    "type": "number",
+                    "flags": {
+                      "default": 50,
+                      "description": "Skill Level"
+                    },
+                    "rules": [
+                      {
+                        "name": "integer"
+                      },
+                      {
+                        "name": "min",
+                        "args": {
+                          "limit": 10
+                        }
+                      },
+                      {
+                        "name": "max",
+                        "args": {
+                          "limit": 100
+                        }
+                      },
+                      {
+                        "name": "multiple",
+                        "args": {
+                          "base": 10,
+                          "baseDecimalPlace": 0,
+                          "pfactor": 1
+                        }
+                      }
+                    ],
+                    "examples": [
+                      10
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "flags": {
+        "description": "Tags associated with the hero, must be an array of two strings"
+      },
+      "rules": [
+        {
+          "name": "length",
+          "args": {
+            "limit": 2
+          }
+        }
+      ],
+      "items": [
+        {
+          "type": "string",
+          "flags": {
+            "presence": "required"
+          }
+        }
+      ]
+    },
+    "retired": {
+      "type": "boolean",
+      "flags": {
+        "description": "Retirement status of the hero, can be true or false"
+      },
+      "falsy": [
+        "no"
+      ],
+      "truthy": [
+        "yes"
+      ]
+    },
+    "certificate": {
+      "type": "binary",
+      "flags": {
+        "encoding": "base64",
+        "description": "Certificate of the hero in base64 encoding"
+      }
+    },
+    "notes": {
+      "type": "any",
+      "flags": {
+        "description": "Additional notes about the hero"
+      },
+      "metas": [
+        {
+          "x-supported-lang": [
+            "zh-CN",
+            "en-US"
+          ],
+          "deprecated": true
+        }
+      ]
+    }
+  }
+}
