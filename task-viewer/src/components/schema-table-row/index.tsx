@@ -1,4 +1,4 @@
-import { useJsonSchema } from "@/components/schema-table-row/useJsonSchema";
+import { useJsonSchema } from "@/hooks/useJsonSchema.ts";
 import type { Description } from "joi";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,13 @@ function ValueItem({ value, secondary }: { value: any; secondary?: boolean }) {
         "text-muted-foreground": secondary,
       })}
     >
-      {value === null ? "<null>" : value === "" ? "<empty>" : value}
+      {value === null
+        ? "<null>"
+        : value === ""
+          ? "<empty>"
+          : typeof value === "boolean"
+            ? value.toString()
+            : value}
     </Badge>
   );
 }
@@ -64,16 +70,33 @@ function DefaultItems({ schema }: { schema: Description }) {
   );
 }
 
+function Notes({ notes }: { notes: string[] }) {
+  return (
+    <div className="mt-2">
+      {notes.map((note, index) => (
+        <blockquote
+          key={index}
+          className="text-sm text-muted-foreground p-2 border-s-4 border-gray-300 dark:border-gray-500"
+        >
+          {note}
+        </blockquote>
+      ))}
+    </div>
+  );
+}
+
 export function SchemaTableRow({
   schema,
   fieldName,
   className,
+  columnCount,
 }: {
   schema: Description;
   fieldName?: string;
   className?: string;
+  columnCount: number;
 }) {
-  const { required, type, description, oneOf } = useJsonSchema(schema);
+  const { required, type, description, oneOf, notes } = useJsonSchema(schema);
   const { expand, expandable, toggleExpand } = useExpandable(schema);
 
   return (
@@ -82,14 +105,19 @@ export function SchemaTableRow({
         onClick={toggleExpand}
         className={cn({ "cursor-pointer": expandable }, className)}
       >
-        <TableCell align="left">
-          {fieldName}
-          {required && <span className="text-red-600 ml-1">*</span>}
-        </TableCell>
+        {columnCount >= 4 && (
+          <TableCell align="left">
+            {fieldName}
+            {required && <span className="text-red-600 ml-1">*</span>}
+          </TableCell>
+        )}
         <TableCell align="left" className="relative">
           <ItemType schema={schema} expand={expand} expandable={expandable} />
         </TableCell>
-        <TableCell align="left">{description}</TableCell>
+        <TableCell align="left">
+          {description}
+          {notes?.length && expand && <Notes notes={notes} />}
+        </TableCell>
         <TableCell align="left">
           <DefaultItems schema={schema} />
         </TableCell>
@@ -97,13 +125,18 @@ export function SchemaTableRow({
       {expandable &&
         expand &&
         oneOf?.map((schema, index) => (
-          <SchemaTableRow key={index} schema={schema} className="bg-slate-50" />
+          <SchemaTableRow
+            key={index}
+            schema={schema}
+            className="bg-slate-50"
+            columnCount={columnCount}
+          />
         ))}
       {expandable && type === "object" && expand && (
         <TableRow className="bg-slate-50">
           {Object.keys(schema.keys ?? {}).length > 0 ? (
             <>
-              <TableCell />
+              {columnCount >= 4 && <TableCell />}
               <TableCell align="left" className="pl-0" colSpan={3}>
                 <SchemaTable schema={schema} />
               </TableCell>

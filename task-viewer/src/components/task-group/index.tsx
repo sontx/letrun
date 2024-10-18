@@ -18,7 +18,12 @@ function TaskList({
 }) {
   const tasks = meta.tasks;
   return (
-    <Accordion type="single" collapsible className={className}>
+    <Accordion
+      type="single"
+      collapsible
+      value={tasks.length > 1 ? undefined : tasks[0].name}
+      className={className}
+    >
       {tasks.map((task) => (
         <AccordionItem value={task.name} key={task.name}>
           <AccordionTrigger className="!no-underline">

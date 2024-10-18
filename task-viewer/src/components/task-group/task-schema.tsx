@@ -23,7 +23,7 @@ export function TaskSchema({
       >
         {icon} {title}
       </div>
-      {schema?.keys ? (
+      {schema ? (
         <SchemaTable schema={schema} className="border" />
       ) : (
         <p className="text-muted-foreground text-center pb-2">{empty}</p>

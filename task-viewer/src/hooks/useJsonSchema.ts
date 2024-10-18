@@ -7,6 +7,7 @@ interface JsonSchema {
   max?: string;
   availableValues?: string[];
   description?: string;
+  notes?: string[];
   type?: string;
   defaultValue?: any;
   oneOf?: JsonSchema[];
@@ -49,7 +50,7 @@ function getMinMax(schema: Description) {
   // Check for greater and less rules for number type
   if (schema.type === "number") {
     const greaterRule = schema.rules.find(
-      (rule: any) => rule.name === "greater"
+      (rule: any) => rule.name === "greater",
     );
     const lessRule = schema.rules.find((rule: any) => rule.name === "less");
     if (greaterRule) {
@@ -97,6 +98,7 @@ function createJsonSchema(schema: Description) {
     required: flags?.presence === "required",
     defaultValue: flags?.default,
     allowUnknown: flags?.unknown,
+    notes: schema.notes,
   };
 
   // Determine the type and add additional constraints if applicable
