@@ -1,8 +1,8 @@
 import {
   countTasks,
   Description,
+  Designer,
   DisplayName,
-  Icon,
   isWorkflowTaskDefsEmpty,
   Keywords,
   Name,
@@ -43,7 +43,10 @@ const OutputSchema = Joi.string().description('The target case to switch to');
 @DisplayName('Switch')
 @Keywords('case', 'decision', 'branch', 'condition', 'conditional')
 @Description('Chooses tasks based on input values')
-@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/switch.svg')
+@Designer({
+  icon: 'https://raw.githubusercontent.com/sontx/letrun/main/icons/switch.svg',
+  nodeType: 'switch',
+})
 @Parameters(Schema)
 @Output(OutputSchema)
 export class SwitchTaskHandler implements TaskHandler {

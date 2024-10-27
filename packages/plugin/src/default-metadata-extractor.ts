@@ -44,7 +44,7 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
         version: input.version,
         description: input.description,
         keywords: input.keywords,
-        icon: input.icon,
+        icon: input.designer?.icon,
         type: 'script',
         tasks: {
           [input.name]: input,
@@ -77,7 +77,7 @@ export default class DefaultMetadataExtractor extends AbstractPlugin implements 
         keywords: handler.keywords,
         version: handler.version,
         description: handler.description,
-        icon: handler.icon,
+        designer: handler.designer,
         parameters: handler.parameters,
         output: handler.output,
       })),

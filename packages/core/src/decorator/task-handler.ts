@@ -1,5 +1,5 @@
 import { injectFieldDecorator } from '@src/utils';
-import { TaskHandler } from '@letrun/common';
+import { DesignerMetadata, TaskHandler } from '@letrun/common';
 import type Joi from 'joi';
 
 /**
@@ -51,19 +51,24 @@ export function Description(value: string) {
 }
 
 /**
- * A decorator that injects the icon field to a {@link TaskHandler}. See {@link TaskHandler.icon}.
- * @param value
+ * A decorator that injects the designer field to a {@link TaskHandler}. See {@link TaskHandler.designer}.
+ * To control how the task handler is displayed in the designer, you can use this decorator to inject the designer metadata.
+ * @param value - task handler designer metadata.
  * @constructor
  *
  * @example
  * ```ts
- * @Icon('https://example.com/icon.png')
+ * @Designer({
+ *   icon: 'https://example.com/icon.png',
+ *   isTerminal: true,
+ *   nodeType: 'task',
+ * })
  * class MyTaskHandler implements TaskHandler {
  * }
  * ```
  */
-export function Icon(value: string) {
-  return injectFieldDecorator('icon', value);
+export function Designer(value: DesignerMetadata) {
+  return injectFieldDecorator('designer', value);
 }
 
 /**

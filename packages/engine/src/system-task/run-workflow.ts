@@ -1,7 +1,7 @@
 import {
   Description,
+  Designer,
   DisplayName,
-  Icon,
   Keywords,
   Name,
   Output,
@@ -35,7 +35,10 @@ const OutputSchema = Joi.any().description('The output of the sub-workflow');
 @DisplayName('Run Workflow')
 @Keywords('workflow', 'sub-workflow')
 @Description('Runs another workflow within the current workflow')
-@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/workflow.svg')
+@Designer({
+  icon: 'https://raw.githubusercontent.com/sontx/letrun/main/icons/workflow.svg',
+  nodeType: 'workflow',
+})
 @Parameters(Schema)
 @Output(OutputSchema)
 export class RunWorkflowTaskHandler implements TaskHandler {

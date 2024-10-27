@@ -37,10 +37,7 @@ export interface TaskHandler<T = any> {
   version?: string;
   /** Optional description of the task handler. */
   description?: string;
-  /**
-   * The icon url of the task handler.
-   */
-  icon?: string;
+
   /**
    * Optional keywords to match against when filtering.
    */
@@ -57,6 +54,11 @@ export interface TaskHandler<T = any> {
   output?: Joi.Description | null;
 
   /**
+   * The metadata for the designer.
+   */
+  designer?: DesignerMetadata;
+
+  /**
    * Handles the task.
    * @param input - The input for the task handler.
    * @returns A promise that resolves to the output of the task handler.
@@ -68,6 +70,28 @@ export interface TaskHandlerConstructor {
   new (): TaskHandler;
 }
 
+export interface DesignerMetadata {
+  /**
+   * The icon url of the task handler.
+   * This icon will be used in the designer.
+   */
+  icon?: string;
+
+  /**
+   * Whether the task handler is a terminal task.
+   * A terminal task is a task that cannot have any outgoing edges, so it is the last task in the branch.
+   */
+  isTerminal?: boolean;
+
+  /**
+   * The type of the node in the designer.
+   * This type is used to determine the appearance of the node in the designer.
+   *
+   * Default is 'task'.
+   */
+  nodeType?: string;
+}
+
 /**
  * Metadata for describing a task.
  */
@@ -77,7 +101,7 @@ export interface TaskMetadata {
   version?: string;
   description?: string;
   keywords?: string[];
-  icon?: string;
+  designer?: DesignerMetadata;
   parameters?: Joi.Description | null;
   output?: Joi.Description | null;
 }

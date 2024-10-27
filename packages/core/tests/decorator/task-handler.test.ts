@@ -1,7 +1,6 @@
 import {
-  Description,
+  Description, Designer,
   DisplayName,
-  Icon,
   Keywords,
   Name,
   Output,
@@ -109,7 +108,11 @@ describe('TaskHandler Decorators', () => {
     @Name('my-task-handler')
     @Version('1.0.0')
     @Description('This is a task handler')
-    @Icon('https://example.com/icon.png')
+    @Designer({
+      icon: 'https://example.com/icon.png',
+      isTerminal: true,
+      nodeType: 'task',
+    })
     @Parameters(Joi.object({ name: Joi.string().required() }))
     @Output(Joi.object({ value: Joi.string().required() }))
     class MyTaskHandler extends BaseClass {}
@@ -133,7 +136,11 @@ describe('TaskHandler Decorators', () => {
     @Keywords('task', 'handler')
     @Parameters(schema)
     @Output(outputSchema)
-    @Icon('https://example.com/icon.png')
+    @Designer({
+      icon: 'https://example.com/icon.png',
+      isTerminal: true,
+      nodeType: 'task',
+    })
     class MyTaskHandler {}
 
     const instance = new MyTaskHandler();
@@ -142,17 +149,25 @@ describe('TaskHandler Decorators', () => {
     expect((instance as any).version).toBe('1.0.0');
     expect((instance as any).description).toBe('This is a task handler');
     expect((instance as any).keywords).toEqual(['task', 'handler']);
-    expect((instance as any).icon).toBe('https://example.com/icon.png');
+    expect((instance as any).designer).toEqual({
+      icon: 'https://example.com/icon.png',
+      isTerminal: true,
+      nodeType: 'task',
+    });
     expect((instance as any).parameters).toEqual(schema.describe());
     expect((instance as any).output).toEqual(outputSchema.describe());
   });
 
-  it('should inject icon field into TaskHandler', () => {
-    @Icon('https://example.com/icon.png')
+  it('should inject designer field into TaskHandler', () => {
+    @Designer({
+      icon: 'https://example.com/icon.png',
+    })
     class MyTaskHandler {}
 
     const instance = new MyTaskHandler();
-    expect((instance as any).icon).toBe('https://example.com/icon.png');
+    expect((instance as any).designer).toEqual({
+      icon: 'https://example.com/icon.png',
+    });
   });
 
   it('should inject displayName field into TaskHandler', () => {

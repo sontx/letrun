@@ -1,8 +1,8 @@
 import {
   delayMs,
   Description,
+  Designer,
   DisplayName,
-  Icon,
   Keywords,
   Name,
   Output,
@@ -31,7 +31,10 @@ const OutputSchema = Joi.any().description('The "data" field from the input para
 @DisplayName('Delay')
 @Keywords('delay', 'wait', 'time')
 @Description('Delays the execution of the workflow for a specified amount of time')
-@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/delay.svg')
+@Designer({
+  icon: 'https://raw.githubusercontent.com/sontx/letrun/main/icons/delay.svg',
+  nodeType: 'delay',
+})
 @Parameters(Schema)
 @Output(OutputSchema)
 export class DelayTaskHandler implements TaskHandler {

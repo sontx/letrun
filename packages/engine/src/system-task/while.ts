@@ -1,7 +1,7 @@
 import {
   Description,
+  Designer,
   DisplayName,
-  Icon,
   Keywords,
   Name,
   Output,
@@ -52,7 +52,10 @@ const OutputSchema = Joi.object({
 @DisplayName('While')
 @Keywords('loop', 'iterate', 'each')
 @Description('Loops through tasks until a condition is met')
-@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/while.svg')
+@Designer({
+  icon: 'https://raw.githubusercontent.com/sontx/letrun/main/icons/while.svg',
+  nodeType: 'while',
+})
 @Parameters(Schema)
 @Output(OutputSchema)
 export class WhileTaskHandler implements TaskHandler {

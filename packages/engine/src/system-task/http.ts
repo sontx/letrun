@@ -1,4 +1,13 @@
-import { Description, DisplayName, Icon, Keywords, Name, Output, Parameters, validateParameters } from '@letrun/core';
+import {
+  Description,
+  Designer,
+  DisplayName,
+  Keywords,
+  Name,
+  Output,
+  Parameters,
+  validateParameters,
+} from '@letrun/core';
 import { TaskHandler, TaskHandlerInput } from '@letrun/common';
 import Joi from 'joi';
 
@@ -74,7 +83,10 @@ const OutputSchema = Joi.any().description('The response data from the HTTP requ
 @DisplayName('HTTP Request')
 @Keywords('http', 'request', 'fetch')
 @Description('Sends HTTP requests and processes responses')
-@Icon('https://raw.githubusercontent.com/sontx/letrun/main/icons/http.svg')
+@Designer({
+  icon: 'https://raw.githubusercontent.com/sontx/letrun/main/icons/http.svg',
+  nodeType: 'http',
+})
 @Parameters(Schema)
 @Output(OutputSchema)
 export class HttpTaskHandler implements TaskHandler {

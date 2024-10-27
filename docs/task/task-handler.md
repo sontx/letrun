@@ -55,7 +55,10 @@ A task handler should have the following structure:
 - `displayName`: The display name of the task, if not defined, we'll use the task name. This is optional.
 - `description`: A brief description of the task, this is optional.
 - `version`: The version of the task, we'll use the package version if not defined. This is optional.
-- `icon`: The icon url of the task, this is optional.
+- `designer`: The metadata for the task designer, this is optional.
+  - `icon`: The icon url of the task, this is optional.
+  - `isTerminal`: A terminal task is a task that cannot have any outgoing edges, so it is the last task in the branch. This is optional.
+  - `nodeType`: This type is used to determine the appearance of the node in the designer, default is `task`. This is optional.
 - `keywords`: An array of keywords for filtering tasks, this is optional.
 - `parameters`: An object that describes the input parameters of the task for showing help, set null if the task doesn't have parameters. This is optional.
 - `output`: An object that describes the output of the task for showing help, set null if the task doesn't have output. This is optional.
@@ -67,7 +70,7 @@ There are alternative ways to define those fields by using these corresponding d
 - `@DisplayName`: The display name of the task.
 - `@Description`: A brief description of the task.
 - `@Version`: The version of the task.
-- `@Icon`: The icon url of the task.
+- `@Designer`: The metadata for the task designer.
 - `@Keywords`: An array of keywords for filtering tasks.
 - `@Parameters`: An object that describes the input parameters of the task for showing help. No value or null means the task doesn't have parameters.
 - `@Output`: An object that describes the output of the task for showing help. No value or null means the task doesn't have output.
