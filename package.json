@@ -11,7 +11,7 @@
     "test": "npm run test -ws --if-present",
     "coverage": "npm run coverage -ws --if-present",
     "build": "npm run build:all && npm run copy",
-    "build:all": "npm run build:common &&npm run build:core && npm run build:deps && npm run build:plugin && npm run build:task && npm run build:engine && npm run build:cli",
+    "build:all": "npm run build:common &&npm run build:core && npm run build:deps && npm run build:plugin && npm run build:task && npm run build:engine && npm run build:cli && npm run build:viewer && npm run build:task-viewer",
     "build:common": "npm run build -w @letrun/common",
     "build:core": "npm run build -w @letrun/core",
     "build:deps": "npm run build -w @letrun/deps",
@@ -19,11 +19,15 @@
     "build:task": "npm run build -w @letrun/task",
     "build:engine": "npm run build -w @letrun/engine",
     "build:cli": "npm run build -w @letrun/cli",
+    "build:viewer": "npm run build -w @letrun/viewer",
+    "build:task-viewer": "npm run build -w @letrun/task-viewer",
     "clean": "rm -rf ./dist/**",
-    "copy": "npm run copy:cli && npm run copy:task && npm run copy:bin",
+    "copy": "npm run copy:cli && npm run copy:task && npm run copy:bin && npm run copy:viewer && npm run copy:task-viewer",
     "copy:cli": "copyfiles -f ./packages/cli/dist/**/*.mjs ./dist",
     "copy:bin": "copyfiles -f ./bin/* ./dist",
-    "copy:task": "copyfiles -f ./packages/task/dist/**/*.js ./dist/tasks"
+    "copy:task": "copyfiles -f ./packages/task/dist/**/*.js ./dist/tasks",
+    "copy:viewer": "copyfiles -f ./packages/viewer/dist/** ./dist",
+    "copy:task-viewer": "rm -rf ./dist/public/** && mkdirp ./dist/public && cp -r ./task-viewer/dist/** ./dist/public"
   },
   "repository": {
     "type": "git",
@@ -35,7 +39,8 @@
   },
   "homepage": "https://github.com/sontx/letrun#readme",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "task-viewer"
   ],
   "engines": {
     "node": ">=20",

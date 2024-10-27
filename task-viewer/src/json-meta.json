@@ -1,0 +1,583 @@
+{
+  "name": "System",
+  "description": "Built-in tasks",
+  "tasks": [
+    {
+      "name": "if",
+      "description": "Executes tasks based on conditions",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/if.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "left": {
+            "type": "any",
+            "flags": {
+              "presence": "required"
+            }
+          },
+          "operator": {
+            "type": "string",
+            "flags": {
+              "presence": "required"
+            },
+            "allow": [
+              "==",
+              "=",
+              "!=",
+              "<>",
+              ">",
+              "<",
+              ">=",
+              "<=",
+              "in",
+              "not in",
+              "contains",
+              "not contains",
+              "matches regex",
+              "is empty",
+              "is not empty",
+              "is defined",
+              "is not defined",
+              "truly",
+              "is truly",
+              "falsy",
+              "is falsy"
+            ]
+          },
+          "right": {
+            "type": "any"
+          }
+        }
+      },
+      "output": {
+        "type": "boolean",
+        "flags": {
+          "description": "The result of the expression"
+        }
+      }
+    },
+    {
+      "name": "switch",
+      "description": "Chooses tasks based on input values",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/switch.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "expression": {
+            "type": "string",
+            "flags": {
+              "description": "The result of this expression will be matched with the target case",
+              "presence": "required"
+            }
+          },
+          "language": {
+            "type": "string",
+            "flags": {
+              "description": "The language of the expression, if not provided, the expression will be treated as other parameter"
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "string",
+        "flags": {
+          "description": "The target case to switch to"
+        }
+      }
+    },
+    {
+      "name": "for",
+      "description": "Loops through a specified range and performs tasks",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/for.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "from": {
+            "type": "number",
+            "flags": {
+              "description": "The iterator will loop from this value",
+              "presence": "required"
+            }
+          },
+          "to": {
+            "type": "number",
+            "flags": {
+              "description": "The iterator will loop until reach this value",
+              "presence": "required"
+            }
+          },
+          "step": {
+            "type": "number",
+            "flags": {
+              "description": "The iterator will plus this value each time it's looped until it reaches the 'to' value",
+              "default": 1
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "keys": {
+          "index": {
+            "type": "number",
+            "flags": {
+              "description": "The current index of the loop, starting from the \"from\" value"
+            }
+          },
+          "iteration": {
+            "type": "number",
+            "flags": {
+              "description": "The current iteration of the loop, starting from 0"
+            }
+          },
+          "from": {
+            "type": "number",
+            "flags": {
+              "description": "The starting value of the loop"
+            }
+          },
+          "to": {
+            "type": "number",
+            "flags": {
+              "description": "The ending value of the loop"
+            }
+          },
+          "step": {
+            "type": "number",
+            "flags": {
+              "description": "The step value of the loop"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "while",
+      "description": "Loops through tasks until a condition is met",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/while.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "expression": {
+            "type": "string",
+            "flags": {
+              "description": "The javascript expression to evaluate",
+              "presence": "required"
+            }
+          },
+          "mode": {
+            "type": "string",
+            "flags": {
+              "only": true,
+              "description": "- doWhile: do tasks first, check condition after\n- whileDo: check condition first, do tasks after",
+              "default": "doWhile"
+            },
+            "allow": [
+              "doWhile",
+              "whileDo"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "flags": {
+              "description": "The language of the expression",
+              "default": "javascript"
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "keys": {
+          "iteration": {
+            "type": "number",
+            "flags": {
+              "description": "The current iteration of the loop, starting from 0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "iterate",
+      "description": "Loops through a list of items and performs tasks",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/iterate.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "items": {
+            "type": "any",
+            "flags": {
+              "description": "An array of items to iterate over",
+              "presence": "required"
+            },
+            "rules": [
+              {
+                "name": "custom",
+                "args": {}
+              }
+            ]
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "keys": {
+          "iteration": {
+            "type": "number",
+            "flags": {
+              "description": "The current iteration of the loop, starting from 0"
+            }
+          },
+          "item": {
+            "type": "any",
+            "flags": {
+              "description": "The current item in the iteration"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "catch",
+      "description": "Handles errors during task execution",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/catch.svg",
+      "parameters": {
+        "type": "object",
+        "dependencies": [
+          {
+            "rel": "oxor",
+            "peers": [
+              "errorName",
+              "expression"
+            ]
+          }
+        ],
+        "keys": {
+          "errorName": {
+            "type": "string",
+            "flags": {
+              "description": "The error name to match against the caught error if the catch is executed"
+            }
+          },
+          "expression": {
+            "type": "string",
+            "flags": {
+              "description": "The script expression to evaluate to determine if the catch should be executed"
+            }
+          },
+          "language": {
+            "type": "string",
+            "flags": {
+              "description": "The language of the expression",
+              "default": "javascript"
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "keys": {
+          "handledBlocks": {
+            "type": "array",
+            "flags": {
+              "description": "The handled blocks"
+            },
+            "items": [
+              {
+                "type": "string",
+                "allow": [
+                  "catch",
+                  "finally"
+                ]
+              }
+            ]
+          },
+          "error": {
+            "type": "object",
+            "flags": {
+              "description": "The error that was caught"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "run-workflow",
+      "description": "Runs another workflow within the current workflow",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/workflow.svg",
+      "parameters": {
+        "type": "object",
+        "dependencies": [
+          {
+            "rel": "xor",
+            "peers": [
+              "file",
+              "workflow"
+            ]
+          }
+        ],
+        "keys": {
+          "file": {
+            "type": "string",
+            "flags": {
+              "description": "The file path to the workflow to run"
+            }
+          },
+          "workflow": {
+            "type": "any",
+            "flags": {
+              "description": "Either the workflow object, workflow definition object or their text content to run"
+            }
+          },
+          "input": {
+            "type": "any",
+            "flags": {
+              "description": "The input to pass to the workflow"
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "any",
+        "flags": {
+          "description": "The output of the sub-workflow"
+        }
+      }
+    },
+    {
+      "name": "log",
+      "description": "Outputs messages or errors for debugging",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/log.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "level": {
+            "type": "string",
+            "flags": {
+              "default": "info",
+              "only": true
+            },
+            "allow": [
+              "debug",
+              "info",
+              "warn",
+              "error"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "flags": {
+              "presence": "required"
+            }
+          }
+        }
+      },
+      "output": null
+    },
+    {
+      "name": "http",
+      "description": "Sends HTTP requests and processes responses",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/http.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "url": {
+            "type": "string",
+            "flags": {
+              "description": "The URL endpoint to send request",
+              "presence": "required"
+            },
+            "rules": [
+              {
+                "name": "uri"
+              }
+            ]
+          },
+          "method": {
+            "type": "string",
+            "flags": {
+              "description": "The HTTP method of this request",
+              "only": true,
+              "default": "GET"
+            },
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE",
+              "PATCH"
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "flags": {
+              "description": "The request's headers"
+            },
+            "patterns": [
+              {
+                "schema": {
+                  "type": "string"
+                },
+                "rule": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "body": {
+            "type": "any",
+            "flags": {
+              "description": "The request body"
+            }
+          },
+          "timeoutMs": {
+            "type": "number",
+            "flags": {
+              "description": "The total waiting time for the response in milliseconds, the request will be canceled after timed out"
+            },
+            "rules": [
+              {
+                "name": "integer"
+              },
+              {
+                "name": "min",
+                "args": {
+                  "limit": 0
+                }
+              }
+            ]
+          },
+          "params": {
+            "type": "object",
+            "flags": {
+              "description": "The query parameters"
+            },
+            "patterns": [
+              {
+                "schema": {
+                  "type": "string"
+                },
+                "rule": {
+                  "type": "any"
+                }
+              }
+            ]
+          },
+          "responseType": {
+            "type": "string",
+            "flags": {
+              "description": "The response type you wish receiving",
+              "only": true,
+              "default": "json"
+            },
+            "allow": [
+              "json",
+              "text",
+              "blob"
+            ]
+          }
+        }
+      },
+      "output": {
+        "type": "any",
+        "flags": {
+          "description": "The response data from the HTTP request which depends on the responseType"
+        }
+      }
+    },
+    {
+      "name": "lambda",
+      "description": "Evaluates a lambda expression.",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/lambda.svg",
+      "parameters": {
+        "type": "object",
+        "flags": {
+          "presence": "required"
+        },
+        "dependencies": [
+          {
+            "rel": "xor",
+            "peers": [
+              "expression",
+              "file"
+            ]
+          }
+        ],
+        "keys": {
+          "expression": {
+            "type": "string",
+            "flags": {
+              "description": "The expression to evaluate."
+            }
+          },
+          "file": {
+            "type": "string",
+            "flags": {
+              "description": "The file to read the expression from."
+            }
+          },
+          "input": {
+            "type": "any",
+            "flags": {
+              "description": "The input to use when evaluating the expression."
+            }
+          },
+          "language": {
+            "type": "string",
+            "flags": {
+              "description": "The language to use when evaluating the expression."
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "any",
+        "flags": {
+          "description": "The result of the lambda expression."
+        }
+      }
+    },
+    {
+      "name": "delay",
+      "description": "Delays the execution of the workflow for a specified amount of time",
+      "icon": "https://raw.githubusercontent.com/sontx/letrun/main/icons/delay.svg",
+      "parameters": {
+        "type": "object",
+        "keys": {
+          "time": {
+            "type": "alternatives",
+            "flags": {
+              "description": "The time to delay, it can be a readable string (1s, 2m, 3 hours...) or a number in milliseconds",
+              "presence": "required"
+            },
+            "matches": [
+              {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            ]
+          },
+          "data": {
+            "type": "any",
+            "flags": {
+              "description": "The data to pass to the output on time out"
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "any",
+        "flags": {
+          "description": "The \"data\" field from the input parameters"
+        }
+      }
+    }
+  ]
+}

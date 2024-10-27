@@ -1,0 +1,27 @@
+{
+  "name": "@letrun/viewer",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.js && npm run copy",
+    "build:prod": "node esbuild.js --prod && npm run copy",
+    "copy": "copyfiles -f ./bin/** ./dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.11.5",
+    "@types/pako": "^2.0.3",
+    "esbuild": "^0.23.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "get-port": "^7.1.0",
+    "open": "^10.1.0",
+    "pako": "^2.1.0"
+  }
+}
